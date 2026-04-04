@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem RPG</title>
+    <style>
+        :root {
+            --bg-dark: #0B132B;
+            --bg-light: #1C2541;
+            --main-color: #2EC4B6;
+            --sec-color: #3A86FF;
+            --text-color: #EAEAEA;
+            --alert-color: #FF6B6B;
+            --border-color: #2A3B5C;
+            --hud-pv: #FF6B6B;
+            --hud-ps: #8338EC;
+            --hud-pe: #2EC4B6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--bg-dark), var(--bg-light));
+            color: var(--text-color);
+            line-height: 1.4;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        /* Efeito de Céu Estrelado */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Layout Base */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Navegação */
+        header {
+            background: rgba(11, 19, 43, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+            backdrop-filter: blur(5px);
+        }
+
+        nav {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        nav a.active, nav a:hover {
+            background: rgba(46, 196, 182, 0.1);
+            color: var(--main-color);
+            border-color: var(--main-color);
+        }
+
+        main {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        section {
+            background: rgba(28, 37, 65, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            scroll-margin-top: 60px;
+        }
+
+        h2 {
+            color: var(--sec-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        /* Formulários e Inputs */
+        .form-group {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: var(--main-color);
+            margin-bottom: 3px;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            background: rgba(11, 19, 43, 0.7);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--sec-color);
+            box-shadow: 0 0 5px rgba(58, 134, 255, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Seção Personagem */
+        .char-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .avatar-container {
+            aspect-ratio: 3/4;
+            background: rgba(0,0,0,0.3);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+
+        .avatar-input {
+            position: absolute;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* HUD Atributos Vitais */
+        .hud-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(11, 19, 43, 0.8);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hud-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-label { font-weight: bold; width: 25px; }
+
+        .hud-bar-wrapper {
+            flex-grow: 1;
+            height: 8px;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #333;
+        }
+
+        .hud-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease, background-color 0.3s;
+        }
+
+        .btn-hud {
+            background: var(--border-color);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-hud:active { transform: scale(0.9); }
+
+        .hud-inputs {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .hud-inputs input {
+            width: 40px;
+            padding: 2px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        /* Accordions (Traços, Equipamentos, Espíritos) */
+        details {
+            background: rgba(11, 19, 43, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        summary {
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--main-color);
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        summary:hover { background: rgba(58, 134, 255, 0.1); }
+        summary::after { content: '+'; color: var(--sec-color); }
+        details[open] > summary::after { content: '-'; }
+
+        .details-content {
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Perícias e Tooltips */
+        .skills-grid { display: flex; flex-direction: column; gap: 10px; }
+        .skill-category {
+            background: rgba(11, 19, 43, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .cat-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            color: var(--sec-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .skill-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .skill-row:last-child { border-bottom: none; }
+        .skill-row input {
+            width: 50px;
+            text-align: right;
+            padding: 4px;
+            font-weight: bold;
+            color: var(--main-color);
+        }
+
+        /* Sistema de Tooltip d100 */
+        .tooltip {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.95);
+            background: var(--bg-light);
+            border: 1px solid var(--sec-color);
+            padding: 8px;
+            border-radius: 6px;
+            width: max-content;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            pointer-events: none;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .skill-row:hover .tooltip, .skill-row input:focus + .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .tooltip-title { font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); }
+        .t-des { color: var(--alert-color); }
+        .t-fra { color: #999; }
+        .t-suc { color: var(--sec-color); }
+        .t-bom { color: var(--main-color); }
+        .t-ext { color: #FFD166; }
+
+        /* Status Fixos */
+        .fixed-stats {
+            background: rgba(46, 196, 182, 0.1);
+            border: 1px solid var(--main-color);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        /* Desktop (Media Query) */
+        @media (min-width: 768px) {
+            .app-container { flex-direction: row; align-items: flex-start; }
+            header {
+                width: 200px;
+                height: 100vh;
+                position: sticky;
+                top: 0;
+                border-right: 1px solid var(--border-color);
+                border-bottom: none;
+            }
+            nav { flex-direction: column; padding: 20px 10px; }
+            main { flex: 1; padding: 20px; }
+            .char-grid { grid-template-columns: 250px 1fr; }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            /* Se for tela muito grande, 3 colunas de perícias */
+            @media (min-width: 1100px) { .skills-grid { grid-template-columns: repeat(3, 1fr); } }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <nav id="navbar">
+            <a href="#personagem" class="active">Personagem</a>
+            <a href="#tracos">Traços</a>
+            <a href="#inventario">Inventário</a>
+            <a href="#equipamentos">Equip. Especiais</a>
+            <a href="#espiritos">Espíritos</a>
+            <a href="#pericias">Perícias</a>
+            <a href="#historico">Histórico</a>
+            <a href="#anotacoes">Anotações</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="personagem">
+            <h2>Personagem</h2>
+            
+            <div class="fixed-stats">
+                Total de Pontos (Perícias): <span id="total-pontos">0</span>
+            </div>
+
+            <div class="char-grid">
+                <div class="left-col">
+                    <div class="avatar-container">
+                        <span style="color: var(--text-color); font-size: 0.8rem; z-index: 0;">Toque para foto</span>
+                        <img id="avatar-preview" src="" style="display:none;">
+                        <input type="file" id="avatar-upload" class="avatar-input" accept="image/*">
+                    </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label>Aparência</label>
+                        <textarea class="data-save" id="char-aparencia" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Fobias</label>
+                        <textarea class="data-save" id="char-fobias" rows="2"></textarea>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    <div class="form-group"><label>Nome</label><input type="text" class="data-save" id="char-nome"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;"><label>Idade</label><input type="number" class="data-save" id="char-idade"></div>
+                        <div class="form-group" style="flex: 1;"><label>Ano</label><input type="number" class="data-save" id="char-ano"></div>
+                    </div>
+                    <div class="form-group"><label>Nacionalidade</label><input type="text" class="data-save" id="char-nacionalidade"></div>
+                    <div class="form-group"><label>Profissão</label><input type="text" class="data-save" id="char-profissao"></div>
+                    <div class="form-group"><label>Nível de Corrupção</label><input type="number" class="data-save" id="char-corrupcao"></div>
+
+                    <div class="hud-container" style="margin-top: 15px;">
+                        <div class="hud-row">
+                            <span class="hud-label" style="color: var(--hud-pv);">PV</span>
+                            <button class="btn-hud" onclick="modVital('pv', -1)">-</button>
+                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-pv" style="background: var(--hud-pv); width: 100%;"></div></div>
+                            <button class="btn-hud" onclick="modVital('pv', 1)">+</button>
+                            <div class="hud-inputs">
+                                <input type="number" class="data-save vital-input" id="pv-atual" value="115" onchange="updateHUD()"> / 
+                                <input type="number" class="data-save vital-input" id="pv-max" value="115" onchange="updateHUD()">
+                            </div>
+                        </div>
+                        <div class="hud-row">
+                            <span class="hud-label" style="color: var(--hud-ps);">PS</span>
+                            <button class="btn-hud" onclick="modVital('ps', -1)">-</button>
+                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-ps" style="background: var(--hud-ps); width: 80%;"></div></div>
+                            <button class="btn-hud" onclick="modVital('ps', 1)">+</button>
+                            <div class="hud-inputs">
+                                <input type="number" class="data-save vital-input" id="ps-atual" value="44" onchange="updateHUD()"> / 
+                                <input type="number" class="data-save vital-input" id="ps-max" value="55" onchange="updateHUD()">
+                            </div>
+                        </div>
+                        <div class="hud-row">
+                            <span class="hud-label" style="color: var(--hud-pe);">PE</span>
+                            <button class="btn-hud" onclick="modVital('pe', -1)">-</button>
+                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-pe" style="background: var(--hud-pe); width: 75%;"></div></div>
+                            <button class="btn-hud" onclick="modVital('pe', 1)">+</button>
+                            <div class="hud-inputs">
+                                <input type="number" class="data-save vital-input" id="pe-atual" value="180" onchange="updateHUD()"> / 
+                                <input type="number" class="data-save vital-input" id="pe-max" value="240" onchange="updateHUD()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tracos">
+            <h2>Traços</h2>
+            <div id="tracos-list">
+                <details>
+                    <summary><input type="text" class="data-save" id="traco-1-nome" placeholder="Nome do Traço" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
+                    <div class="details-content">
+                        <textarea class="data-save" id="traco-1-desc" placeholder="Descrição completa..." style="width: 100%;"></textarea>
+                    </div>
+                </details>
+                <details>
+                    <summary><input type="text" class="data-save" id="traco-2-nome" placeholder="Nome do Traço" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
+                    <div class="details-content">
+                        <textarea class="data-save" id="traco-2-desc" placeholder="Descrição completa..." style="width: 100%;"></textarea>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="inventario">
+            <h2>Inventário</h2>
+            <div class="form-group">
+                <label>Mochila / Equipamentos / Consumíveis / Utilidades (Item | Qtd)</label>
+                <textarea class="data-save" id="inventario-texto" rows="6" placeholder="- Faca de combate (1)\n- Kit médico (3)"></textarea>
+            </div>
+        </section>
+
+        <section id="equipamentos">
+            <h2>Equip. Especiais</h2>
+            <details>
+                <summary><input type="text" class="data-save" id="equip-1-nome" placeholder="Nome do Equipamento" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
+                <div class="details-content">
+                    <textarea class="data-save" id="equip-1-desc" placeholder="Descrição e Efeitos..." style="width: 100%; margin-bottom: 5px;"></textarea>
+                    <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" class="data-save" id="equip-1-usado"> Usado/Equipado</label>
+                    <details style="margin-top: 10px; border-color: var(--sec-color);">
+                        <summary style="color: var(--sec-color); font-size: 0.9rem;">Habilidade</summary>
+                        <div class="details-content">
+                            <input type="text" class="data-save" id="equip-1-hab-nome" placeholder="Nome da Habilidade" style="width: 100%; margin-bottom: 5px;">
+                            <textarea class="data-save" id="equip-1-hab-desc" placeholder="Descrição da habilidade..." style="width: 100%;"></textarea>
+                            <input type="text" class="data-save" id="equip-1-hab-custo" placeholder="Custo (ex: 10 PE)" style="width: 100%; margin-top: 5px;">
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <section id="espiritos">
+            <h2>Espíritos</h2>
+            <details>
+                <summary><input type="text" class="data-save" id="esp-1-nome" placeholder="Nome do Espírito" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
+                <div class="details-content">
+                    <input type="text" class="data-save" id="esp-1-elemento" placeholder="Elemento" style="width: 100%; margin-bottom: 5px;">
+                    <textarea class="data-save" id="esp-1-desc" placeholder="Descrição do Espírito..." style="width: 100%; margin-bottom: 5px;"></textarea>
+                    <details style="margin-top: 10px; border-color: #8338EC;">
+                        <summary style="color: #8338EC; font-size: 0.9rem;">Habilidade Espiritual</summary>
+                        <div class="details-content">
+                            <input type="text" class="data-save" id="esp-1-hab-nome" placeholder="Nome da Habilidade" style="width: 100%; margin-bottom: 5px;">
+                            <textarea class="data-save" id="esp-1-hab-desc" placeholder="Descrição..." style="width: 100%;"></textarea>
+                        </div>
+                    </details>
+                </div>
+            </details>
+        </section>
+
+        <section id="pericias">
+            <h2>Perícias <span style="font-size: 0.8rem; color: #999; font-weight: normal; text-transform: none;">(Toque/Passe o mouse no número)</span></h2>
+            <div class="skills-grid" id="skills-container">
+                </div>
+        </section>
+
+        <section id="historico">
+            <h2>Histórico</h2>
+            <textarea class="data-save" id="hist-texto" rows="8" style="width: 100%;"></textarea>
+        </section>
+
+        <section id="anotacoes">
+            <h2>Anotações</h2>
+            <textarea class="data-save" id="anota-texto" rows="8" style="width: 100%;"></textarea>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    // ==========================================
+    // CONFIGURAÇÃO INICIAL DAS PERÍCIAS
+    // ==========================================
+    const skillData = {
+        "Físicas": { Agilidade: 65, Bloquear: 25, Escalar: 10, Esquivar: 100, Furtividade: 35, Luta: 120, Natação: 10, Pontaria: 20, Prestidigitação: 10, Reflexos: 60 },
+        "Práticas": { APH: 100, Arte: 10, Mecânica: 65, Medicina: 70, Psicanálise: 50, Psicologia: 80 },
+        "Sociais": { Atuação: 30, Barganha: 40, Intimidação: 30, Lábia: 35, Persuasão: 50 },
+        "Condução": { Dirigir: 20, Navegar: 20, Pilotar: 5 },
+        "Conhecimento": { Antropologia: 20, Arcano: 105, Arqueologia: 25, Ciências: 45, Coliso: 20, Contabilidade: 30, Criptografia: 25, Farmácia: 55, História: 25, Linguagem: 45 },
+        "Investigativas": { Biblioteca: 45, Encontrar: 75, Ouvir: 70, Rastrear: 55, Falsificar: 25 },
+        "Específicas": { Sanidade: 55, Vontade: 55, Sorte: 30, Sobrenatural: 120, Fortitude: 115 }
+    };
+
+    // ==========================================
+    // LÓGICA MATEMÁTICA D100 (TOOLTIP)
+    // ==========================================
+    function calculateSkillBrackets(p) {
+        let val = parseInt(p) || 0;
+        
+        let extVal = Math.floor(val * 0.10);
+        let extStr = extVal >= 1 ? `01–${String(extVal).padStart(2, '0')}` : "—";
+        let lastVal = Math.max(0, extVal);
+
+        let bomVal = Math.floor(val / 3);
+        let bomStr = "—";
+        if (bomVal > lastVal) {
+            bomStr = `${String(lastVal + 1).padStart(2, '0')}–${String(bomVal).padStart(2, '0')}`;
+            lastVal = bomVal;
+        }
+
+        let sucVal = Math.floor(val * 0.60);
+        let sucStr = "—";
+        if (sucVal > lastVal) {
+            sucStr = `${String(lastVal + 1).padStart(2, '0')}–${String(sucVal).padStart(2, '0')}`;
+            lastVal = sucVal;
+        }
+
+        let desInicio = 90 + Math.floor(val / 10);
+        let desStr = "—";
+        if (val < 130) {
+            desInicio = Math.min(100, desInicio);
+            desStr = desInicio === 100 ? "100" : `${desInicio}–100`;
+        } else {
+            desInicio = 101; // Desastre inativo
+        }
+
+        let fracStr = "—";
+        if (lastVal + 1 <= desInicio - 1) {
+            fracStr = `${String(lastVal + 1).padStart(2, '0')}–${String(desInicio - 1).padStart(2, '0')}`;
+        }
+
+        return `
+            <div class="tooltip-title">Resultado:</div>
+            <div class="t-des">Desastre = ${desStr}</div>
+            <div class="t-fra">Fracasso = ${fracStr}</div>
+            <div class="t-suc">Sucesso = ${sucStr}</div>
+            <div class="t-bom">Bom = ${bomStr}</div>
+            <div class="t-ext">Extremo = ${extStr}</div>
+        `;
+    }
+
+    // ==========================================
+    // RENDERIZAÇÃO DAS PERÍCIAS
+    // ==========================================
+    const container = document.getElementById('skills-container');
+
+    for (const [categoria, pericias] of Object.entries(skillData)) {
+        let catHtml = `<div class="skill-category" id="cat-${categoria}">
+            <div class="cat-header">
+                <span>${categoria}</span>
+                <span>Base: <span id="base-${categoria}">0</span></span>
+            </div>`;
+        
+        for (const [nome, valorInicial] of Object.entries(pericias)) {
+            let id = `skill-${nome.replace(/\s/g, '')}`;
+            catHtml += `
+                <div class="skill-row">
+                    <span>${nome}</span>
+                    <input type="number" class="skill-input data-save" id="${id}" data-cat="${categoria}" value="${valorInicial}">
+                    <div class="tooltip" id="tt-${id}"></div>
+                </div>
+            `;
+        }
+        catHtml += `</div>`;
+        container.innerHTML += catHtml;
+    }
+
+    // ==========================================
+    // CÁLCULOS GERAIS EM TEMPO REAL
+    // ==========================================
+    function updateAllSkills() {
+        let totalPts = 0;
+        let catTotals = {};
+        let catCounts = {};
+
+        document.querySelectorAll('.skill-input').forEach(input => {
+            let val = parseInt(input.value) || 0;
+            let cat = input.getAttribute('data-cat');
+            let id = input.id;
+
+            // Total Geral
+            totalPts += val;
+
+            // Totais Categoria
+            catTotals[cat] = (catTotals[cat] || 0) + val;
+            catCounts[cat] = (catCounts[cat] || 0) + 1;
+
+            // Atualiza Tooltip
+            document.getElementById(`tt-${id}`).innerHTML = calculateSkillBrackets(val);
+        });
+
+        // Atualiza UI Totais
+        document.getElementById('total-pontos').innerText = totalPts;
+        for (let cat in catTotals) {
+            let base = Math.floor(catTotals[cat] / catCounts[cat]);
+            let el = document.getElementById(`base-${cat}`);
+            if(el) el.innerText = base;
+        }
+    }
+
+    // Listener para recalcular nas mudanças de input
+    document.querySelectorAll('.skill-input').forEach(input => {
+        input.addEventListener('input', updateAllSkills);
+    });
+
+    // ==========================================
+    // SISTEMA HUD (BARRAS VITAIS)
+    // ==========================================
+    function updateHUD() {
+        ['pv', 'ps', 'pe'].forEach(stat => {
+            let atual = parseInt(document.getElementById(`${stat}-atual`).value) || 0;
+            let max = parseInt(document.getElementById(`${stat}-max`).value) || 1;
+            let percent = Math.min(100, Math.max(0, (atual / max) * 100));
+            let bar = document.getElementById(`bar-${stat}`);
+            bar.style.width = `${percent}%`;
+            
+            // Intensidade da cor ao cair vida
+            if(stat === 'pv') {
+                if(percent <= 25) bar.style.backgroundColor = '#ff0000';
+                else bar.style.backgroundColor = 'var(--hud-pv)';
+            }
+        });
+        saveData();
+    }
+
+    function modVital(stat, amount) {
+        let el = document.getElementById(`${stat}-atual`);
+        let val = parseInt(el.value) || 0;
+        el.value = val + amount;
+        updateHUD();
+        saveData();
+    }
+
+    // ==========================================
+    // UPLOAD DE IMAGEM (Base64 para LocalStorage)
+    // ==========================================
+    const avatarInput = document.getElementById('avatar-upload');
+    const avatarPreview = document.getElementById('avatar-preview');
+
+    avatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatarPreview.src = e.target.result;
+                avatarPreview.style.display = 'block';
+                localStorage.setItem('rpg_avatar', e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // ==========================================
+    // AUTO-SAVE E CARREGAMENTO (LOCALSTORAGE)
+    // ==========================================
+    function saveData() {
+        const data = {};
+        document.querySelectorAll('.data-save').forEach(el => {
+            if (el.type === 'checkbox') data[el.id] = el.checked;
+            else data[el.id] = el.value;
+        });
+        localStorage.setItem('rpg_ficha_data', JSON.stringify(data));
+    }
+
+    function loadData() {
+        const data = JSON.parse(localStorage.getItem('rpg_ficha_data'));
+        if (data) {
+            for (const key in data) {
+                let el = document.getElementById(key);
+                if (el) {
+                    if (el.type === 'checkbox') el.checked = data[key];
+                    else el.value = data[key];
+                }
+            }
+        }
+        
+        const avatar = localStorage.getItem('rpg_avatar');
+        if (avatar) {
+            avatarPreview.src = avatar;
+            avatarPreview.style.display = 'block';
+        }
+    }
+
+    // Adiciona listener de save para todos os campos
+    document.querySelectorAll('.data-save').forEach(el => {
+        el.addEventListener('input', saveData);
+        el.addEventListener('change', saveData);
+    });
+
+    // ==========================================
+    // SCROLL SPY (DESTAQUE NO MENU)
+    // ==========================================
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('nav a');
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '-50% 0px -50% 0px', // Aciona quando a seção passa do meio da tela
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                        // Auto-scroll do menu no mobile
+                        link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+
+    // Smooth scroll para links do menu
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            window.scrollTo({
+                top: targetEl.offsetTop - 60,
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // ==========================================
+    // INICIALIZAÇÃO
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+        loadData();
+        updateAllSkills();
+        updateHUD();
+    });
+
+</script>
+
+</body>
+</html>
