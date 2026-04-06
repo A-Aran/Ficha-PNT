@@ -1,820 +1,1126 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de Personagem RPG</title>
-    <style>
-        :root {
-            --bg-dark: #0B132B;
-            --bg-light: #1C2541;
-            --main-color: #2EC4B6;
-            --sec-color: #3A86FF;
-            --text-color: #EAEAEA;
-            --alert-color: #FF6B6B;
-            --border-color: #2A3B5C;
-            --hud-pv: #FF6B6B;
-            --hud-ps: #8338EC;
-            --hud-pe: #2EC4B6;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Problemas no Tempo - Ficha Digital</title>
+<style>
+  :root {
+    /* Cores padrão - alteradas dinamicamente via JS */
+    --primary: #2EC4B6;
+    --secondary: #196F67;
+    --border: rgba(46, 196, 182, 0.25);
+    --border-subtle: rgba(46, 196, 182, 0.08);
+    --bg-card: rgba(46, 196, 182, 0.08);
+    --bg-hover: rgba(46, 196, 182, 0.15);
+    
+    /* Outras cores base */
+    --bg-start: #0B132B;
+    --bg-end: #1C2541;
+    --text: #EAEAEA;
+    --danger: #FF6B6B;
+    --font-main: 'Segoe UI', system-ui, sans-serif;
+  }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            background: linear-gradient(to bottom, var(--bg-dark), var(--bg-light));
-            color: var(--text-color);
-            line-height: 1.4;
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 40px;
-        }
+  body {
+    font-family: var(--font-main);
+    color: var(--text);
+    background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    font-size: 16px;
+  }
 
-        /* Efeito de Céu Estrelado */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            opacity: 0.15;
-            z-index: -1;
-            pointer-events: none;
-        }
+  /* Estrelas sutis em CSS */
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none;
+    background-image: 
+      radial-gradient(1px 1px at 25px 5px, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 50px 25px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1.5px 1.5px at 100px 100px, rgba(255,255,255,0.5), transparent),
+      radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.4), transparent);
+    background-size: 350px 350px;
+  }
 
-        /* Layout Base */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+  h1, h2, h3 { color: var(--primary); font-weight: 600; }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; height: auto; }
+  
+  button {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    cursor: pointer; border-radius: 4px; padding: 8px 16px; font-size: 0.9rem;
+    transition: all 0.2s; min-height: 44px; display: flex; align-items: center; justify-content: center;
+  }
+  button:hover { background: var(--bg-hover); border-color: var(--primary); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.btn-primary { background: var(--secondary); border-color: var(--secondary); color: #fff; }
+  button.btn-primary:hover { filter: brightness(1.2); }
+  button.btn-danger { background: rgba(255,107,107,0.1); border-color: var(--danger); color: var(--danger); }
+  button.btn-danger:hover { background: var(--danger); color: #fff; }
 
-        /* Navegação */
-        header {
-            background: rgba(11, 19, 43, 0.95);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            overflow-x: auto;
-            white-space: nowrap;
-            backdrop-filter: blur(5px);
-        }
+  /* Estilo para os botões de link na área do personagem */
+  .btn-link {
+    min-height: 38px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--border); 
+    border: 1px solid var(--primary);
+    color: var(--text);
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .btn-link:hover {
+    background: var(--primary);
+    color: #000;
+  }
 
-        nav {
-            display: flex;
-            padding: 10px;
-            gap: 10px;
-        }
+  input, textarea {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text);
+    border-radius: 4px; padding: 8px; font-family: inherit; font-size: 1rem; min-height: 44px;
+    width: 100%; transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.5); }
+  input[type="number"] { -moz-appearance: textfield; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
+  /* Layout Base */
+  #app { display: flex; min-height: 100vh; }
+  #header-mobile { display: none; }
+  #overlay { display: none; }
 
-        nav a.active, nav a:hover {
-            background: rgba(46, 196, 182, 0.1);
-            color: var(--main-color);
-            border-color: var(--main-color);
-        }
+  /* Sidebar */
+  #sidebar {
+    width: 220px; background: rgba(11, 19, 43, 0.85); backdrop-filter: blur(10px);
+    border-right: 1px solid var(--border); position: fixed; top: 0; bottom: 0; left: 0;
+    display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s ease;
+  }
+  #sidebar .brand {
+    padding: 20px; text-transform: uppercase; letter-spacing: 0.05em;
+    font-size: 1.2rem; font-weight: bold; color: var(--primary); text-align: center; border-bottom: 1px solid var(--border);
+  }
+  #sidebar nav { display: flex; flex-direction: column; padding: 10px 0; flex-grow: 1; overflow-y: auto; }
+  #sidebar nav a {
+    padding: 15px 20px; display: flex; align-items: center; gap: 12px;
+    border-left: 3px solid transparent; transition: all 0.2s;
+  }
+  #sidebar nav a:hover { background: var(--bg-hover); }
+  #sidebar nav a.active { border-left-color: var(--primary); background: var(--bg-hover); color: var(--primary); }
+  .icon-placeholder { width: 20px; height: 20px; background: currentColor; mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center; -webkit-mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center; }
 
-        main {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+  /* Sidebar Footer */
+  .sidebar-footer {
+    padding: 10px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.3);
+    text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center;
+  }
+  .total-points-badge {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 4px 8px;
+    width: 100%;
+  }
+  .total-points-badge .label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
+  .total-points-badge .value { color: var(--text); font-weight: 500; font-size: 1.1rem; }
 
-        section {
-            background: rgba(28, 37, 65, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            scroll-margin-top: 60px;
-        }
+  .color-picker-header { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 2px; cursor: pointer; user-select: none; }
+  .color-picker-header .label { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+  .color-picker-header:hover .label { color: var(--primary); }
+  #palette-toggle-icon { font-size: 0.6rem; opacity: 0.7; transition: transform 0.3s; }
+  
+  .color-picker-container { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; overflow: hidden; transition: max-height 0.3s ease; }
+  .color-option { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+  .color-option:hover { transform: scale(1.2); }
+  .color-option.active { border-color: var(--primary); transform: scale(1.2); box-shadow: 0 0 6px var(--primary); }
 
-        h2 {
-            color: var(--sec-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-        }
+  /* Main Content */
+  #main-content { flex-grow: 1; margin-left: 220px; padding: 30px 40px; max-width: 1200px; padding-bottom: 100px; }
+  section { margin-bottom: 60px; scroll-margin-top: 80px; }
+  
+  .section-title { 
+    font-size: 1.8rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); 
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
+  }
+  .sec-toggle { font-size: 0.6em; transition: transform 0.3s; opacity: 0.7; }
+  .section-title.collapsed .sec-toggle { transform: rotate(-90deg); }
+  .section-content.collapsed { display: none !important; }
 
-        /* Formulários e Inputs */
-        .form-group {
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-        }
+  /* Grids */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .grid-form { display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
 
-        label {
-            font-size: 0.8rem;
-            color: var(--main-color);
-            margin-bottom: 3px;
-        }
+  /* Componente Re-Timed */
+  .char-header { display: grid; grid-template-columns: auto 1fr; gap: 30px; }
+  
+  .char-photo-container { width: 300px; display: flex; flex-direction: column; gap: 10px; }
+  .char-photo {
+    width: 100%; aspect-ratio: 3/4; background: rgba(0,0,0,0.3);
+    object-fit: cover; cursor: pointer;
+    border: 8px solid var(--primary); 
+    border-radius: 4px; padding: 4px;
+    transition: border-color 0.3s; 
+  }
+  .char-photo-input { display: none; }
+  
+  /* Redesign do HUD Vital */
+  .vital-hud { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
+  .hud-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+  .hud-label { width: 35px; font-weight: bold; color: var(--primary); }
+  
+  .hud-controls-group { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
+  .hud-btn { width: 32px; height: 32px; min-height: 32px; padding: 0; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border); }
+  
+  .hud-bar-container { flex-grow: 1; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden; display: flex; }
+  .hud-bar-fill { height: 100%; transition: width 0.3s ease; }
+  .hud-bar-fill.pv { background: var(--danger); }
+  .hud-bar-fill.ps { background: #3A86FF; } /* Cor Fixa para PS */
+  .hud-bar-fill.pe { background: var(--primary); }
 
-        input[type="text"], input[type="number"], textarea {
-            background: rgba(11, 19, 43, 0.7);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.2s;
-        }
+  .hud-value-group { display: flex; align-items: center; gap: 5px; color: rgba(255,255,255,0.7); }
+  .hud-input { width: 56px; text-align: center; padding: 4px; height: 32px; min-height: 32px; font-weight: bold; background: rgba(0,0,0,0.4); border-color: var(--border); }
+  .hud-max { width: 40px; color: rgba(255,255,255,0.4); font-size: 0.9rem; text-align: right; }
 
-        input:focus, textarea:focus {
-            border-color: var(--sec-color);
-            box-shadow: 0 0 5px rgba(58, 134, 255, 0.3);
-        }
+  /* Corrupção */
+  .corruption-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+  .corruption-squares { display: flex; gap: 4px; }
+  .corr-square { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .corr-square.active { background: var(--primary); border-color: var(--primary); }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+  /* Perícias */
+  .skill-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .skill-cat-header { 
+    background: rgba(0,0,0,0.3); padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; font-weight: bold;
+  }
+  .skill-base { color: var(--primary); cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+  .skill-base:hover { background: var(--bg-hover); }
+  .skill-list { display: flex; flex-direction: column; }
+  .skill-row { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 8px 16px; border-bottom: 1px solid var(--border-subtle); cursor: pointer;
+  }
+  .skill-row:hover { background: var(--bg-hover); }
+  .skill-row:last-child { border-bottom: none; }
+  .skill-name { flex-grow: 1; pointer-events: none; }
+  .skill-input-wrapper { display: flex; align-items: center; gap: 8px; }
+  .skill-input { width: 56px; text-align: center; height: 36px; min-height: 36px; padding: 4px; pointer-events: auto; }
 
-        /* Seção Personagem */
-        .char-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
+  /* Tooltip d100 */
+  #d100-tooltip {
+    position: absolute; background: #1C2541; border: 1px solid var(--primary); border-radius: 8px;
+    padding: 12px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); z-index: 9999;
+    color: #EAEAEA; width: max-content; font-size: 0.95rem;
+    opacity: 0; visibility: hidden; transform: scale(0.95);
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none; display: grid; grid-template-columns: auto auto; gap: 6px 20px;
+  }
+  #d100-tooltip.show { opacity: 1; visibility: visible; transform: scale(1); }
+  .tt-label { font-weight: bold; letter-spacing: 0.05em; }
+  .tt-val { text-align: right; font-variant-numeric: tabular-nums; }
+  
+  /* Cores Lavadas (Pastel/Desaturadas) para o Resultado */
+  .tt-desastre { color: #E57373; } /* Vermelho Lavado */
+  .tt-fracasso { color: #FFF176; } /* Amarelo Lavado */
+  .tt-sucesso { color: #F8F9FA; }  /* Branco Suave/Lavado */
+  .tt-bom { color: #64B5F6; }      /* Azul Lavado */
+  .tt-extremo { color: #80DEEA; }  /* Ciano Lavado */
 
-        .avatar-container {
-            aspect-ratio: 3/4;
-            background: rgba(0,0,0,0.3);
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-        }
+  /* Listas Dinâmicas */
+  .list-controls { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .filter-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
+  
+  .grid-2.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 15px; }
 
-        .avatar-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-        }
+  .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; break-inside: avoid; }
+  .item-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .item-title-input { font-weight: bold; color: var(--primary); font-size: 1.1rem; flex-grow: 1; background: transparent; border: none; min-height: unset; padding: 0;}
+  .item-title-input:focus { background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--primary); }
+  .item-qty-controls { display: flex; align-items: center; gap: 5px; }
+  .item-qty-input { width: 50px; text-align: center; }
+  .item-body { display: none; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .item-body.expanded { display: flex; }
+  .item-desc { min-height: 80px; resize: vertical; }
+  .toggle-desc-btn { width: 100%; border: none; background: rgba(0,0,0,0.2); color: var(--text); font-size: 0.8rem; }
+  .toggle-desc-btn span { display: inline-block; transition: transform 0.3s; }
+  .toggle-desc-btn.expanded span { transform: rotate(180deg); }
+  
+  .category-separator { margin: 15px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 1.1rem; grid-column: 1 / -1; }
+  .empty-msg { grid-column: 1 / -1; opacity: 0.5; font-size: 0.9rem; }
+  .full-textarea { min-height: 250px; resize: vertical; line-height: 1.5; }
 
-        .avatar-input {
-            position: absolute;
-            width: 100%; height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 2;
-        }
+  /* Botão de Ação Flutuante (Menu Opções) */
+  .fab-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .fab-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+  }
+  .fab-container.open .fab-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .fab-main {
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    font-size: 1rem;
+    min-height: 50px;
+  }
+  .fab-option {
+    background: #1C2541;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  .fab-option:hover { background: var(--primary); color: #000; }
 
-        /* HUD Atributos Vitais */
-        .hud-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(11, 19, 43, 0.8);
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
+  /* --- Impressão (PDF) --- */
+  @media print {
+    body { background: #fff; color: #000; font-size: 12px; }
+    body::before { display: none; }
+    
+    #sidebar, #header-mobile, .fab-container, .list-controls, button.toggle-desc-btn, #d100-tooltip, .btn-link { display: none !important; }
+    
+    #main-content { margin-left: 0; padding: 0; max-width: 100%; }
+    
+    .section-title { border-bottom: 2px solid #000; color: #000; page-break-after: avoid; margin-bottom: 10px; padding-bottom: 5px; }
+    .section-title .sec-toggle { display: none; }
+    
+    .card { background: none; border: 1px solid #ccc; box-shadow: none; padding: 15px; }
+    
+    input, textarea, select { 
+      background: none; border: 1px solid #eee; color: #000; 
+      font-size: 12px; padding: 4px; min-height: auto; 
+    }
+    textarea { height: auto; overflow: visible; }
+    
+    .hud-btn { display: none; }
+    .hud-bar-container { border: 1px solid #000; background: none; }
+    .hud-bar-fill { display: none; }
+    .hud-value-group { color: #000; }
+    .hud-input { border: none; background: none; color: #000; }
+    .hud-max { color: #000; }
+    .hud-label { color: #000; }
+    
+    .char-photo { border: 2px solid #000; }
+    .skill-cat-header { background: #f0f0f0; color: #000; border-bottom: 1px solid #000; }
+    .skill-base { color: #000; }
+    .skill-row { border-bottom: 1px solid #eee; }
+    .skill-input { border: none; background: none; }
+    
+    .item-card { border: 1px solid #ccc; break-inside: avoid; background: none; padding: 10px; }
+    .item-body { display: flex !important; } /* Força as descrições aparecerem */
+    .item-title-input { color: #000; border-bottom: none; }
+    .item-qty-controls button { display: none; }
+    
+    .category-separator { color: #000; border-bottom: 1px solid #000; }
+    h1, h2, h3 { color: #000; }
+    .corruption-squares .corr-square { border-color: #000; }
+    .corruption-squares .corr-square.active { background: #000; }
+  }
 
-        .hud-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+  /* --- Responsividade --- */
+  @media (min-width: 1024px) {
+    .inventory-filters { overflow: visible; }
+  }
 
-        .hud-label { font-weight: bold; width: 25px; }
+  @media (max-width: 1023px) and (min-width: 768px) {
+    #sidebar { width: 70px; }
+    #sidebar .brand span { display: none; }
+    #sidebar nav a span { display: none; }
+    #sidebar nav a { justify-content: center; padding: 15px 0; }
+    .sidebar-footer { padding: 10px 5px; }
+    .sidebar-footer .label, .color-picker-header { display: none; }
+    .total-points-badge { padding: 6px 2px; }
+    .total-points-badge .value { font-size: 1rem; }
+    .total-points-badge .value::after { content: ' P'; font-size: 0.8rem; }
+    .color-picker-container { display: none !important; }
+    #main-content { margin-left: 70px; padding: 30px; }
+  }
 
-        .hud-bar-wrapper {
-            flex-grow: 1;
-            height: 8px;
-            background: #000;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #333;
-        }
+  @media (max-width: 767px) {
+    body { font-size: 15px; }
+    #header-mobile {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-start); padding: 10px 20px; border-bottom: 1px solid var(--border);
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+    }
+    #header-mobile h1 { font-size: 1.2rem; margin: 0; }
+    
+    #sidebar { transform: translateX(-100%); width: 260px; z-index: 1000; }
+    #sidebar.open { transform: translateX(0); }
+    #overlay.open { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999; }
+    
+    #main-content { margin-left: 0; padding: 80px 15px 30px; padding-bottom: 100px; }
+    
+    .char-header { grid-template-columns: 1fr; }
+    .char-photo-container { width: 100%; max-width: 300px; margin: 0 auto; }
+    .grid-2 { grid-template-columns: 1fr; }
+    
+    .hud-row { flex-wrap: wrap; gap: 5px; }
+    .hud-bar-container { width: 100%; height: 12px; margin-bottom: 5px; }
+    .hud-controls-group { width: 100%; justify-content: space-between; }
+    
+    .list-controls { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
+    .grid-2.inventory-grid { grid-template-columns: 1fr; }
 
-        .hud-bar-fill {
-            height: 100%;
-            transition: width 0.3s ease, background-color 0.3s;
-        }
-
-        .btn-hud {
-            background: var(--border-color);
-            border: none;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-hud:active { transform: scale(0.9); }
-
-        .hud-inputs {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .hud-inputs input {
-            width: 40px;
-            padding: 2px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-
-        /* Accordions (Traços, Equipamentos, Espíritos) */
-        details {
-            background: rgba(11, 19, 43, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-
-        summary {
-            padding: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--main-color);
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        summary::-webkit-details-marker { display: none; }
-        summary:hover { background: rgba(58, 134, 255, 0.1); }
-        summary::after { content: '+'; color: var(--sec-color); }
-        details[open] > summary::after { content: '-'; }
-
-        .details-content {
-            padding: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Perícias e Tooltips */
-        .skills-grid { display: flex; flex-direction: column; gap: 10px; }
-        .skill-category {
-            background: rgba(11, 19, 43, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-        }
-        .cat-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-            margin-bottom: 8px;
-            color: var(--sec-color);
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .skill-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-        }
-        .skill-row:last-child { border-bottom: none; }
-        .skill-row input {
-            width: 50px;
-            text-align: right;
-            padding: 4px;
-            font-weight: bold;
-            color: var(--main-color);
-        }
-
-        /* Sistema de Tooltip d100 */
-        .tooltip {
-            position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%) scale(0.95);
-            background: var(--bg-light);
-            border: 1px solid var(--sec-color);
-            padding: 8px;
-            border-radius: 6px;
-            width: max-content;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s;
-            pointer-events: none;
-            font-size: 0.8rem;
-            line-height: 1.5;
-        }
-
-        .skill-row:hover .tooltip, .skill-row input:focus + .tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(-50%) scale(1);
-        }
-
-        .tooltip-title { font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); }
-        .t-des { color: var(--alert-color); }
-        .t-fra { color: #999; }
-        .t-suc { color: var(--sec-color); }
-        .t-bom { color: var(--main-color); }
-        .t-ext { color: #FFD166; }
-
-        /* Status Fixos */
-        .fixed-stats {
-            background: rgba(46, 196, 182, 0.1);
-            border: 1px solid var(--main-color);
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
-        /* Desktop (Media Query) */
-        @media (min-width: 768px) {
-            .app-container { flex-direction: row; align-items: flex-start; }
-            header {
-                width: 200px;
-                height: 100vh;
-                position: sticky;
-                top: 0;
-                border-right: 1px solid var(--border-color);
-                border-bottom: none;
-            }
-            nav { flex-direction: column; padding: 20px 10px; }
-            main { flex: 1; padding: 20px; }
-            .char-grid { grid-template-columns: 250px 1fr; }
-            .skills-grid { grid-template-columns: repeat(2, 1fr); }
-            /* Se for tela muito grande, 3 colunas de perícias */
-            @media (min-width: 1100px) { .skills-grid { grid-template-columns: repeat(3, 1fr); } }
-        }
-    </style>
+    #d100-tooltip { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); }
+    #d100-tooltip.show { transform: translate(-50%, -50%) scale(1); }
+  }
+</style>
 </head>
 <body>
 
-<div class="app-container">
-    <header>
-        <nav id="navbar">
-            <a href="#personagem" class="active">Personagem</a>
-            <a href="#tracos">Traços</a>
-            <a href="#inventario">Inventário</a>
-            <a href="#equipamentos">Equip. Especiais</a>
-            <a href="#espiritos">Espíritos</a>
-            <a href="#pericias">Perícias</a>
-            <a href="#historico">Histórico</a>
-            <a href="#anotacoes">Anotações</a>
-        </nav>
-    </header>
+<div id="app">
+  <header id="header-mobile">
+    <h1>Problemas no Tempo</h1>
+    <button style="border:none; color:var(--primary); font-size:1.5rem;" onclick="toggleMenu()">☰</button>
+  </header>
 
-    <main>
-        <section id="personagem">
-            <h2>Personagem</h2>
+  <div id="overlay" onclick="toggleMenu()"></div>
+
+  <aside id="sidebar">
+    <div class="brand"><span>Problemas no Tempo</span></div>
+    <nav id="nav-menu">
+      <a href="#personagem" class="active"><div class="icon-placeholder"></div> <span>Re-Timed</span></a>
+      <a href="#tracos"><div class="icon-placeholder"></div> <span>Traços</span></a>
+      <a href="#inventario"><div class="icon-placeholder"></div> <span>Inventário</span></a>
+      <a href="#equipamentos"><div class="icon-placeholder"></div> <span>Equipamentos</span></a>
+      <a href="#espiritos"><div class="icon-placeholder"></div> <span>Espíritos</span></a>
+      <a href="#pericias"><div class="icon-placeholder"></div> <span>Perícias</span></a>
+      <a href="#historico"><div class="icon-placeholder"></div> <span>Histórico</span></a>
+      <a href="#anotacoes"><div class="icon-placeholder"></div> <span>Anotações</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="total-points-badge">
+        <span class="label">Total de Pontos</span>
+        <span class="value" id="ui-total-points">0</span>
+      </div>
+      <div class="color-picker-header" onclick="togglePalette()">
+        <span class="label" style="margin: 0;">Paleta de Cores</span>
+        <span id="palette-toggle-icon">▼</span>
+      </div>
+      <div class="color-picker-container" id="ui-color-picker">
+        </div>
+    </div>
+  </aside>
+
+  <main id="main-content">
+
+    <section id="personagem">
+      <h2 class="section-title" onclick="toggleSection('personagem')">
+        <span>Re-Timed</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-personagem" class="section-content">
+        <div class="card char-header">
+          
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="char-photo-container">
+              <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo" id="ui-photo" onclick="document.getElementById('file-upload').click()" title="Clique para alterar a foto">
+              <input type="file" id="file-upload" class="char-photo-input" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+            <div>
+              <label style="font-size: 0.9rem; color: var(--primary);">Aparência</label>
+              <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
+            </div>
+            <div>
+              <label style="font-size: 0.9rem; color: var(--primary);">Fobias</label>
+              <textarea id="ui-phobias" rows="3" oninput="saveData()"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <div class="grid-form">
+              <label>Nome</label> <input type="text" id="ui-name" oninput="saveData()">
+              <label>Idade</label> <input type="text" id="ui-age" oninput="saveData()">
+              <label>Nacionalidade</label> <input type="text" id="ui-nationality" oninput="saveData()">
+              <label>Profissão</label> <input type="text" id="ui-profession" oninput="saveData()">
+              <label>Ano</label> <input type="text" id="ui-year" oninput="saveData()">
+            </div>
             
-            <div class="fixed-stats">
-                Total de Pontos (Perícias): <span id="total-pontos">0</span>
+            <div style="margin-top: 20px;">
+              <label style="font-size: 0.9rem; color: var(--primary);">Nível de Corrupção</label>
+              <div class="corruption-container">
+                <div class="corruption-squares" id="ui-corruption"></div>
+              </div>
             </div>
 
-            <div class="char-grid">
-                <div class="left-col">
-                    <div class="avatar-container">
-                        <span style="color: var(--text-color); font-size: 0.8rem; z-index: 0;">Toque para foto</span>
-                        <img id="avatar-preview" src="" style="display:none;">
-                        <input type="file" id="avatar-upload" class="avatar-input" accept="image/*">
-                    </div>
-                    <div class="form-group" style="margin-top: 10px;">
-                        <label>Aparência</label>
-                        <textarea class="data-save" id="char-aparencia" rows="2"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Fobias</label>
-                        <textarea class="data-save" id="char-fobias" rows="2"></textarea>
-                    </div>
+            <div class="vital-hud">
+              <div class="hud-row">
+                <span class="hud-label">PV</span>
+                <div class="hud-controls-group">
+                  <button class="hud-btn" onclick="modVital('PV', -5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PV', -1)">-1</button>
+                  <div class="hud-bar-container"><div class="hud-bar-fill pv" id="ui-pv-bar"></div></div>
+                  <div class="hud-value-group">
+                    <input type="number" id="ui-pv-cur" class="hud-input" onchange="setVital('PV', this.value)">
+                    <span class="hud-max">/ <span id="ui-pv-max">0</span></span>
+                  </div>
+                  <button class="hud-btn" onclick="modVital('PV', 1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PV', 5)">+5</button>
                 </div>
-
-                <div class="right-col">
-                    <div class="form-group"><label>Nome</label><input type="text" class="data-save" id="char-nome"></div>
-                    <div style="display: flex; gap: 10px;">
-                        <div class="form-group" style="flex: 1;"><label>Idade</label><input type="number" class="data-save" id="char-idade"></div>
-                        <div class="form-group" style="flex: 1;"><label>Ano</label><input type="number" class="data-save" id="char-ano"></div>
-                    </div>
-                    <div class="form-group"><label>Nacionalidade</label><input type="text" class="data-save" id="char-nacionalidade"></div>
-                    <div class="form-group"><label>Profissão</label><input type="text" class="data-save" id="char-profissao"></div>
-                    <div class="form-group"><label>Nível de Corrupção</label><input type="number" class="data-save" id="char-corrupcao"></div>
-
-                    <div class="hud-container" style="margin-top: 15px;">
-                        <div class="hud-row">
-                            <span class="hud-label" style="color: var(--hud-pv);">PV</span>
-                            <button class="btn-hud" onclick="modVital('pv', -1)">-</button>
-                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-pv" style="background: var(--hud-pv); width: 100%;"></div></div>
-                            <button class="btn-hud" onclick="modVital('pv', 1)">+</button>
-                            <div class="hud-inputs">
-                                <input type="number" class="data-save vital-input" id="pv-atual" value="115" onchange="updateHUD()"> / 
-                                <input type="number" class="data-save vital-input" id="pv-max" value="115" onchange="updateHUD()">
-                            </div>
-                        </div>
-                        <div class="hud-row">
-                            <span class="hud-label" style="color: var(--hud-ps);">PS</span>
-                            <button class="btn-hud" onclick="modVital('ps', -1)">-</button>
-                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-ps" style="background: var(--hud-ps); width: 80%;"></div></div>
-                            <button class="btn-hud" onclick="modVital('ps', 1)">+</button>
-                            <div class="hud-inputs">
-                                <input type="number" class="data-save vital-input" id="ps-atual" value="44" onchange="updateHUD()"> / 
-                                <input type="number" class="data-save vital-input" id="ps-max" value="55" onchange="updateHUD()">
-                            </div>
-                        </div>
-                        <div class="hud-row">
-                            <span class="hud-label" style="color: var(--hud-pe);">PE</span>
-                            <button class="btn-hud" onclick="modVital('pe', -1)">-</button>
-                            <div class="hud-bar-wrapper"><div class="hud-bar-fill" id="bar-pe" style="background: var(--hud-pe); width: 75%;"></div></div>
-                            <button class="btn-hud" onclick="modVital('pe', 1)">+</button>
-                            <div class="hud-inputs">
-                                <input type="number" class="data-save vital-input" id="pe-atual" value="180" onchange="updateHUD()"> / 
-                                <input type="number" class="data-save vital-input" id="pe-max" value="240" onchange="updateHUD()">
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <div class="hud-row">
+                <span class="hud-label">PS</span>
+                <div class="hud-controls-group">
+                  <button class="hud-btn" onclick="modVital('PS', -5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PS', -1)">-1</button>
+                  <div class="hud-bar-container"><div class="hud-bar-fill ps" id="ui-ps-bar"></div></div>
+                  <div class="hud-value-group">
+                    <input type="number" id="ui-ps-cur" class="hud-input" onchange="setVital('PS', this.value)">
+                    <span class="hud-max">/ <span id="ui-ps-max">0</span></span>
+                  </div>
+                  <button class="hud-btn" onclick="modVital('PS', 1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PS', 5)">+5</button>
                 </div>
+              </div>
+              <div class="hud-row">
+                <span class="hud-label">PE</span>
+                <div class="hud-controls-group">
+                  <button class="hud-btn" onclick="modVital('PE', -5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PE', -1)">-1</button>
+                  <div class="hud-bar-container"><div class="hud-bar-fill pe" id="ui-pe-bar"></div></div>
+                  <div class="hud-value-group">
+                    <input type="number" id="ui-pe-cur" class="hud-input" onchange="setVital('PE', this.value)">
+                    <span class="hud-max">/ <span id="ui-pe-max">0</span></span>
+                  </div>
+                  <button class="hud-btn" onclick="modVital('PE', 1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PE', 5)">+5</button>
+                </div>
+              </div>
             </div>
-        </section>
 
-        <section id="tracos">
-            <h2>Traços</h2>
-            <div id="tracos-list">
-                <details>
-                    <summary><input type="text" class="data-save" id="traco-1-nome" placeholder="Nome do Traço" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
-                    <div class="details-content">
-                        <textarea class="data-save" id="traco-1-desc" placeholder="Descrição completa..." style="width: 100%;"></textarea>
-                    </div>
-                </details>
-                <details>
-                    <summary><input type="text" class="data-save" id="traco-2-nome" placeholder="Nome do Traço" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
-                    <div class="details-content">
-                        <textarea class="data-save" id="traco-2-desc" placeholder="Descrição completa..." style="width: 100%;"></textarea>
-                    </div>
-                </details>
+            <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+              <button class="btn-link" onclick="window.open('https://www.owlbear.rodeo/room/jcxE-N8n8e0y/TheDirtyProse', '_blank')">Entrar na Mesa</button>
+              <button class="btn-link" onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0', '_blank')">Livro do Jogador</button>
             </div>
-        </section>
+            
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section id="inventario">
-            <h2>Inventário</h2>
-            <div class="form-group">
-                <label>Mochila / Equipamentos / Consumíveis / Utilidades (Item | Qtd)</label>
-                <textarea class="data-save" id="inventario-texto" rows="6" placeholder="- Faca de combate (1)\n- Kit médico (3)"></textarea>
-            </div>
-        </section>
+    <section id="tracos">
+      <h2 class="section-title" onclick="toggleSection('tracos')">
+        <span>Traços</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-tracos" class="section-content">
+        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('traits')">+ Traço</button></div>
+        <div id="ui-traits-list"></div>
+      </div>
+    </section>
 
-        <section id="equipamentos">
-            <h2>Equip. Especiais</h2>
-            <details>
-                <summary><input type="text" class="data-save" id="equip-1-nome" placeholder="Nome do Equipamento" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
-                <div class="details-content">
-                    <textarea class="data-save" id="equip-1-desc" placeholder="Descrição e Efeitos..." style="width: 100%; margin-bottom: 5px;"></textarea>
-                    <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" class="data-save" id="equip-1-usado"> Usado/Equipado</label>
-                    <details style="margin-top: 10px; border-color: var(--sec-color);">
-                        <summary style="color: var(--sec-color); font-size: 0.9rem;">Habilidade</summary>
-                        <div class="details-content">
-                            <input type="text" class="data-save" id="equip-1-hab-nome" placeholder="Nome da Habilidade" style="width: 100%; margin-bottom: 5px;">
-                            <textarea class="data-save" id="equip-1-hab-desc" placeholder="Descrição da habilidade..." style="width: 100%;"></textarea>
-                            <input type="text" class="data-save" id="equip-1-hab-custo" placeholder="Custo (ex: 10 PE)" style="width: 100%; margin-top: 5px;">
-                        </div>
-                    </details>
-                </div>
-            </details>
-        </section>
+    <section id="inventario">
+      <h2 class="section-title" onclick="toggleSection('inventario')">
+        <span>Inventário</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-inventario" class="section-content">
+        <div class="list-controls inventory-filters" id="ui-inv-filters">
+          <button class="filter-btn active" onclick="setInvFilter('Todos')">Todos</button>
+          <button class="filter-btn" onclick="setInvFilter('Mochila')">Mochila</button>
+          <button class="filter-btn" onclick="setInvFilter('Equipamentos')">Equipamentos</button>
+          <button class="filter-btn" onclick="setInvFilter('Consumíveis')">Consumíveis</button>
+          <button class="filter-btn" onclick="setInvFilter('Utilidades')">Utilidades</button>
+        </div>
+        <div class="list-controls"><button class="btn-primary" onclick="addInventoryItem()">+ Item</button></div>
+        <div id="ui-inv-list" class="grid-2 inventory-grid"></div>
+      </div>
+    </section>
 
-        <section id="espiritos">
-            <h2>Espíritos</h2>
-            <details>
-                <summary><input type="text" class="data-save" id="esp-1-nome" placeholder="Nome do Espírito" style="background: transparent; border: none; color: inherit; font-weight: bold; outline: none; width: 80%;" onclick="event.preventDefault();"></summary>
-                <div class="details-content">
-                    <input type="text" class="data-save" id="esp-1-elemento" placeholder="Elemento" style="width: 100%; margin-bottom: 5px;">
-                    <textarea class="data-save" id="esp-1-desc" placeholder="Descrição do Espírito..." style="width: 100%; margin-bottom: 5px;"></textarea>
-                    <details style="margin-top: 10px; border-color: #8338EC;">
-                        <summary style="color: #8338EC; font-size: 0.9rem;">Habilidade Espiritual</summary>
-                        <div class="details-content">
-                            <input type="text" class="data-save" id="esp-1-hab-nome" placeholder="Nome da Habilidade" style="width: 100%; margin-bottom: 5px;">
-                            <textarea class="data-save" id="esp-1-hab-desc" placeholder="Descrição..." style="width: 100%;"></textarea>
-                        </div>
-                    </details>
-                </div>
-            </details>
-        </section>
+    <section id="equipamentos">
+      <h2 class="section-title" onclick="toggleSection('equipamentos')">
+        <span>Equipamentos Especiais</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-equipamentos" class="section-content">
+        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('equipments')">+ Equipamento</button></div>
+        <div id="ui-equipments-list" class="grid-2 inventory-grid"></div>
+      </div>
+    </section>
 
-        <section id="pericias">
-            <h2>Perícias <span style="font-size: 0.8rem; color: #999; font-weight: normal; text-transform: none;">(Toque/Passe o mouse no número)</span></h2>
-            <div class="skills-grid" id="skills-container">
-                </div>
-        </section>
+    <section id="espiritos">
+      <h2 class="section-title" onclick="toggleSection('espiritos')">
+        <span>Espíritos</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-espiritos" class="section-content">
+        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('spirits')">+ Espírito</button></div>
+        <div id="ui-spirits-list" class="grid-2 inventory-grid"></div>
+      </div>
+    </section>
 
-        <section id="historico">
-            <h2>Histórico</h2>
-            <textarea class="data-save" id="hist-texto" rows="8" style="width: 100%;"></textarea>
-        </section>
+    <section id="pericias">
+      <h2 class="section-title" onclick="toggleSection('pericias')">
+        <span>Perícias</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-pericias" class="section-content">
+        <div class="grid-2" id="ui-skills-container"></div>
+      </div>
+    </section>
 
-        <section id="anotacoes">
-            <h2>Anotações</h2>
-            <textarea class="data-save" id="anota-texto" rows="8" style="width: 100%;"></textarea>
-        </section>
+    <section id="historico">
+      <h2 class="section-title" onclick="toggleSection('historico')">
+        <span>Histórico</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-historico" class="section-content">
+        <textarea id="ui-history" class="full-textarea" oninput="saveData()" placeholder="A história do personagem..."></textarea>
+      </div>
+    </section>
 
-    </main>
+    <section id="anotacoes">
+      <h2 class="section-title" onclick="toggleSection('anotacoes')">
+        <span>Anotações</span> <span class="sec-toggle">▼</span>
+      </h2>
+      <div id="content-anotacoes" class="section-content">
+        <textarea id="ui-notes" class="full-textarea" oninput="saveData()" placeholder="Pistas, contatos..."></textarea>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="d100-tooltip">
+  <div class="tt-label tt-desastre">Desastre</div><div class="tt-val tt-desastre" id="tt-val-d"></div>
+  <div class="tt-label tt-fracasso">Fracasso</div><div class="tt-val tt-fracasso" id="tt-val-f"></div>
+  <div class="tt-label tt-sucesso">Sucesso</div><div class="tt-val tt-sucesso" id="tt-val-s"></div>
+  <div class="tt-label tt-bom">Bom</div><div class="tt-val tt-bom" id="tt-val-b"></div>
+  <div class="tt-label tt-extremo">Extremo</div><div class="tt-val tt-extremo" id="tt-val-e"></div>
+</div>
+
+<input type="file" id="file-load-input" accept=".json" style="display: none;" onchange="loadFromFile(event)">
+
+<div class="fab-container" id="fab-save">
+  <div class="fab-menu">
+    <button class="fab-option" onclick="document.getElementById('file-load-input').click()">Carregar (.json)</button>
+    <button class="fab-option" onclick="saveToFile()">Salvar (.json)</button>
+    <button class="fab-option" onclick="window.print()">PDF / Imprimir</button>
+  </div>
+  <button class="btn-primary fab-main" onclick="toggleFab()">⚙️ Opções</button>
 </div>
 
 <script>
-    // ==========================================
-    // CONFIGURAÇÃO INICIAL DAS PERÍCIAS
-    // ==========================================
-    const skillData = {
-        "Físicas": { Agilidade: 65, Bloquear: 25, Escalar: 10, Esquivar: 100, Furtividade: 35, Luta: 120, Natação: 10, Pontaria: 20, Prestidigitação: 10, Reflexos: 60 },
-        "Práticas": { APH: 100, Arte: 10, Mecânica: 65, Medicina: 70, Psicanálise: 50, Psicologia: 80 },
-        "Sociais": { Atuação: 30, Barganha: 40, Intimidação: 30, Lábia: 35, Persuasão: 50 },
-        "Condução": { Dirigir: 20, Navegar: 20, Pilotar: 5 },
-        "Conhecimento": { Antropologia: 20, Arcano: 105, Arqueologia: 25, Ciências: 45, Coliso: 20, Contabilidade: 30, Criptografia: 25, Farmácia: 55, História: 25, Linguagem: 45 },
-        "Investigativas": { Biblioteca: 45, Encontrar: 75, Ouvir: 70, Rastrear: 55, Falsificar: 25 },
-        "Específicas": { Sanidade: 55, Vontade: 55, Sorte: 30, Sobrenatural: 120, Fortitude: 115 }
-    };
+/* =========================================
+   ESTADO E DADOS INICIAIS
+========================================= */
+const DEFAULT_SKILLS = {
+  Físicas: { agilidade: 65, bloquear: 25, escalar: 10, esquivar: 100, furtividade: 35, luta: 120, natacao: 10, pontaria: 20, prestidigitacao: 10, reflexos: 60 },
+  Práticas: { aph: 100, arte: 10, mecanica: 65, medicina: 70, psicanalise: 50, psicologia: 80 },
+  Sociais: { atuacao: 30, barganha: 40, intimidacao: 30, labia: 35, persuasao: 50 },
+  Condução: { dirigir: 20, navegar: 20, pilotar: 5 },
+  Conhecimento: { antropologia: 20, arcano: 105, arqueologia: 25, ciencias: 45, coliso: 20, contabilidade: 30, criptografia: 25, farmacia: 55, historia: 25, linguagem: 45 },
+  Investigativas: { biblioteca: 45, encontrar: 75, ouvir: 70, rastrear: 55, falsificar: 25 },
+  Específicas: { sanidade: 55, vontade: 55, sorte: 30, sobrenatural: 120, fortitude: 115 }
+};
 
-    // ==========================================
-    // LÓGICA MATEMÁTICA D100 (TOOLTIP)
-    // ==========================================
-    function calculateSkillBrackets(p) {
-        let val = parseInt(p) || 0;
-        
-        let extVal = Math.floor(val * 0.10);
-        let extStr = extVal >= 1 ? `01–${String(extVal).padStart(2, '0')}` : "—";
-        let lastVal = Math.max(0, extVal);
+// 17 Cores Distintas
+const COLOR_PALETTES = [
+  { primary: '#FF4D4D', secondary: '#992E2E' }, // Vermelho
+  { primary: '#FF9F1C', secondary: '#995F10' }, // Laranja
+  { primary: '#FFD700', secondary: '#998100' }, // Amarelo Ouro
+  { primary: '#CCFF00', secondary: '#7A9900' }, // Verde Limão
+  { primary: '#2ECC71', secondary: '#1B7A43' }, // Verde Clássico
+  { primary: '#20B2AA', secondary: '#136A66' }, // Verde Menta
+  { primary: '#00FFFF', secondary: '#009999' }, // Ciano
+  { primary: '#3ABEFF', secondary: '#227299' }, // Azul Celeste
+  { primary: '#3A86FF', secondary: '#225099' }, // Azul Cobalto
+  { primary: '#7B61FF', secondary: '#493A99' }, // Índigo
+  { primary: '#AF52DE', secondary: '#693185' }, // Roxo
+  { primary: '#F012BE', secondary: '#900B72' }, // Magenta
+  { primary: '#FF4E9E', secondary: '#992E5E' }, // Rosa Choque
+  { primary: '#FF8FA3', secondary: '#995561' }, // Coral/Pêssego
+  { primary: '#CD7F32', secondary: '#7A4C1E' }, // Bronze/Marrom
+  { primary: '#EAEAEA', secondary: '#8C8C8C' }, // Prata/Branco
+  { primary: '#787880', secondary: '#48484D' }  // Chumbo/Cinza
+];
 
-        let bomVal = Math.floor(val / 3);
-        let bomStr = "—";
-        if (bomVal > lastVal) {
-            bomStr = `${String(lastVal + 1).padStart(2, '0')}–${String(bomVal).padStart(2, '0')}`;
-            lastVal = bomVal;
+const DEFAULT_STATE = {
+  name: '', age: '', nationality: '', profession: '', year: '', appearance: '', phobias: '', photo: '', corruption: 0,
+  skills: JSON.parse(JSON.stringify(DEFAULT_SKILLS)),
+  vital: { pv: 115, ps: 55, pe: 240 },
+  traits: [], inventory: [], equipments: [], spirits: [], history: '', notes: '',
+  collapsed: {},
+  paletteIndex: 0,
+  showPalette: true
+};
+
+let state = null;
+let currentInvFilter = 'Todos';
+const tooltipEl = document.getElementById('d100-tooltip');
+const SECTIONS = ['personagem', 'tracos', 'inventario', 'equipamentos', 'espiritos', 'pericias', 'historico', 'anotacoes'];
+
+/* =========================================
+   INICIALIZAÇÃO & STORAGE
+========================================= */
+function init() {
+  const saved = localStorage.getItem('rpg_sheet_data_v2');
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+      for (let cat in DEFAULT_SKILLS) {
+        if (!state.skills[cat]) state.skills[cat] = {};
+        for (let s in DEFAULT_SKILLS[cat]) {
+          if (state.skills[cat][s] === undefined) state.skills[cat][s] = DEFAULT_SKILLS[cat][s];
         }
+      }
+      if (!state.collapsed) state.collapsed = {};
+      if (state.paletteIndex === undefined) state.paletteIndex = 0;
+      if (state.showPalette === undefined) state.showPalette = true;
+    } catch(e) { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+  } else {
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  }
 
-        let sucVal = Math.floor(val * 0.60);
-        let sucStr = "—";
-        if (sucVal > lastVal) {
-            sucStr = `${String(lastVal + 1).padStart(2, '0')}–${String(sucVal).padStart(2, '0')}`;
-            lastVal = sucVal;
-        }
+  renderColorPicker(); 
+  applyPalette(state.paletteIndex, false); 
+  applyPaletteToggleState();
 
-        let desInicio = 90 + Math.floor(val / 10);
-        let desStr = "—";
-        if (val < 130) {
-            desInicio = Math.min(100, desInicio);
-            desStr = desInicio === 100 ? "100" : `${desInicio}–100`;
-        } else {
-            desInicio = 101; // Desastre inativo
-        }
+  bindBasicInputs();
+  renderCorruption();
+  renderSkills();
+  updateCalculations(); 
+  renderDynamicList('traits');
+  renderInventory();
+  renderDynamicList('equipments');
+  renderDynamicList('spirits');
+  
+  SECTIONS.forEach(applyCollapsedState);
+  setupScrollSpy();
+  setupTooltipClose();
+}
 
-        let fracStr = "—";
-        if (lastVal + 1 <= desInicio - 1) {
-            fracStr = `${String(lastVal + 1).padStart(2, '0')}–${String(desInicio - 1).padStart(2, '0')}`;
-        }
+function saveData() {
+  state.name = document.getElementById('ui-name').value;
+  state.age = document.getElementById('ui-age').value;
+  state.nationality = document.getElementById('ui-nationality').value;
+  state.profession = document.getElementById('ui-profession').value;
+  state.year = document.getElementById('ui-year').value;
+  state.appearance = document.getElementById('ui-appearance').value;
+  state.phobias = document.getElementById('ui-phobias').value;
+  state.history = document.getElementById('ui-history').value;
+  state.notes = document.getElementById('ui-notes').value;
+  localStorage.setItem('rpg_sheet_data_v2', JSON.stringify(state));
+}
 
-        return `
-            <div class="tooltip-title">Resultado:</div>
-            <div class="t-des">Desastre = ${desStr}</div>
-            <div class="t-fra">Fracasso = ${fracStr}</div>
-            <div class="t-suc">Sucesso = ${sucStr}</div>
-            <div class="t-bom">Bom = ${bomStr}</div>
-            <div class="t-ext">Extremo = ${extStr}</div>
-        `;
+function bindBasicInputs() {
+  const ids = ['name', 'age', 'nationality', 'profession', 'year', 'appearance', 'phobias', 'history', 'notes'];
+  ids.forEach(id => { if(state[id]) document.getElementById('ui-' + id).value = state[id]; });
+  if(state.photo) document.getElementById('ui-photo').src = state.photo;
+}
+
+/* =========================================
+   SISTEMA DE CARREGAR/SALVAR (FAB)
+========================================= */
+function toggleFab() {
+  document.getElementById('fab-save').classList.toggle('open');
+}
+
+function saveToFile() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "ficha_re_timed.json");
+  dlAnchorElem.click();
+  toggleFab();
+}
+
+function loadFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const loadedState = JSON.parse(e.target.result);
+      if (loadedState && typeof loadedState === 'object') {
+        localStorage.setItem('rpg_sheet_data_v2', JSON.stringify(loadedState));
+        alert('Ficha carregada com sucesso!');
+        window.location.reload(); 
+      } else {
+        alert('O arquivo selecionado é inválido.');
+      }
+    } catch (error) {
+      alert('Erro ao ler o arquivo JSON.');
+      console.error(error);
     }
+  };
+  reader.readAsText(file);
+  toggleFab();
+}
 
-    // ==========================================
-    // RENDERIZAÇÃO DAS PERÍCIAS
-    // ==========================================
-    const container = document.getElementById('skills-container');
+// Fechar FAB ao clicar fora
+document.addEventListener('click', (e) => {
+  const fab = document.getElementById('fab-save');
+  if (fab.classList.contains('open') && !fab.contains(e.target)) {
+    fab.classList.remove('open');
+  }
+});
 
-    for (const [categoria, pericias] of Object.entries(skillData)) {
-        let catHtml = `<div class="skill-category" id="cat-${categoria}">
-            <div class="cat-header">
-                <span>${categoria}</span>
-                <span>Base: <span id="base-${categoria}">0</span></span>
-            </div>`;
-        
-        for (const [nome, valorInicial] of Object.entries(pericias)) {
-            let id = `skill-${nome.replace(/\s/g, '')}`;
-            catHtml += `
-                <div class="skill-row">
-                    <span>${nome}</span>
-                    <input type="number" class="skill-input data-save" id="${id}" data-cat="${categoria}" value="${valorInicial}">
-                    <div class="tooltip" id="tt-${id}"></div>
-                </div>
-            `;
-        }
-        catHtml += `</div>`;
-        container.innerHTML += catHtml;
+/* =========================================
+   PALETA DE CORES
+========================================= */
+function hexToRgb(hex) {
+  let c = hex.substring(1);
+  return `${parseInt(c.substring(0, 2), 16)}, ${parseInt(c.substring(2, 4), 16)}, ${parseInt(c.substring(4, 6), 16)}`;
+}
+
+function renderColorPicker() {
+  const container = document.getElementById('ui-color-picker');
+  container.innerHTML = '';
+  COLOR_PALETTES.forEach((palette, index) => {
+    const opt = document.createElement('div');
+    opt.className = `color-option ${index === state.paletteIndex ? 'active' : ''}`;
+    opt.style.backgroundColor = palette.primary;
+    opt.dataset.index = index;
+    opt.onclick = () => applyPalette(index);
+    container.appendChild(opt);
+  });
+}
+
+function applyPalette(index, shouldSave = true) {
+  const root = document.documentElement;
+  const palette = COLOR_PALETTES[index];
+  const rgb = hexToRgb(palette.primary);
+  
+  root.style.setProperty('--primary', palette.primary);
+  root.style.setProperty('--secondary', palette.secondary);
+  root.style.setProperty('--border', `rgba(${rgb}, 0.3)`);
+  root.style.setProperty('--border-subtle', `rgba(${rgb}, 0.1)`);
+  root.style.setProperty('--bg-hover', `rgba(${rgb}, 0.15)`);
+  root.style.setProperty('--bg-card', `rgba(${rgb}, 0.08)`);
+  
+  document.querySelectorAll('#ui-color-picker .color-option').forEach(opt => opt.classList.remove('active'));
+  const activeOpt = document.querySelector(`#ui-color-picker .color-option[data-index="${index}"]`);
+  if (activeOpt) activeOpt.classList.add('active');
+
+  if (shouldSave) {
+    state.paletteIndex = index;
+    saveData();
+  }
+}
+
+function togglePalette() {
+  state.showPalette = !state.showPalette;
+  saveData();
+  applyPaletteToggleState();
+}
+
+function applyPaletteToggleState() {
+  const picker = document.getElementById('ui-color-picker');
+  const icon = document.getElementById('palette-toggle-icon');
+  if (state.showPalette) {
+    picker.style.maxHeight = '200px'; 
+    icon.style.transform = 'rotate(0deg)';
+  } else {
+    picker.style.maxHeight = '0px';
+    icon.style.transform = 'rotate(-90deg)';
+  }
+}
+
+/* =========================================
+   CÁLCULOS & REGRAS
+========================================= */
+function updateCalculations() {
+  let totalPoints = 0;
+  for (let cat in state.skills) {
+    let sum = 0, count = 0;
+    for (let sk in state.skills[cat]) { sum += state.skills[cat][sk]; count++; }
+    const base = Math.floor(Math.floor(sum / count) / 5) * 5;
+    const baseEl = document.getElementById(`base-${cat}`);
+    if(baseEl) { baseEl.innerText = `Base: ${base}`; baseEl.dataset.val = base; }
+    totalPoints += sum;
+  }
+  document.getElementById('ui-total-points').innerText = totalPoints;
+
+  const f = state.skills['Específicas'];
+  const maxPV = f.fortitude || 0;
+  const maxPS = Math.floor(((f.sanidade || 0) + (f.vontade || 0)) / 2);
+  const maxPE = (f.sobrenatural || 0) * 2;
+
+  if(state.vital.pv > maxPV) state.vital.pv = maxPV;
+  if(state.vital.ps > maxPS) state.vital.ps = maxPS;
+  if(state.vital.pe > maxPE) state.vital.pe = maxPE;
+
+  updateHUD('PV', state.vital.pv, maxPV);
+  updateHUD('PS', state.vital.ps, maxPS);
+  updateHUD('PE', state.vital.pe, maxPE);
+}
+
+function modVital(type, amount) {
+  const max = getMaxVital(type);
+  let cur = state.vital[type.toLowerCase()] + amount;
+  if (cur < 0) cur = 0; if (cur > max) cur = max;
+  state.vital[type.toLowerCase()] = cur;
+  updateHUD(type, cur, max);
+  saveData();
+}
+
+function setVital(type, val) {
+  const max = getMaxVital(type);
+  let cur = parseInt(val) || 0;
+  if (cur < 0) cur = 0; if (cur > max) cur = max;
+  state.vital[type.toLowerCase()] = cur;
+  updateHUD(type, cur, max);
+  saveData();
+}
+
+function getMaxVital(type) {
+  const f = state.skills['Específicas'];
+  if(type==='PV') return f.fortitude || 0;
+  if(type==='PS') return Math.floor(((f.sanidade || 0) + (f.vontade || 0)) / 2);
+  if(type==='PE') return (f.sobrenatural || 0) * 2;
+  return 0;
+}
+
+function updateHUD(type, cur, max) {
+  const t = type.toLowerCase();
+  document.getElementById(`ui-${t}-cur`).value = cur;
+  document.getElementById(`ui-${t}-max`).innerText = max;
+  const pct = max > 0 ? (cur / max) * 100 : 0;
+  document.getElementById(`ui-${t}-bar`).style.width = `${pct}%`;
+
+  const group = document.getElementById(`ui-${t}-cur`).closest('.hud-controls-group');
+  const btns = group.querySelectorAll('.hud-btn');
+  btns[0].disabled = (cur === 0); btns[1].disabled = (cur === 0);
+  btns[2].disabled = (cur >= max); btns[3].disabled = (cur >= max);
+}
+
+function handleSkillChange(cat, skill, valStr) {
+  let v = parseInt(valStr) || 0;
+  v = Math.floor(v / 5) * 5;
+  if(v < 0) v = 0;
+  state.skills[cat][skill] = v;
+  document.getElementById(`sk-${cat}-${skill}`).value = v;
+  
+  if (tooltipEl.classList.contains('show') && tooltipEl.dataset.activeId === `row-${cat}-${skill}`) {
+    showTooltip(v, null, true);
+  }
+  updateCalculations();
+  saveData();
+}
+
+/* =========================================
+   TOOLTIP D100 (Ordem Decrescente)
+========================================= */
+function showTooltip(P, event = null, keepPos = false) {
+  P = parseInt(P) || 0;
+  const extremo = Math.floor(P * 0.10);
+  const bom = Math.floor(P / 3);
+  const sucesso = Math.floor(P * 0.60);
+  
+  const desastreInicio = P >= 60 ? 96 : 90;
+
+  const maxE = extremo; const minE = 1;
+  const maxB = bom; const minB = extremo + 1;
+  const maxS = sucesso; const minS = bom + 1;
+  const maxF = desastreInicio - 1; const minF = sucesso + 1;
+  const maxD = 100; const minD = desastreInicio;
+
+  const formatRange = (min, max) => min > max ? "—" : (min === max ? pad(min) : `${pad(min)}–${pad(max)}`);
+
+  const strD = P >= 130 ? "—" : formatRange(minD, maxD);
+  const strF = formatRange(minF, maxF);
+  const strS = formatRange(minS, maxS);
+  const strB = formatRange(minB, maxB);
+  const strE = formatRange(minE, maxE);
+
+  document.getElementById('tt-val-d').innerText = strD;
+  document.getElementById('tt-val-f').innerText = strF;
+  document.getElementById('tt-val-s').innerText = strS;
+  document.getElementById('tt-val-b').innerText = strB;
+  document.getElementById('tt-val-e').innerText = strE;
+
+  tooltipEl.classList.add('show');
+
+  if (!keepPos && event) {
+    if (window.innerWidth < 768) {
+      tooltipEl.style.left = '50%'; tooltipEl.style.top = '50%';
+      tooltipEl.style.transform = 'translate(-50%, -50%) scale(1)';
+    } else {
+      const rect = event.currentTarget.getBoundingClientRect();
+      let top = rect.top + window.scrollY;
+      let left = rect.right + 15 + window.scrollX;
+      tooltipEl.style.transform = 'scale(1)';
+      if (left + tooltipEl.offsetWidth > window.innerWidth) left = rect.left - tooltipEl.offsetWidth - 15 + window.scrollX;
+      if (top + tooltipEl.offsetHeight > window.scrollY + window.innerHeight) top -= (tooltipEl.offsetHeight - rect.height);
+      tooltipEl.style.left = `${left}px`; tooltipEl.style.top = `${top}px`;
     }
+    tooltipEl.dataset.activeId = event.currentTarget.id;
+  }
+}
 
-    // ==========================================
-    // CÁLCULOS GERAIS EM TEMPO REAL
-    // ==========================================
-    function updateAllSkills() {
-        let totalPts = 0;
-        let catTotals = {};
-        let catCounts = {};
+function hideTooltip() { tooltipEl.classList.remove('show'); tooltipEl.style.transform = 'scale(0.95)'; tooltipEl.dataset.activeId = ''; }
+function setupTooltipClose() {
+  document.addEventListener('click', (e) => { if (!e.target.closest('.skill-row') && !e.target.closest('.skill-base') && !e.target.closest('#d100-tooltip')) hideTooltip(); });
+  document.addEventListener('touchstart', (e) => { if (!e.target.closest('.skill-row') && !e.target.closest('.skill-base') && !e.target.closest('#d100-tooltip')) hideTooltip(); });
+}
+function pad(n) { return n < 10 ? '0'+n : n; }
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
-        document.querySelectorAll('.skill-input').forEach(input => {
-            let val = parseInt(input.value) || 0;
-            let cat = input.getAttribute('data-cat');
-            let id = input.id;
+/* =========================================
+   RENDERIZAÇÃO
+========================================= */
+function renderCorruption() {
+  const cont = document.getElementById('ui-corruption'); cont.innerHTML = '';
+  for(let i=1; i<=6; i++) {
+    const sq = document.createElement('div');
+    sq.className = `corr-square ${i <= state.corruption ? 'active' : ''}`;
+    sq.onclick = () => { if(state.corruption === i) state.corruption--; else state.corruption = i; saveData(); renderCorruption(); };
+    cont.appendChild(sq);
+  }
+}
 
-            // Total Geral
-            totalPts += val;
+function renderSkills() {
+  const container = document.getElementById('ui-skills-container'); container.innerHTML = '';
+  const colA = document.createElement('div'); const colB = document.createElement('div');
+  const catA = ['Físicas', 'Práticas', 'Sociais', 'Condução']; const catB = ['Conhecimento', 'Investigativas', 'Específicas'];
 
-            // Totais Categoria
-            catTotals[cat] = (catTotals[cat] || 0) + val;
-            catCounts[cat] = (catCounts[cat] || 0) + 1;
-
-            // Atualiza Tooltip
-            document.getElementById(`tt-${id}`).innerHTML = calculateSkillBrackets(val);
-        });
-
-        // Atualiza UI Totais
-        document.getElementById('total-pontos').innerText = totalPts;
-        for (let cat in catTotals) {
-            let base = Math.floor(catTotals[cat] / catCounts[cat]);
-            let el = document.getElementById(`base-${cat}`);
-            if(el) el.innerText = base;
-        }
-    }
-
-    // Listener para recalcular nas mudanças de input
-    document.querySelectorAll('.skill-input').forEach(input => {
-        input.addEventListener('input', updateAllSkills);
+  const renderCat = (catName) => {
+    const wrap = document.createElement('div'); wrap.className = 'skill-category';
+    const head = document.createElement('div'); head.className = 'skill-cat-header';
+    head.innerHTML = `<span>${catName.toUpperCase()}</span> <span class="skill-base" id="base-${catName}" id-cat="${catName}">Base: 0</span>`;
+    wrap.appendChild(head);
+    const list = document.createElement('div'); list.className = 'skill-list';
+    Object.keys(state.skills[catName]).sort().forEach(sk => {
+      const val = state.skills[catName][sk]; const row = document.createElement('div'); row.className = 'skill-row'; row.id = `row-${catName}-${sk}`;
+      row.innerHTML = `<span class="skill-name">${capitalize(sk)}</span><div class="skill-input-wrapper"><input type="number" class="skill-input" id="sk-${catName}-${sk}" value="${val}" onclick="event.stopPropagation()"></div>`;
+      row.addEventListener('mouseenter', (e) => showTooltip(state.skills[catName][sk], e)); row.addEventListener('mouseleave', () => hideTooltip()); row.addEventListener('click', (e) => showTooltip(state.skills[catName][sk], e));
+      const inp = row.querySelector('input');
+      inp.addEventListener('change', (e) => handleSkillChange(catName, sk, e.target.value)); inp.addEventListener('blur', (e) => handleSkillChange(catName, sk, e.target.value));
+      list.appendChild(row);
     });
+    const baseEl = head.querySelector('.skill-base');
+    baseEl.addEventListener('mouseenter', (e) => showTooltip(e.target.dataset.val, e)); baseEl.addEventListener('mouseleave', () => hideTooltip()); baseEl.addEventListener('click', (e) => showTooltip(e.target.dataset.val, e));
+    wrap.appendChild(list); return wrap;
+  };
+  catA.forEach(c => colA.appendChild(renderCat(c))); catB.forEach(c => colB.appendChild(renderCat(c)));
+  container.appendChild(colA); container.appendChild(colB);
+}
 
-    // ==========================================
-    // SISTEMA HUD (BARRAS VITAIS)
-    // ==========================================
-    function updateHUD() {
-        ['pv', 'ps', 'pe'].forEach(stat => {
-            let atual = parseInt(document.getElementById(`${stat}-atual`).value) || 0;
-            let max = parseInt(document.getElementById(`${stat}-max`).value) || 1;
-            let percent = Math.min(100, Math.max(0, (atual / max) * 100));
-            let bar = document.getElementById(`bar-${stat}`);
-            bar.style.width = `${percent}%`;
-            
-            // Intensidade da cor ao cair vida
-            if(stat === 'pv') {
-                if(percent <= 25) bar.style.backgroundColor = '#ff0000';
-                else bar.style.backgroundColor = 'var(--hud-pv)';
-            }
-        });
-        saveData();
-    }
+function renderDynamicList(listName) {
+  const container = document.getElementById(`ui-${listName}-list`); container.innerHTML = '';
+  state[listName].forEach((item, index) => {
+    const card = document.createElement('div'); card.className = 'item-card';
+    card.innerHTML = `
+      <div class="item-header">
+        <input type="text" class="item-title-input" value="${item.name}" placeholder="Nome..." onchange="updateDynamicItem('${listName}', ${index}, 'name', this.value)">
+        <button class="btn-danger" style="padding: 4px 8px; min-height: 32px;" onclick="removeDynamicItem('${listName}', ${index})">×</button>
+      </div>
+      <button class="toggle-desc-btn ${item.expanded ? 'expanded' : ''}" onclick="toggleDynamicDesc('${listName}', ${index})">
+        ${item.expanded ? '▲ Ocultar Descrição' : '▼ Expandir Descrição'} <span>▼</span>
+      </button>
+      <div class="item-body ${item.expanded ? 'expanded' : ''}">
+        ${listName !== 'traits' ? `<label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom: 5px;"><input type="checkbox" style="width:auto; min-height:auto;" ${item.active ? 'checked' : ''} onchange="updateDynamicItem('${listName}', ${index}, 'active', this.checked)"> Usado/Equipado</label>` : ''}
+        <textarea class="item-desc" placeholder="Detalhes..." onchange="updateDynamicItem('${listName}', ${index}, 'desc', this.value)">${item.desc || ''}</textarea>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+function addDynamicItem(listName) { state[listName].unshift({ name: 'Novo Item', desc: '', expanded: true, active: false }); saveData(); renderDynamicList(listName); }
+function removeDynamicItem(listName, index) { if(confirm('Remover?')) { state[listName].splice(index, 1); saveData(); renderDynamicList(listName); } }
+function updateDynamicItem(listName, index, field, val) { state[listName][index][field] = val; saveData(); }
+function toggleDynamicDesc(listName, index) { state[listName][index].expanded = !state[listName][index].expanded; saveData(); renderDynamicList(listName); }
 
-    function modVital(stat, amount) {
-        let el = document.getElementById(`${stat}-atual`);
-        let val = parseInt(el.value) || 0;
-        el.value = val + amount;
-        updateHUD();
-        saveData();
-    }
-
-    // ==========================================
-    // UPLOAD DE IMAGEM (Base64 para LocalStorage)
-    // ==========================================
-    const avatarInput = document.getElementById('avatar-upload');
-    const avatarPreview = document.getElementById('avatar-preview');
-
-    avatarInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                avatarPreview.src = e.target.result;
-                avatarPreview.style.display = 'block';
-                localStorage.setItem('rpg_avatar', e.target.result);
-            }
-            reader.readAsDataURL(file);
-        }
+function renderInventory() {
+  const container = document.getElementById('ui-inv-list'); container.innerHTML = '';
+  const cats = ['Mochila', 'Equipamentos', 'Consumíveis', 'Utilidades'];
+  cats.forEach(cat => {
+    if (currentInvFilter !== 'Todos' && currentInvFilter !== cat) return;
+    const items = state.inventory.filter(i => i.category === cat);
+    if (currentInvFilter === 'Todos') { const sep = document.createElement('div'); sep.className = 'category-separator'; sep.innerText = `── ${cat} ──`; container.appendChild(sep); }
+    if (items.length === 0 && currentInvFilter === 'Todos') { const p = document.createElement('p'); p.className = 'empty-msg'; p.innerText = '(Vazio)'; container.appendChild(p); return; }
+    items.forEach(item => {
+      const globalIndex = state.inventory.indexOf(item);
+      const card = document.createElement('div'); card.className = 'item-card';
+      card.innerHTML = `
+        <div class="item-header">
+          <input type="text" class="item-title-input" value="${item.name}" placeholder="Nome..." onchange="updateInvItem(${globalIndex}, 'name', this.value)">
+          <div class="item-qty-controls"><button onclick="modInvQty(${globalIndex}, -1)">-</button><input type="number" class="item-qty-input" value="${item.qty}" onchange="updateInvItem(${globalIndex}, 'qty', this.value)"><button onclick="modInvQty(${globalIndex}, 1)">+</button><button class="btn-danger" style="margin-left:5px;" onclick="removeInvItem(${globalIndex})">×</button></div>
+        </div>
+        <select style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); padding: 5px; border-radius: 4px;" onchange="updateInvItem(${globalIndex}, 'category', this.value)">${cats.map(c => `<option value="${c}" ${c===item.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
+        <button class="toggle-desc-btn ${item.expanded ? 'expanded' : ''}" onclick="toggleInvDesc(${globalIndex})">Desc. <span>▼</span></button>
+        <div class="item-body ${item.expanded ? 'expanded' : ''}"><textarea class="item-desc" placeholder="Detalhes..." onchange="updateInvItem(${globalIndex}, 'desc', this.value)">${item.desc || ''}</textarea></div>`;
+      container.appendChild(card);
     });
+  });
+}
+function setInvFilter(f) { currentInvFilter = f; document.querySelectorAll('#ui-inv-filters .filter-btn').forEach(b => b.classList.toggle('active', b.innerText === f)); renderInventory(); }
+function addInventoryItem() { const cat = currentInvFilter === 'Todos' ? 'Mochila' : currentInvFilter; state.inventory.unshift({ name: 'Novo Item', category: cat, qty: 1, desc: '', expanded: true }); saveData(); renderInventory(); }
+function removeInvItem(i) { if(confirm('Remover?')) { state.inventory.splice(i, 1); saveData(); renderInventory(); } }
+function updateInvItem(i, f, v) { if(f === 'qty') v = parseInt(v) || 0; state.inventory[i][f] = v; saveData(); if(f === 'category') renderInventory(); }
+function modInvQty(i, a) { let q = (parseInt(state.inventory[i].qty) || 0) + a; if(q < 0) q = 0; state.inventory[i].qty = q; saveData(); renderInventory(); }
+function toggleInvDesc(i) { state.inventory[i].expanded = !state.inventory[i].expanded; saveData(); renderInventory(); }
 
-    // ==========================================
-    // AUTO-SAVE E CARREGAMENTO (LOCALSTORAGE)
-    // ==========================================
-    function saveData() {
-        const data = {};
-        document.querySelectorAll('.data-save').forEach(el => {
-            if (el.type === 'checkbox') data[el.id] = el.checked;
-            else data[el.id] = el.value;
-        });
-        localStorage.setItem('rpg_ficha_data', JSON.stringify(data));
+/* =========================================
+   UI & UTILITÁRIOS
+========================================= */
+function handleImageUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas'); const MAX_WIDTH = 400; const MAX_HEIGHT = 533; 
+      let width = img.width; let height = img.height;
+      if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      document.getElementById('ui-photo').src = dataUrl; state.photo = dataUrl; saveData();
     }
+    img.src = event.target.result;
+  }
+  reader.readAsDataURL(file);
+}
 
-    function loadData() {
-        const data = JSON.parse(localStorage.getItem('rpg_ficha_data'));
-        if (data) {
-            for (const key in data) {
-                let el = document.getElementById(key);
-                if (el) {
-                    if (el.type === 'checkbox') el.checked = data[key];
-                    else el.value = data[key];
-                }
-            }
-        }
-        
-        const avatar = localStorage.getItem('rpg_avatar');
-        if (avatar) {
-            avatarPreview.src = avatar;
-            avatarPreview.style.display = 'block';
-        }
-    }
+function toggleSection(secId) {
+  state.collapsed[secId] = !state.collapsed[secId];
+  saveData();
+  applyCollapsedState(secId);
+}
+function applyCollapsedState(secId) {
+  const content = document.getElementById('content-' + secId);
+  const title = document.querySelector(`#${secId} .section-title`);
+  if (state.collapsed[secId]) { content.classList.add('collapsed'); title.classList.add('collapsed'); }
+  else { content.classList.remove('collapsed'); title.classList.remove('collapsed'); }
+}
 
-    // Adiciona listener de save para todos os campos
-    document.querySelectorAll('.data-save').forEach(el => {
-        el.addEventListener('input', saveData);
-        el.addEventListener('change', saveData);
+function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+document.querySelectorAll('#nav-menu a').forEach(link => { link.addEventListener('click', () => { if(window.innerWidth < 768) toggleMenu(); document.querySelectorAll('#nav-menu a').forEach(l => l.classList.remove('active')); link.classList.add('active'); }); });
+
+function setupScrollSpy() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('#nav-menu a').forEach(link => { link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`); });
+      }
     });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+}
 
-    // ==========================================
-    // SCROLL SPY (DESTAQUE NO MENU)
-    // ==========================================
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('nav a');
-
-    const observerOptions = {
-        root: null,
-        rootMargin: '-50% 0px -50% 0px', // Aciona quando a seção passa do meio da tela
-        threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').substring(1) === entry.target.id) {
-                        link.classList.add('active');
-                        // Auto-scroll do menu no mobile
-                        link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    }
-                });
-            }
-        });
-    }, observerOptions);
-
-    sections.forEach(section => observer.observe(section));
-
-    // Smooth scroll para links do menu
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetEl = document.getElementById(targetId);
-            window.scrollTo({
-                top: targetEl.offsetTop - 60,
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    // ==========================================
-    // INICIALIZAÇÃO
-    // ==========================================
-    window.addEventListener('DOMContentLoaded', () => {
-        loadData();
-        updateAllSkills();
-        updateHUD();
-    });
-
+window.onload = init;
 </script>
-
 </body>
 </html>
