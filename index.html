@@ -2,1122 +2,1429 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Problemas no Tempo - Ficha Digital</title>
+<!-- Fixed viewport at 480px — scales uniformly across all mobile screens -->
+<meta name="viewport" content="width=480">
+<title>Problemas no Tempo — Ficha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    /* Cores padrão - alteradas dinamicamente via JS */
-    --primary: #2EC4B6;
-    --secondary: #196F67;
-    --border: rgba(46, 196, 182, 0.25);
-    --border-subtle: rgba(46, 196, 182, 0.08);
-    --bg-card: rgba(46, 196, 182, 0.08);
-    --bg-hover: rgba(46, 196, 182, 0.15);
-    
-    /* Outras cores base */
-    --bg-start: #0B132B;
-    --bg-end: #1C2541;
-    --text: #EAEAEA;
-    --danger: #FF6B6B;
-    --font-main: 'Segoe UI', system-ui, sans-serif;
-  }
+/* ─────────────────────────────────────────────
+   DESIGN DIRECTION: "Quiet Futurism"
+   Terminal meets tactical HUD — structured,
+   precise, low-noise. The tech is implied
+   through geometry and spacing, not neon blasts.
+───────────────────────────────────────────── */
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --acc:    #00e5b4;
+  --acc2:   #0097a7;
+  --acc-d:  #007a60;
+  --dim:    rgba(0,229,180,0.12);
+  --dim2:   rgba(0,229,180,0.06);
+  --line:   rgba(0,229,180,0.18);
+  --line2:  rgba(0,229,180,0.08);
+  --bg0:    #07090f;
+  --bg1:    #0c111d;
+  --bg2:    #101622;
+  --bg3:    #141c2a;
+  --txt:    #d0dde8;
+  --txt2:   #6e8099;
+  --danger: #e05252;
+  --danger-d: rgba(224,82,82,0.14);
+  --blue:   #3d8bcd;
+  --mono:   'Share Tech Mono', monospace;
+  --sans:   'Rajdhani', system-ui, sans-serif;
+  --r:      4px;
+}
 
-  body {
-    font-family: var(--font-main);
-    color: var(--text);
-    background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
-    background-attachment: fixed;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    font-size: 16px;
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-  /* Estrelas sutis em CSS */
-  body::before {
-    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none;
-    background-image: 
-      radial-gradient(1px 1px at 25px 5px, rgba(255,255,255,0.5), transparent),
-      radial-gradient(1px 1px at 50px 25px, rgba(255,255,255,0.2), transparent),
-      radial-gradient(1.5px 1.5px at 100px 100px, rgba(255,255,255,0.5), transparent),
-      radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.4), transparent);
-    background-size: 350px 350px;
-  }
+body {
+  font-family: var(--sans);
+  font-weight: 400;
+  color: var(--txt);
+  background: var(--bg0);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
 
-  h1, h2, h3 { color: var(--primary); font-weight: 600; }
-  a { text-decoration: none; color: inherit; }
-  img { max-width: 100%; height: auto; }
-  
-  button {
-    background: transparent; border: 1px solid var(--border); color: var(--text);
-    cursor: pointer; border-radius: 4px; padding: 8px 16px; font-size: 0.9rem;
-    transition: all 0.2s; min-height: 44px; display: flex; align-items: center; justify-content: center;
-  }
-  button:hover { background: var(--bg-hover); border-color: var(--primary); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  button.btn-primary { background: var(--secondary); border-color: var(--secondary); color: #fff; }
-  button.btn-primary:hover { filter: brightness(1.2); }
-  button.btn-danger { background: rgba(255,107,107,0.1); border-color: var(--danger); color: var(--danger); }
-  button.btn-danger:hover { background: var(--danger); color: #fff; }
+/* ── SCANLINE + MESH ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    ),
+    radial-gradient(ellipse 70% 50% at 15% 15%, rgba(0,229,180,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 80%, rgba(0,151,167,0.06) 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg0), var(--bg1) 45%, var(--bg2));
+}
+body > * { position: relative; z-index: 1; }
 
-  /* Estilo para os botões de link na área do personagem */
-  .btn-link {
-    min-height: 38px;
-    padding: 8px 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    background: var(--border); 
-    border: 1px solid var(--primary);
-    color: var(--text);
-    border-radius: 4px;
-    transition: all 0.2s;
-  }
-  .btn-link:hover {
-    background: var(--primary);
-    color: #000;
-  }
+/* ── TYPOGRAPHY ── */
+h1,h2,h3 { font-family: var(--sans); font-weight: 700; color: var(--acc); letter-spacing: 0.08em; }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; height: auto; display: block; }
 
-  input, textarea {
-    background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text);
-    border-radius: 4px; padding: 8px; font-family: inherit; font-size: 1rem; min-height: 44px;
-    width: 100%; transition: border-color 0.2s;
-  }
-  input:focus, textarea:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.5); }
-  input[type="number"] { -moz-appearance: textfield; }
-  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* ── INPUTS ── */
+input, textarea, select {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid var(--line);
+  color: var(--txt);
+  border-radius: var(--r);
+  padding: 7px 10px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 13px;
+  min-height: 36px;
+  width: 100%;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  -webkit-appearance: none;
+  line-height: 1.4;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--acc);
+  box-shadow: 0 0 0 2px rgba(0,229,180,0.12), inset 0 0 8px rgba(0,229,180,0.04);
+}
+input[type="number"] { -moz-appearance: textfield; }
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="checkbox"] { width:16px; min-height:16px; accent-color: var(--acc); cursor: pointer; }
+select option { background: var(--bg2); }
 
-  /* Layout Base */
-  #app { display: flex; min-height: 100vh; }
-  #header-mobile { display: none; }
-  #overlay { display: none; }
+/* ── BUTTONS ── */
+button {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--txt);
+  cursor: pointer;
+  border-radius: var(--r);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+button:hover  { background: var(--dim); border-color: var(--acc); color: var(--acc); }
+button:active { transform: scale(0.96); }
+button:disabled { opacity: 0.28; cursor: not-allowed; transform: none; }
 
-  /* Sidebar */
+.btn-p {
+  background: linear-gradient(90deg, var(--acc-d), var(--acc2));
+  border-color: var(--acc);
+  color: #fff;
+}
+.btn-p:hover { filter: brightness(1.18); background: linear-gradient(90deg, var(--acc-d), var(--acc2)); color: #fff; }
+
+.btn-x { background: var(--danger-d); border-color: var(--danger); color: var(--danger); }
+.btn-x:hover { background: var(--danger); color: #fff; }
+
+.btn-ghost {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-color: var(--line);
+  color: var(--txt2);
+}
+.btn-ghost:hover { border-color: var(--acc); color: var(--acc); background: var(--dim2); }
+
+/* ── LAYOUT ── */
+#app { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: 180px;
+  background: rgba(7,9,15,0.95);
+  border-right: 1px solid var(--line);
+  position: fixed; top: 0; bottom: 0; left: 0;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+/* Corner accent */
+#sidebar::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 2px; height: 60px;
+  background: linear-gradient(180deg, var(--acc), transparent);
+}
+
+.brand {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.brand-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--txt2);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.brand-name {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--acc);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  display: block;
+}
+.brand-glyph {
+  font-size: 20px;
+  opacity: 0.6;
+  margin-bottom: 4px;
+  display: block;
+}
+
+#sidebar nav {
+  display: flex; flex-direction: column;
+  padding: 6px 0; flex-grow: 1;
+  overflow-y: auto;
+}
+#sidebar nav::-webkit-scrollbar { width: 2px; }
+#sidebar nav::-webkit-scrollbar-thumb { background: var(--line); }
+
+#sidebar nav a {
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 9px;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--txt2);
+  text-transform: uppercase;
+}
+#sidebar nav a:hover { background: var(--dim2); color: var(--txt); }
+#sidebar nav a.active {
+  border-left-color: var(--acc);
+  background: var(--dim);
+  color: var(--acc);
+}
+.ni { font-size: 11px; width: 16px; flex-shrink: 0; text-align: center; opacity: 0.75; }
+
+/* Sidebar footer */
+.sidebar-foot {
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+.pts-box {
+  background: var(--dim2);
+  border: 1px solid var(--line2);
+  border-radius: var(--r);
+  padding: 8px 10px;
+  text-align: center;
+}
+.pts-box .lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--acc);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+.pts-box .val {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--txt);
+  font-weight: normal;
+}
+
+/* ── MAIN ── */
+#main {
+  flex-grow: 1;
+  margin-left: 180px;
+  padding: 28px 26px 100px;
+  max-width: 1200px;
+}
+
+/* ── SECTION TITLE ── */
+section { margin-bottom: 44px; scroll-margin-top: 70px; }
+.sec-hd {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer; user-select: none;
+}
+.sec-hd-l {
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-hd-bar {
+  width: 3px; height: 16px;
+  background: var(--acc);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.sec-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--txt2);
+  letter-spacing: 0.08em;
+}
+.sec-arrow { font-size: 10px; color: var(--txt2); transition: transform 0.25s; }
+.sec-hd.closed .sec-arrow { transform: rotate(-90deg); }
+.sec-body.hidden { display: none !important; }
+
+/* ── CARD ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 16px;
+  position: relative;
+}
+/* Corner cut decoration */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  border-style: solid;
+  border-width: 0 12px 12px 0;
+  border-color: transparent var(--acc) transparent transparent;
+  opacity: 0.25;
+  border-radius: 0 var(--r) 0 0;
+}
+
+/* ── CHAR LAYOUT ── */
+.char-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 18px;
+}
+.char-photo-col { display: flex; flex-direction: column; gap: 10px; }
+.char-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  background: var(--bg1);
+}
+.char-photo:hover { border-color: var(--acc); box-shadow: 0 0 16px rgba(0,229,180,0.15); }
+.photo-hint { font-family: var(--mono); font-size: 9px; color: var(--txt2); text-align: center; letter-spacing: 0.08em; }
+
+.field-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--acc);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 3px;
+}
+.field-row { margin-bottom: 9px; }
+
+.grid-fields {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 6px 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.grid-fields .field-lbl { margin: 0; }
+
+/* ── CORRUPTION ── */
+.corr-row { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.corr-lbl { font-family: var(--mono); font-size: 9px; color: var(--txt2); letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px; }
+.corr-sq {
+  width: 22px; height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.corr-sq::after {
+  content: '';
+  position: absolute; inset: 3px;
+  border-radius: 1px;
+  background: var(--acc);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.corr-sq:hover::after { opacity: 0.4; }
+.corr-sq.on::after { opacity: 1; }
+.corr-sq.on { border-color: var(--acc); box-shadow: 0 0 6px rgba(0,229,180,0.3); }
+
+/* ── VITAL HUD ── */
+.vital-hud { display: flex; flex-direction: column; gap: 10px; }
+.hud-row { display: flex; align-items: center; gap: 6px; }
+.hud-lbl {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--acc);
+  width: 24px;
+  flex-shrink: 0;
+  letter-spacing: 0.06em;
+}
+.hud-ctrl { display: flex; align-items: center; gap: 5px; flex-grow: 1; min-width: 0; }
+.hud-btn {
+  width: 26px; height: 26px; min-height: 26px;
+  padding: 0; font-size: 11px;
+  font-family: var(--mono);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.hud-track {
+  flex-grow: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 99px;
+  overflow: hidden;
+  min-width: 20px;
+}
+.hud-fill { height: 100%; border-radius: 99px; transition: width 0.3s cubic-bezier(.4,0,.2,1); }
+.hud-fill.pv { background: linear-gradient(90deg, #7f1d1d, var(--danger)); }
+.hud-fill.ps { background: linear-gradient(90deg, #1e3a5f, var(--blue)); }
+.hud-fill.pe { background: linear-gradient(90deg, var(--acc-d), var(--acc)); }
+.hud-nums { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.hud-in {
+  width: 42px; text-align: center;
+  padding: 3px 4px; height: 26px; min-height: 26px;
+  font-family: var(--mono); font-size: 12px;
+  font-weight: normal;
+  background: rgba(0,0,0,0.5);
+  border-color: var(--line);
+}
+.hud-max { font-family: var(--mono); font-size: 10px; color: var(--txt2); min-width: 28px; }
+
+/* ── QUICK LINKS ── */
+.quick-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* ── SKILLS ── */
+.skill-cat {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.skill-cat-hd {
+  background: var(--bg3);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.skill-cat-hd span:first-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--acc);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.skill-base {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--txt2);
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+.skill-base:hover { background: var(--dim); color: var(--acc); }
+.skill-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line2);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.skill-row:hover { background: var(--dim2); }
+.skill-row:last-child { border-bottom: none; }
+.sk-name {
+  font-size: 12px; font-weight: 500;
+  flex-grow: 1; pointer-events: none;
+  letter-spacing: 0.03em;
+}
+.sk-inp-wrap { display: flex; align-items: center; }
+.sk-inp {
+  width: 52px; text-align: center;
+  height: 30px; min-height: 30px;
+  padding: 3px; font-size: 12px;
+  font-family: var(--mono);
+  font-weight: normal;
+  pointer-events: auto;
+}
+
+/* ── D100 TOOLTIP ── */
+#tt {
+  position: absolute;
+  background: rgba(7,9,15,0.98);
+  border: 1px solid var(--acc);
+  border-radius: var(--r);
+  padding: 11px 15px;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.8), 0 0 18px rgba(0,229,180,0.1);
+  z-index: 9999;
+  color: var(--txt);
+  width: max-content;
+  font-size: 12px;
+  opacity: 0; visibility: hidden;
+  transform: scale(0.93) translateY(4px);
+  transition: all 140ms cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 5px 18px;
+}
+#tt::before {
+  content: 'D100';
+  position: absolute; top: -10px; left: 10px;
+  font-family: var(--mono); font-size: 9px;
+  background: var(--acc); color: var(--bg0);
+  padding: 1px 6px; border-radius: 2px;
+  letter-spacing: 0.1em;
+}
+#tt.show { opacity: 1; visibility: visible; transform: scale(1) translateY(0); }
+.tt-l { font-family: var(--mono); font-size: 10px; font-weight: normal; letter-spacing: 0.06em; }
+.tt-v { text-align: right; font-family: var(--mono); font-size: 10px; font-weight: normal; }
+.t-dis { color: #f87171; }
+.t-fal { color: #fbbf24; }
+.t-suc { color: #cbd5e1; }
+.t-bon { color: #60a5fa; }
+.t-ext { color: #34d399; }
+
+/* ── ITEM CARDS ── */
+.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 10px; }
+.item-card {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.15s;
+}
+.item-card:hover { border-color: rgba(0,229,180,0.35); }
+.item-hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.item-name-in {
+  font-weight: 600; font-size: 13px; color: var(--acc);
+  flex-grow: 1; background: transparent; border: none;
+  min-height: unset; padding: 0; height: auto; border-radius: 0;
+  font-family: var(--sans);
+}
+.item-name-in:focus {
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--acc);
+  box-shadow: none; padding: 0 4px;
+}
+.qty-row { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.qty-in { width: 40px; text-align: center; height: 26px; min-height: 26px; padding: 2px; font-size: 11px; font-family: var(--mono); }
+.sq-btn { width: 24px; height: 24px; min-height: 24px; padding: 0; font-size: 11px; border-radius: 3px; }
+.del-btn { width: 24px; height: 24px; min-height: 24px; padding: 0; margin-left: 4px; font-size: 12px; border-radius: 3px; }
+.item-body { display: none; flex-direction: column; gap: 8px; }
+.item-body.open { display: flex; }
+.item-desc { min-height: 65px; resize: vertical; font-size: 12px; }
+.tog-btn {
+  width: 100%; border: none;
+  background: rgba(0,0,0,0.22);
+  color: var(--txt2); font-size: 10px;
+  font-family: var(--mono);
+  min-height: 26px; border-radius: 3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tog-btn:hover { background: var(--dim); color: var(--acc); border-color: transparent; }
+.tog-icon { display: inline-block; transition: transform 0.25s; }
+.tog-btn.open .tog-icon { transform: rotate(180deg); }
+.cat-sep {
+  grid-column: 1/-1;
+  font-family: var(--mono); font-size: 10px; color: var(--acc);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding-bottom: 5px; border-bottom: 1px solid var(--line);
+  margin-top: 4px;
+}
+.empty-note { grid-column: 1/-1; font-size: 11px; color: var(--txt2); font-style: italic; }
+
+/* ── LIST CONTROLS ── */
+.lc { margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+.f-btn { font-size: 11px; padding: 5px 12px; min-height: 30px; font-family: var(--mono); letter-spacing: 0.08em; }
+.f-btn.on { background: var(--acc); color: var(--bg0); border-color: var(--acc); font-weight: 700; }
+
+/* ── FULL TEXTAREA ── */
+.full-ta { min-height: 220px; resize: vertical; line-height: 1.6; font-size: 12px; font-family: var(--sans); }
+
+/* ── MOBILE HEADER ── */
+#mob-hd {
+  display: none;
+  align-items: center; justify-content: space-between;
+  background: rgba(7,9,15,0.97);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 90;
+}
+#mob-hd h1 {
+  font-family: var(--mono);
+  font-size: 11px; margin: 0;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--acc);
+}
+.ham {
+  background: none; border: 1px solid var(--line);
+  border-radius: 3px; width: 34px; height: 34px;
+  min-height: 34px; padding: 0;
+  font-size: 14px; color: var(--acc);
+}
+
+#overlay { display: none; }
+
+/* ── FAB ── */
+.fab-wrap {
+  position: fixed; bottom: 18px; right: 18px;
+  z-index: 1000;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+}
+.fab-menu {
+  display: flex; flex-direction: column; gap: 4px;
+  opacity: 0; visibility: hidden;
+  transform: translateY(8px) scale(0.97);
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  background: rgba(7,9,15,0.98);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 10px;
+  width: 210px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+}
+/* Corner accent on FAB menu */
+.fab-menu::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 2px; height: 40px;
+  background: linear-gradient(180deg, var(--acc), transparent);
+}
+.fab-wrap.open .fab-menu { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.fab-main {
+  border-radius: 99px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  min-height: 42px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 18px rgba(0,229,180,0.15);
+}
+.fab-opt {
+  background: transparent;
+  border: 1px solid var(--line2);
+  border-radius: 3px;
+  padding: 8px 12px;
+  text-align: left;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--txt2);
+  min-height: 34px;
+  justify-content: flex-start;
+}
+.fab-opt:hover { background: var(--dim); border-color: var(--acc); color: var(--acc); }
+.fab-div { height: 1px; background: var(--line); margin: 3px 0; }
+.pal-tog {
+  width: 100%; justify-content: space-between;
+  background: transparent; border: 1px solid var(--line2);
+  border-radius: 3px; padding: 8px 12px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--txt2); min-height: 34px;
+}
+.pal-tog:hover { border-color: var(--acc); color: var(--acc); }
+.pal-chev { transition: transform 0.25s; }
+.pal-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.3s, padding 0.3s;
+  padding: 0 2px;
+}
+.pal-grid.open { max-height: 150px; padding: 6px 2px; }
+.c-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.c-dot:hover { transform: scale(1.2); }
+.c-dot.on { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 6px currentColor; }
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 14px; }
+
+/* ── MOBILE BREAKPOINT ── */
+/* With width=480 viewport meta, this fires on all phones */
+@media (max-width: 479px) {
+  #mob-hd { display: flex; }
   #sidebar {
-    width: 220px; background: rgba(11, 19, 43, 0.85); backdrop-filter: blur(10px);
-    border-right: 1px solid var(--border); position: fixed; top: 0; bottom: 0; left: 0;
-    display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s ease;
+    transform: translateX(-100%);
+    width: 230px; z-index: 1000;
   }
-  #sidebar .brand {
-    padding: 20px; text-transform: uppercase; letter-spacing: 0.05em;
-    font-size: 1.2rem; font-weight: bold; color: var(--primary); text-align: center; border-bottom: 1px solid var(--border);
+  #sidebar.open { transform: translateX(0); }
+  #overlay.open {
+    display: block;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 999;
   }
-  #sidebar nav { display: flex; flex-direction: column; padding: 10px 0; flex-grow: 1; overflow-y: auto; }
-  #sidebar nav a {
-    padding: 15px 20px; display: flex; align-items: center; gap: 12px;
-    border-left: 3px solid transparent; transition: all 0.2s;
+  #main { margin-left: 0; padding: 58px 12px 90px; }
+  .char-grid { grid-template-columns: 1fr; }
+  .char-photo-col { flex-direction: row; align-items: flex-start; gap: 12px; }
+  .char-photo { width: 100px; flex-shrink: 0; }
+  .char-photo-col > div { flex-grow: 1; }
+  .hud-row { flex-wrap: wrap; }
+  .hud-track { width: 100%; order: 3; flex-basis: 100%; height: 6px; }
+  .hud-ctrl { flex-wrap: wrap; }
+  .items-grid, .g2 { grid-template-columns: 1fr; }
+  .lc { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
+  .lc::-webkit-scrollbar { height: 2px; }
+  .f-btn { white-space: nowrap; }
+  .fab-wrap { bottom: 12px; right: 12px; }
+  .quick-links { justify-content: center; }
+  #tt {
+    position: fixed !important;
+    top: 50% !important; left: 50% !important;
+    transform: translate(-50%,-48%) scale(0.93) !important;
   }
-  #sidebar nav a:hover { background: var(--bg-hover); }
-  #sidebar nav a.active { border-left-color: var(--primary); background: var(--bg-hover); color: var(--primary); }
-  .icon-placeholder { width: 20px; height: 20px; background: currentColor; mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center; -webkit-mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/></svg>') no-repeat center; }
+  #tt.show { transform: translate(-50%,-50%) scale(1) !important; }
+}
 
-  /* Sidebar Footer */
-  .sidebar-footer {
-    padding: 10px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.3);
-    text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center;
-  }
-  .total-points-badge {
-    background: var(--bg-hover);
-    border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    padding: 4px 8px;
-    width: 100%;
-  }
-  .total-points-badge .label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px; }
-  .total-points-badge .value { color: var(--text); font-weight: 500; font-size: 1.1rem; }
-
-  .color-picker-header { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 2px; cursor: pointer; user-select: none; }
-  .color-picker-header .label { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
-  .color-picker-header:hover .label { color: var(--primary); }
-  #palette-toggle-icon { font-size: 0.6rem; opacity: 0.7; transition: transform 0.3s; }
-  
-  .color-picker-container { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; overflow: hidden; transition: max-height 0.3s ease; }
-  .color-option { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
-  .color-option:hover { transform: scale(1.2); }
-  .color-option.active { border-color: var(--primary); transform: scale(1.2); box-shadow: 0 0 6px var(--primary); }
-
-  /* Main Content */
-  #main-content { flex-grow: 1; margin-left: 220px; padding: 30px 40px; max-width: 1200px; padding-bottom: 100px; }
-  section { margin-bottom: 60px; scroll-margin-top: 80px; }
-  
-  .section-title { 
-    font-size: 1.8rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); 
-    display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
-  }
-  .sec-toggle { font-size: 0.6em; transition: transform 0.3s; opacity: 0.7; }
-  .section-title.collapsed .sec-toggle { transform: rotate(-90deg); }
-  .section-content.collapsed { display: none !important; }
-
-  /* Grids */
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-  .grid-form { display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); }
-
-  /* Componente Re-Timed */
-  .char-header { display: grid; grid-template-columns: auto 1fr; gap: 30px; }
-  
-  .char-photo-container { width: 300px; display: flex; flex-direction: column; gap: 10px; }
-  .char-photo {
-    width: 100%; aspect-ratio: 3/4; background: rgba(0,0,0,0.3);
-    object-fit: cover; cursor: pointer;
-    border: 8px solid var(--primary); 
-    border-radius: 4px; padding: 4px;
-    transition: border-color 0.3s; 
-  }
-  .char-photo-input { display: none; }
-  
-  /* Redesign do HUD Vital */
-  .vital-hud { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
-  .hud-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
-  .hud-label { width: 35px; font-weight: bold; color: var(--primary); }
-  
-  .hud-controls-group { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
-  .hud-btn { width: 32px; height: 32px; min-height: 32px; padding: 0; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border); }
-  
-  .hud-bar-container { flex-grow: 1; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden; display: flex; }
-  .hud-bar-fill { height: 100%; transition: width 0.3s ease; }
-  .hud-bar-fill.pv { background: var(--danger); }
-  .hud-bar-fill.ps { background: #3A86FF; } /* Cor Fixa para PS */
-  .hud-bar-fill.pe { background: var(--primary); }
-
-  .hud-value-group { display: flex; align-items: center; gap: 5px; color: rgba(255,255,255,0.7); }
-  .hud-input { width: 56px; text-align: center; padding: 4px; height: 32px; min-height: 32px; font-weight: bold; background: rgba(0,0,0,0.4); border-color: var(--border); }
-  .hud-max { width: 40px; color: rgba(255,255,255,0.4); font-size: 0.9rem; text-align: right; }
-
-  /* Corrupção */
-  .corruption-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-  .corruption-squares { display: flex; gap: 4px; }
-  .corr-square { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
-  .corr-square.active { background: var(--primary); border-color: var(--primary); }
-
-  /* Perícias */
-  .skill-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
-  .skill-cat-header { 
-    background: rgba(0,0,0,0.3); padding: 12px 16px; border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center; font-weight: bold;
-  }
-  .skill-base { color: var(--primary); cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-  .skill-base:hover { background: var(--bg-hover); }
-  .skill-list { display: flex; flex-direction: column; }
-  .skill-row { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 8px 16px; border-bottom: 1px solid var(--border-subtle); cursor: pointer;
-  }
-  .skill-row:hover { background: var(--bg-hover); }
-  .skill-row:last-child { border-bottom: none; }
-  .skill-name { flex-grow: 1; pointer-events: none; }
-  .skill-input-wrapper { display: flex; align-items: center; gap: 8px; }
-  .skill-input { width: 56px; text-align: center; height: 36px; min-height: 36px; padding: 4px; pointer-events: auto; }
-
-  /* Tooltip d100 */
-  #d100-tooltip {
-    position: absolute; background: #1C2541; border: 1px solid var(--primary); border-radius: 8px;
-    padding: 12px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.6); z-index: 9999;
-    color: #EAEAEA; width: max-content; font-size: 0.95rem;
-    opacity: 0; visibility: hidden; transform: scale(0.95);
-    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none; display: grid; grid-template-columns: auto auto; gap: 6px 20px;
-  }
-  #d100-tooltip.show { opacity: 1; visibility: visible; transform: scale(1); }
-  .tt-label { font-weight: bold; letter-spacing: 0.05em; }
-  .tt-val { text-align: right; font-variant-numeric: tabular-nums; }
-  
-  /* Cores Lavadas (Pastel/Desaturadas) para o Resultado */
-  .tt-desastre { color: #E57373; } /* Vermelho Lavado */
-  .tt-fracasso { color: #FFF176; } /* Amarelo Lavado */
-  .tt-sucesso { color: #F8F9FA; }  /* Branco Suave/Lavado */
-  .tt-bom { color: #64B5F6; }      /* Azul Lavado */
-  .tt-extremo { color: #80DEEA; }  /* Ciano Lavado */
-
-  /* Listas Dinâmicas */
-  .list-controls { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .filter-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
-  
-  .grid-2.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 15px; }
-
-  .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; break-inside: avoid; }
-  .item-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .item-title-input { font-weight: bold; color: var(--primary); font-size: 1.1rem; flex-grow: 1; background: transparent; border: none; min-height: unset; padding: 0;}
-  .item-title-input:focus { background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--primary); }
-  .item-qty-controls { display: flex; align-items: center; gap: 5px; }
-  .item-qty-input { width: 50px; text-align: center; }
-  .item-body { display: none; flex-direction: column; gap: 10px; margin-top: 10px; }
-  .item-body.expanded { display: flex; }
-  .item-desc { min-height: 80px; resize: vertical; }
-  .toggle-desc-btn { width: 100%; border: none; background: rgba(0,0,0,0.2); color: var(--text); font-size: 0.8rem; }
-  .toggle-desc-btn span { display: inline-block; transition: transform 0.3s; }
-  .toggle-desc-btn.expanded span { transform: rotate(180deg); }
-  
-  .category-separator { margin: 15px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; color: var(--primary); font-weight: bold; font-size: 1.1rem; grid-column: 1 / -1; }
-  .empty-msg { grid-column: 1 / -1; opacity: 0.5; font-size: 0.9rem; }
-  .full-textarea { min-height: 250px; resize: vertical; line-height: 1.5; }
-
-  /* Botão de Ação Flutuante (Menu Opções) */
-  .fab-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-  }
-  .fab-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: all 0.2s ease;
-  }
-  .fab-container.open .fab-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
-  .fab-main {
-    border-radius: 50px;
-    padding: 10px 20px;
-    font-weight: bold;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    font-size: 1rem;
-    min-height: 50px;
-  }
-  .fab-option {
-    background: #1C2541;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 16px;
-    text-align: center;
-    width: 100%;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  }
-  .fab-option:hover { background: var(--primary); color: #000; }
-
-  /* --- Impressão (PDF) --- */
-  @media print {
-    body { background: #fff; color: #000; font-size: 12px; }
-    body::before { display: none; }
-    
-    #sidebar, #header-mobile, .fab-container, .list-controls, button.toggle-desc-btn, #d100-tooltip, .btn-link { display: none !important; }
-    
-    #main-content { margin-left: 0; padding: 0; max-width: 100%; }
-    
-    .section-title { border-bottom: 2px solid #000; color: #000; page-break-after: avoid; margin-bottom: 10px; padding-bottom: 5px; }
-    .section-title .sec-toggle { display: none; }
-    
-    .card { background: none; border: 1px solid #ccc; box-shadow: none; padding: 15px; }
-    
-    input, textarea, select { 
-      background: none; border: 1px solid #eee; color: #000; 
-      font-size: 12px; padding: 4px; min-height: auto; 
-    }
-    textarea { height: auto; overflow: visible; }
-    
-    .hud-btn { display: none; }
-    .hud-bar-container { border: 1px solid #000; background: none; }
-    .hud-bar-fill { display: none; }
-    .hud-value-group { color: #000; }
-    .hud-input { border: none; background: none; color: #000; }
-    .hud-max { color: #000; }
-    .hud-label { color: #000; }
-    
-    .char-photo { border: 2px solid #000; }
-    .skill-cat-header { background: #f0f0f0; color: #000; border-bottom: 1px solid #000; }
-    .skill-base { color: #000; }
-    .skill-row { border-bottom: 1px solid #eee; }
-    .skill-input { border: none; background: none; }
-    
-    .item-card { border: 1px solid #ccc; break-inside: avoid; background: none; padding: 10px; }
-    .item-body { display: flex !important; } /* Força as descrições aparecerem */
-    .item-title-input { color: #000; border-bottom: none; }
-    .item-qty-controls button { display: none; }
-    
-    .category-separator { color: #000; border-bottom: 1px solid #000; }
-    h1, h2, h3 { color: #000; }
-    .corruption-squares .corr-square { border-color: #000; }
-    .corruption-squares .corr-square.active { background: #000; }
-  }
-
-  /* --- Responsividade --- */
-  @media (min-width: 1024px) {
-    .inventory-filters { overflow: visible; }
-  }
-
-  @media (max-width: 1023px) and (min-width: 768px) {
-    #sidebar { width: 70px; }
-    #sidebar .brand span { display: none; }
-    #sidebar nav a span { display: none; }
-    #sidebar nav a { justify-content: center; padding: 15px 0; }
-    .sidebar-footer { padding: 10px 5px; }
-    .sidebar-footer .label, .color-picker-header { display: none; }
-    .total-points-badge { padding: 6px 2px; }
-    .total-points-badge .value { font-size: 1rem; }
-    .total-points-badge .value::after { content: ' P'; font-size: 0.8rem; }
-    .color-picker-container { display: none !important; }
-    #main-content { margin-left: 70px; padding: 30px; }
-  }
-
-  @media (max-width: 767px) {
-    body { font-size: 15px; }
-    #header-mobile {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--bg-start); padding: 10px 20px; border-bottom: 1px solid var(--border);
-      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
-    }
-    #header-mobile h1 { font-size: 1.2rem; margin: 0; }
-    
-    #sidebar { transform: translateX(-100%); width: 260px; z-index: 1000; }
-    #sidebar.open { transform: translateX(0); }
-    #overlay.open { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999; }
-    
-    #main-content { margin-left: 0; padding: 80px 15px 30px; padding-bottom: 100px; }
-    
-    .char-header { grid-template-columns: 1fr; }
-    .char-photo-container { width: 100%; max-width: 300px; margin: 0 auto; }
-    .grid-2 { grid-template-columns: 1fr; }
-    
-    .hud-row { flex-wrap: wrap; gap: 5px; }
-    .hud-bar-container { width: 100%; height: 12px; margin-bottom: 5px; }
-    .hud-controls-group { width: 100%; justify-content: space-between; }
-    
-    .list-controls { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
-    .grid-2.inventory-grid { grid-template-columns: 1fr; }
-
-    #d100-tooltip { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); }
-    #d100-tooltip.show { transform: translate(-50%, -50%) scale(1); }
-  }
+/* ── PRINT ── */
+@media print {
+  body { background: #fff; color: #000; }
+  body::before { display: none; }
+  #sidebar, #mob-hd, .fab-wrap, .lc button:not(.f-btn), #tt { display: none !important; }
+  #main { margin-left: 0; padding: 0; }
+  .card { background: none; border: 1px solid #ccc; }
+  .card::after { display: none; }
+  input,textarea,select { background: none; border: 1px solid #ddd; color: #000; min-height: auto; }
+  .hud-btn { display: none; }
+  .hud-fill { display: none; }
+  .hud-in,.hud-max,.hud-lbl,.sk-inp,.skill-base { color: #000 !important; border-color: #eee; }
+  .item-body { display: flex !important; }
+  h1,h2,h3,.sec-title,.acc { color: #000; }
+  .corr-sq.on { background: #000; }
+  .btn-ghost { display: none !important; }
+}
 </style>
 </head>
 <body>
-
 <div id="app">
-  <header id="header-mobile">
-    <h1>Problemas no Tempo</h1>
-    <button style="border:none; color:var(--primary); font-size:1.5rem;" onclick="toggleMenu()">☰</button>
+
+  <!-- Mobile header -->
+  <header id="mob-hd">
+    <h1>⧖ Problemas no Tempo</h1>
+    <button class="ham" onclick="toggleMenu()" aria-label="Menu">≡</button>
   </header>
 
   <div id="overlay" onclick="toggleMenu()"></div>
 
+  <!-- Sidebar -->
   <aside id="sidebar">
-    <div class="brand"><span>Problemas no Tempo</span></div>
+    <div class="brand">
+      <span class="brand-tag">sys/ficha/v3</span>
+      <span class="brand-glyph">⧖</span>
+      <span class="brand-name">Problemas<br>no Tempo</span>
+    </div>
     <nav id="nav-menu">
-      <a href="#personagem" class="active"><div class="icon-placeholder"></div> <span>Re-Timed</span></a>
-      <a href="#tracos"><div class="icon-placeholder"></div> <span>Traços</span></a>
-      <a href="#inventario"><div class="icon-placeholder"></div> <span>Inventário</span></a>
-      <a href="#equipamentos"><div class="icon-placeholder"></div> <span>Equipamentos</span></a>
-      <a href="#espiritos"><div class="icon-placeholder"></div> <span>Espíritos</span></a>
-      <a href="#pericias"><div class="icon-placeholder"></div> <span>Perícias</span></a>
-      <a href="#historico"><div class="icon-placeholder"></div> <span>Histórico</span></a>
-      <a href="#anotacoes"><div class="icon-placeholder"></div> <span>Anotações</span></a>
+      <a href="#personagem" class="active"><span class="ni">◈</span> <span>Re-Timed</span></a>
+      <a href="#tracos"><span class="ni">◇</span> <span>Traços</span></a>
+      <a href="#inventario"><span class="ni">⊡</span> <span>Inventário</span></a>
+      <a href="#equipamentos"><span class="ni">⚙</span> <span>Equip.</span></a>
+      <a href="#espiritos"><span class="ni">✦</span> <span>Espíritos</span></a>
+      <a href="#pericias"><span class="ni">◉</span> <span>Perícias</span></a>
+      <a href="#historico"><span class="ni">▤</span> <span>Histórico</span></a>
+      <a href="#anotacoes"><span class="ni">✎</span> <span>Anotações</span></a>
     </nav>
-    <div class="sidebar-footer">
-      <div class="total-points-badge">
-        <span class="label">Total de Pontos</span>
-        <span class="value" id="ui-total-points">0</span>
+    <div class="sidebar-foot">
+      <div class="pts-box">
+        <span class="lbl">Total de Pontos</span>
+        <span class="val" id="ui-total-pts">0</span>
       </div>
-      <div class="color-picker-header" onclick="togglePalette()">
-        <span class="label" style="margin: 0;">Paleta de Cores</span>
-        <span id="palette-toggle-icon">▼</span>
-      </div>
-      <div class="color-picker-container" id="ui-color-picker">
-        </div>
     </div>
   </aside>
 
-  <main id="main-content">
+  <!-- Main -->
+  <main id="main">
 
+    <!-- RE-TIMED -->
     <section id="personagem">
-      <h2 class="section-title" onclick="toggleSection('personagem')">
-        <span>Re-Timed</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-personagem" class="section-content">
-        <div class="card char-header">
-          
-          <div style="display: flex; flex-direction: column; gap: 20px;">
-            <div class="char-photo-container">
-              <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo" id="ui-photo" onclick="document.getElementById('file-upload').click()" title="Clique para alterar a foto">
-              <input type="file" id="file-upload" class="char-photo-input" accept="image/*" onchange="handleImageUpload(event)">
-            </div>
-            <div>
-              <label style="font-size: 0.9rem; color: var(--primary);">Aparência</label>
+      <div class="sec-hd" onclick="toggleSec('personagem')">
+        <div class="sec-hd-l">
+          <div class="sec-hd-bar"></div>
+          <span class="sec-title">Re-Timed</span>
+          <span class="sec-num">01</span>
+        </div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-personagem" class="sec-body">
+        <div class="card char-grid">
+
+          <!-- Photo col -->
+          <div class="char-photo-col">
+            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo" id="ui-photo" onclick="document.getElementById('file-upload').click()" title="Toque para alterar">
+            <input type="file" id="file-upload" style="display:none" accept="image/*" onchange="handleImg(event)">
+            <p class="photo-hint">[ CLIQUE PARA ALTERAR ]</p>
+            <div class="field-row">
+              <span class="field-lbl">Aparência</span>
               <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
             </div>
-            <div>
-              <label style="font-size: 0.9rem; color: var(--primary);">Fobias</label>
-              <textarea id="ui-phobias" rows="3" oninput="saveData()"></textarea>
+            <div class="field-row">
+              <span class="field-lbl">Fobias</span>
+              <textarea id="ui-phobias" rows="2" oninput="saveData()"></textarea>
             </div>
           </div>
 
+          <!-- Info col -->
           <div>
-            <div class="grid-form">
-              <label>Nome</label> <input type="text" id="ui-name" oninput="saveData()">
-              <label>Idade</label> <input type="text" id="ui-age" oninput="saveData()">
-              <label>Nacionalidade</label> <input type="text" id="ui-nationality" oninput="saveData()">
-              <label>Profissão</label> <input type="text" id="ui-profession" oninput="saveData()">
-              <label>Ano</label> <input type="text" id="ui-year" oninput="saveData()">
+            <div class="grid-fields">
+              <span class="field-lbl">Nome</span>        <input type="text" id="ui-name" oninput="saveData()">
+              <span class="field-lbl">Idade</span>       <input type="text" id="ui-age" oninput="saveData()">
+              <span class="field-lbl">Nac.</span>        <input type="text" id="ui-nationality" oninput="saveData()">
+              <span class="field-lbl">Profissão</span>   <input type="text" id="ui-profession" oninput="saveData()">
+              <span class="field-lbl">Ano</span>         <input type="text" id="ui-year" oninput="saveData()">
             </div>
-            
-            <div style="margin-top: 20px;">
-              <label style="font-size: 0.9rem; color: var(--primary);">Nível de Corrupção</label>
-              <div class="corruption-container">
-                <div class="corruption-squares" id="ui-corruption"></div>
-              </div>
+
+            <div class="corr-row">
+              <span class="corr-lbl">Corrupção</span>
+              <div id="ui-corruption" style="display:flex;gap:5px;"></div>
             </div>
 
             <div class="vital-hud">
               <div class="hud-row">
-                <span class="hud-label">PV</span>
-                <div class="hud-controls-group">
-                  <button class="hud-btn" onclick="modVital('PV', -5)">-5</button>
-                  <button class="hud-btn" onclick="modVital('PV', -1)">-1</button>
-                  <div class="hud-bar-container"><div class="hud-bar-fill pv" id="ui-pv-bar"></div></div>
-                  <div class="hud-value-group">
-                    <input type="number" id="ui-pv-cur" class="hud-input" onchange="setVital('PV', this.value)">
+                <span class="hud-lbl">PV</span>
+                <div class="hud-ctrl">
+                  <button class="hud-btn" onclick="modVital('PV',-5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PV',-1)">-1</button>
+                  <div class="hud-track"><div class="hud-fill pv" id="ui-pv-bar"></div></div>
+                  <div class="hud-nums">
+                    <input type="number" class="hud-in" id="ui-pv-cur" onchange="setVital('PV',this.value)">
                     <span class="hud-max">/ <span id="ui-pv-max">0</span></span>
                   </div>
-                  <button class="hud-btn" onclick="modVital('PV', 1)">+1</button>
-                  <button class="hud-btn" onclick="modVital('PV', 5)">+5</button>
+                  <button class="hud-btn" onclick="modVital('PV',1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PV',5)">+5</button>
                 </div>
               </div>
               <div class="hud-row">
-                <span class="hud-label">PS</span>
-                <div class="hud-controls-group">
-                  <button class="hud-btn" onclick="modVital('PS', -5)">-5</button>
-                  <button class="hud-btn" onclick="modVital('PS', -1)">-1</button>
-                  <div class="hud-bar-container"><div class="hud-bar-fill ps" id="ui-ps-bar"></div></div>
-                  <div class="hud-value-group">
-                    <input type="number" id="ui-ps-cur" class="hud-input" onchange="setVital('PS', this.value)">
+                <span class="hud-lbl">PS</span>
+                <div class="hud-ctrl">
+                  <button class="hud-btn" onclick="modVital('PS',-5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PS',-1)">-1</button>
+                  <div class="hud-track"><div class="hud-fill ps" id="ui-ps-bar"></div></div>
+                  <div class="hud-nums">
+                    <input type="number" class="hud-in" id="ui-ps-cur" onchange="setVital('PS',this.value)">
                     <span class="hud-max">/ <span id="ui-ps-max">0</span></span>
                   </div>
-                  <button class="hud-btn" onclick="modVital('PS', 1)">+1</button>
-                  <button class="hud-btn" onclick="modVital('PS', 5)">+5</button>
+                  <button class="hud-btn" onclick="modVital('PS',1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PS',5)">+5</button>
                 </div>
               </div>
               <div class="hud-row">
-                <span class="hud-label">PE</span>
-                <div class="hud-controls-group">
-                  <button class="hud-btn" onclick="modVital('PE', -5)">-5</button>
-                  <button class="hud-btn" onclick="modVital('PE', -1)">-1</button>
-                  <div class="hud-bar-container"><div class="hud-bar-fill pe" id="ui-pe-bar"></div></div>
-                  <div class="hud-value-group">
-                    <input type="number" id="ui-pe-cur" class="hud-input" onchange="setVital('PE', this.value)">
+                <span class="hud-lbl">PE</span>
+                <div class="hud-ctrl">
+                  <button class="hud-btn" onclick="modVital('PE',-5)">-5</button>
+                  <button class="hud-btn" onclick="modVital('PE',-1)">-1</button>
+                  <div class="hud-track"><div class="hud-fill pe" id="ui-pe-bar"></div></div>
+                  <div class="hud-nums">
+                    <input type="number" class="hud-in" id="ui-pe-cur" onchange="setVital('PE',this.value)">
                     <span class="hud-max">/ <span id="ui-pe-max">0</span></span>
                   </div>
-                  <button class="hud-btn" onclick="modVital('PE', 1)">+1</button>
-                  <button class="hud-btn" onclick="modVital('PE', 5)">+5</button>
+                  <button class="hud-btn" onclick="modVital('PE',1)">+1</button>
+                  <button class="hud-btn" onclick="modVital('PE',5)">+5</button>
                 </div>
               </div>
             </div>
 
-            <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-              <button class="btn-link" onclick="window.open('https://www.owlbear.rodeo/room/jcxE-N8n8e0y/TheDirtyProse', '_blank')">Entrar na Mesa</button>
-              <button class="btn-link" onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0', '_blank')">Livro do Jogador</button>
+            <div class="quick-links">
+              <button class="btn-ghost" onclick="window.open('https://www.owlbear.rodeo/room/jcxE-N8n8e0y/TheDirtyProse','_blank')">⚔ Mesa</button>
+              <button class="btn-ghost" onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0','_blank')">▤ Livro</button>
             </div>
-            
           </div>
         </div>
       </div>
     </section>
 
+    <!-- TRAÇOS -->
     <section id="tracos">
-      <h2 class="section-title" onclick="toggleSection('tracos')">
-        <span>Traços</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-tracos" class="section-content">
-        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('traits')">+ Traço</button></div>
-        <div id="ui-traits-list"></div>
+      <div class="sec-hd" onclick="toggleSec('tracos')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Traços</span><span class="sec-num">02</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-tracos" class="sec-body">
+        <div class="lc"><button class="btn-p" onclick="addDyn('traits')">+ Traço</button></div>
+        <div id="ui-traits-list" class="items-grid"></div>
       </div>
     </section>
 
+    <!-- INVENTÁRIO -->
     <section id="inventario">
-      <h2 class="section-title" onclick="toggleSection('inventario')">
-        <span>Inventário</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-inventario" class="section-content">
-        <div class="list-controls inventory-filters" id="ui-inv-filters">
-          <button class="filter-btn active" onclick="setInvFilter('Todos')">Todos</button>
-          <button class="filter-btn" onclick="setInvFilter('Mochila')">Mochila</button>
-          <button class="filter-btn" onclick="setInvFilter('Equipamentos')">Equipamentos</button>
-          <button class="filter-btn" onclick="setInvFilter('Consumíveis')">Consumíveis</button>
-          <button class="filter-btn" onclick="setInvFilter('Utilidades')">Utilidades</button>
+      <div class="sec-hd" onclick="toggleSec('inventario')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Inventário</span><span class="sec-num">03</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-inventario" class="sec-body">
+        <div class="lc" id="inv-filters">
+          <button class="f-btn on" onclick="setFilter('Todos')">Todos</button>
+          <button class="f-btn" onclick="setFilter('Mochila')">Mochila</button>
+          <button class="f-btn" onclick="setFilter('Equipamentos')">Equip.</button>
+          <button class="f-btn" onclick="setFilter('Consumíveis')">Cons.</button>
+          <button class="f-btn" onclick="setFilter('Utilidades')">Util.</button>
         </div>
-        <div class="list-controls"><button class="btn-primary" onclick="addInventoryItem()">+ Item</button></div>
-        <div id="ui-inv-list" class="grid-2 inventory-grid"></div>
+        <div class="lc"><button class="btn-p" onclick="addInv()">+ Item</button></div>
+        <div id="ui-inv-list" class="items-grid"></div>
       </div>
     </section>
 
+    <!-- EQUIPAMENTOS -->
     <section id="equipamentos">
-      <h2 class="section-title" onclick="toggleSection('equipamentos')">
-        <span>Equipamentos Especiais</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-equipamentos" class="section-content">
-        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('equipments')">+ Equipamento</button></div>
-        <div id="ui-equipments-list" class="grid-2 inventory-grid"></div>
+      <div class="sec-hd" onclick="toggleSec('equipamentos')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Equipamentos Especiais</span><span class="sec-num">04</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-equipamentos" class="sec-body">
+        <div class="lc"><button class="btn-p" onclick="addDyn('equipments')">+ Equipamento</button></div>
+        <div id="ui-equipments-list" class="items-grid"></div>
       </div>
     </section>
 
+    <!-- ESPÍRITOS -->
     <section id="espiritos">
-      <h2 class="section-title" onclick="toggleSection('espiritos')">
-        <span>Espíritos</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-espiritos" class="section-content">
-        <div class="list-controls"><button class="btn-primary" onclick="addDynamicItem('spirits')">+ Espírito</button></div>
-        <div id="ui-spirits-list" class="grid-2 inventory-grid"></div>
+      <div class="sec-hd" onclick="toggleSec('espiritos')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Espíritos</span><span class="sec-num">05</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-espiritos" class="sec-body">
+        <div class="lc"><button class="btn-p" onclick="addDyn('spirits')">+ Espírito</button></div>
+        <div id="ui-spirits-list" class="items-grid"></div>
       </div>
     </section>
 
+    <!-- PERÍCIAS -->
     <section id="pericias">
-      <h2 class="section-title" onclick="toggleSection('pericias')">
-        <span>Perícias</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-pericias" class="section-content">
-        <div class="grid-2" id="ui-skills-container"></div>
+      <div class="sec-hd" onclick="toggleSec('pericias')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Perícias</span><span class="sec-num">06</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-pericias" class="sec-body">
+        <div class="g2" id="ui-skills-container"></div>
       </div>
     </section>
 
+    <!-- HISTÓRICO -->
     <section id="historico">
-      <h2 class="section-title" onclick="toggleSection('historico')">
-        <span>Histórico</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-historico" class="section-content">
-        <textarea id="ui-history" class="full-textarea" oninput="saveData()" placeholder="A história do personagem..."></textarea>
+      <div class="sec-hd" onclick="toggleSec('historico')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">07</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-historico" class="sec-body">
+        <textarea id="ui-history" class="full-ta" oninput="saveData()" placeholder="A história do personagem..."></textarea>
       </div>
     </section>
 
+    <!-- ANOTAÇÕES -->
     <section id="anotacoes">
-      <h2 class="section-title" onclick="toggleSection('anotacoes')">
-        <span>Anotações</span> <span class="sec-toggle">▼</span>
-      </h2>
-      <div id="content-anotacoes" class="section-content">
-        <textarea id="ui-notes" class="full-textarea" oninput="saveData()" placeholder="Pistas, contatos..."></textarea>
+      <div class="sec-hd" onclick="toggleSec('anotacoes')">
+        <div class="sec-hd-l"><div class="sec-hd-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">08</span></div>
+        <span class="sec-arrow">▼</span>
+      </div>
+      <div id="bd-anotacoes" class="sec-body">
+        <textarea id="ui-notes" class="full-ta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
       </div>
     </section>
 
   </main>
 </div>
 
-<div id="d100-tooltip">
-  <div class="tt-label tt-desastre">Desastre</div><div class="tt-val tt-desastre" id="tt-val-d"></div>
-  <div class="tt-label tt-fracasso">Fracasso</div><div class="tt-val tt-fracasso" id="tt-val-f"></div>
-  <div class="tt-label tt-sucesso">Sucesso</div><div class="tt-val tt-sucesso" id="tt-val-s"></div>
-  <div class="tt-label tt-bom">Bom</div><div class="tt-val tt-bom" id="tt-val-b"></div>
-  <div class="tt-label tt-extremo">Extremo</div><div class="tt-val tt-extremo" id="tt-val-e"></div>
+<!-- D100 Tooltip -->
+<div id="tt">
+  <div class="tt-l t-dis">Desastre</div><div class="tt-v t-dis" id="tt-d"></div>
+  <div class="tt-l t-fal">Fracasso</div><div class="tt-v t-fal" id="tt-f"></div>
+  <div class="tt-l t-suc">Sucesso</div><div class="tt-v t-suc" id="tt-s"></div>
+  <div class="tt-l t-bon">Bom</div><div class="tt-v t-bon" id="tt-b"></div>
+  <div class="tt-l t-ext">Extremo</div><div class="tt-v t-ext" id="tt-e"></div>
 </div>
 
-<input type="file" id="file-load-input" accept=".json" style="display: none;" onchange="loadFromFile(event)">
+<input type="file" id="file-load" accept=".json" style="display:none" onchange="loadFile(event)">
 
-<div class="fab-container" id="fab-save">
+<!-- FAB -->
+<div class="fab-wrap" id="fab">
   <div class="fab-menu">
-    <button class="fab-option" onclick="document.getElementById('file-load-input').click()">Carregar (.json)</button>
-    <button class="fab-option" onclick="saveToFile()">Salvar (.json)</button>
-    <button class="fab-option" onclick="window.print()">PDF / Imprimir</button>
+    <button class="fab-opt" onclick="document.getElementById('file-load').click()">[ CARREGAR .JSON ]</button>
+    <button class="fab-opt" onclick="saveFile()">[ SALVAR .JSON ]</button>
+    <button class="fab-opt" onclick="window.print()">[ PDF / IMPRIMIR ]</button>
+    <div class="fab-div"></div>
+    <button class="pal-tog" onclick="togPal(event)">
+      <span>[ TEMA ]</span>
+      <span class="pal-chev" id="pal-chev">▼</span>
+    </button>
+    <div class="pal-grid" id="ui-pal"></div>
   </div>
-  <button class="btn-primary fab-main" onclick="toggleFab()">⚙️ Opções</button>
+  <button class="btn-p fab-main" onclick="togFab()">[ SYS ]</button>
 </div>
 
 <script>
-/* =========================================
-   ESTADO E DADOS INICIAIS
-========================================= */
-const DEFAULT_SKILLS = {
-  Físicas: { agilidade: 65, bloquear: 25, escalar: 10, esquivar: 100, furtividade: 35, luta: 120, natacao: 10, pontaria: 20, prestidigitacao: 10, reflexos: 60 },
-  Práticas: { aph: 100, arte: 10, mecanica: 65, medicina: 70, psicanalise: 50, psicologia: 80 },
-  Sociais: { atuacao: 30, barganha: 40, intimidacao: 30, labia: 35, persuasao: 50 },
-  Condução: { dirigir: 20, navegar: 20, pilotar: 5 },
-  Conhecimento: { antropologia: 20, arcano: 105, arqueologia: 25, ciencias: 45, coliso: 20, contabilidade: 30, criptografia: 25, farmacia: 55, historia: 25, linguagem: 45 },
-  Investigativas: { biblioteca: 45, encontrar: 75, ouvir: 70, rastrear: 55, falsificar: 25 },
-  Específicas: { sanidade: 55, vontade: 55, sorte: 30, sobrenatural: 120, fortitude: 115 }
+/* ================================================
+   DEFAULTS
+================================================ */
+const DEF_SKILLS = {
+  Físicas:       {agilidade:65,bloquear:25,escalar:10,esquivar:100,furtividade:35,luta:120,natacao:10,pontaria:20,prestidigitacao:10,reflexos:60},
+  Práticas:      {aph:100,arte:10,mecanica:65,medicina:70,psicanalise:50,psicologia:80},
+  Sociais:       {atuacao:30,barganha:40,intimidacao:30,labia:35,persuasao:50},
+  Condução:      {dirigir:20,navegar:20,pilotar:5},
+  Conhecimento:  {antropologia:20,arcano:105,arqueologia:25,ciencias:45,coliso:20,contabilidade:30,criptografia:25,farmacia:55,historia:25,linguagem:45},
+  Investigativas:{biblioteca:45,encontrar:75,ouvir:70,rastrear:55,falsificar:25},
+  Específicas:   {sanidade:55,vontade:55,sorte:30,sobrenatural:120,fortitude:115}
 };
 
-// 17 Cores Distintas
-const COLOR_PALETTES = [
-  { primary: '#FF4D4D', secondary: '#992E2E' }, // Vermelho
-  { primary: '#FF9F1C', secondary: '#995F10' }, // Laranja
-  { primary: '#FFD700', secondary: '#998100' }, // Amarelo Ouro
-  { primary: '#CCFF00', secondary: '#7A9900' }, // Verde Limão
-  { primary: '#2ECC71', secondary: '#1B7A43' }, // Verde Clássico
-  { primary: '#20B2AA', secondary: '#136A66' }, // Verde Menta
-  { primary: '#00FFFF', secondary: '#009999' }, // Ciano
-  { primary: '#3ABEFF', secondary: '#227299' }, // Azul Celeste
-  { primary: '#3A86FF', secondary: '#225099' }, // Azul Cobalto
-  { primary: '#7B61FF', secondary: '#493A99' }, // Índigo
-  { primary: '#AF52DE', secondary: '#693185' }, // Roxo
-  { primary: '#F012BE', secondary: '#900B72' }, // Magenta
-  { primary: '#FF4E9E', secondary: '#992E5E' }, // Rosa Choque
-  { primary: '#FF8FA3', secondary: '#995561' }, // Coral/Pêssego
-  { primary: '#CD7F32', secondary: '#7A4C1E' }, // Bronze/Marrom
-  { primary: '#EAEAEA', secondary: '#8C8C8C' }, // Prata/Branco
-  { primary: '#787880', secondary: '#48484D' }  // Chumbo/Cinza
+const PALS = [
+  {p:'#00e5b4',s:'#007a60'},{p:'#FF4D4D',s:'#7f1d1d'},{p:'#FF9F1C',s:'#7c3a08'},
+  {p:'#FFD700',s:'#7a6200'},{p:'#CCFF00',s:'#4c6200'},{p:'#2ECC71',s:'#0f4d2b'},
+  {p:'#3ABEFF',s:'#0e4f70'},{p:'#3A86FF',s:'#0e2e6e'},{p:'#7B61FF',s:'#2c1f7a'},
+  {p:'#AF52DE',s:'#4a1466'},{p:'#F012BE',s:'#5e0052'},{p:'#FF4E9E',s:'#6b0033'},
+  {p:'#FF8FA3',s:'#6b1525'},{p:'#CD7F32',s:'#5a3310'},{p:'#EAEAEA',s:'#666'},
+  {p:'#00FFFF',s:'#006666'},{p:'#787880',s:'#303035'}
 ];
 
-const DEFAULT_STATE = {
-  name: '', age: '', nationality: '', profession: '', year: '', appearance: '', phobias: '', photo: '', corruption: 0,
-  skills: JSON.parse(JSON.stringify(DEFAULT_SKILLS)),
-  vital: { pv: 115, ps: 55, pe: 240 },
-  traits: [], inventory: [], equipments: [], spirits: [], history: '', notes: '',
-  collapsed: {},
-  paletteIndex: 0,
-  showPalette: true
+const DEF_STATE = {
+  name:'',age:'',nationality:'',profession:'',year:'',
+  appearance:'',phobias:'',photo:'',corruption:0,
+  skills:JSON.parse(JSON.stringify(DEF_SKILLS)),
+  vital:{pv:115,ps:55,pe:240},
+  traits:[],inventory:[],equipments:[],spirits:[],
+  history:'',notes:'',collapsed:{},paletteIndex:0
 };
 
-let state = null;
-let currentInvFilter = 'Todos';
-const tooltipEl = document.getElementById('d100-tooltip');
-const SECTIONS = ['personagem', 'tracos', 'inventario', 'equipamentos', 'espiritos', 'pericias', 'historico', 'anotacoes'];
+let S = null;
+let invF = 'Todos';
+let palOpen = false;
+const TT = document.getElementById('tt');
+const SECS = ['personagem','tracos','inventario','equipamentos','espiritos','pericias','historico','anotacoes'];
+const INV_CATS = ['Mochila','Equipamentos','Consumíveis','Utilidades'];
 
-/* =========================================
-   INICIALIZAÇÃO & STORAGE
-========================================= */
+/* ================================================
+   INIT
+================================================ */
 function init() {
-  const saved = localStorage.getItem('rpg_sheet_data_v2');
-  if (saved) {
+  const raw = localStorage.getItem('rpt_v4') || localStorage.getItem('rpg_sheet_v3') || localStorage.getItem('rpg_sheet_data_v2');
+  if (raw) {
     try {
-      state = JSON.parse(saved);
-      for (let cat in DEFAULT_SKILLS) {
-        if (!state.skills[cat]) state.skills[cat] = {};
-        for (let s in DEFAULT_SKILLS[cat]) {
-          if (state.skills[cat][s] === undefined) state.skills[cat][s] = DEFAULT_SKILLS[cat][s];
-        }
+      S = JSON.parse(raw);
+      for (const c in DEF_SKILLS) {
+        if (!S.skills[c]) S.skills[c] = {};
+        for (const k in DEF_SKILLS[c]) if (S.skills[c][k] === undefined) S.skills[c][k] = DEF_SKILLS[c][k];
       }
-      if (!state.collapsed) state.collapsed = {};
-      if (state.paletteIndex === undefined) state.paletteIndex = 0;
-      if (state.showPalette === undefined) state.showPalette = true;
-    } catch(e) { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+      if (!S.collapsed) S.collapsed = {};
+      if (S.paletteIndex === undefined) S.paletteIndex = 0;
+    } catch { S = JSON.parse(JSON.stringify(DEF_STATE)); }
   } else {
-    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    S = JSON.parse(JSON.stringify(DEF_STATE));
   }
 
-  renderColorPicker(); 
-  applyPalette(state.paletteIndex, false); 
-  applyPaletteToggleState();
-
-  bindBasicInputs();
-  renderCorruption();
+  renderPal();
+  applyPal(S.paletteIndex, false);
+  bindInputs();
+  renderCorr();
   renderSkills();
-  updateCalculations(); 
-  renderDynamicList('traits');
-  renderInventory();
-  renderDynamicList('equipments');
-  renderDynamicList('spirits');
-  
-  SECTIONS.forEach(applyCollapsedState);
-  setupScrollSpy();
-  setupTooltipClose();
-}
-
-function saveData() {
-  state.name = document.getElementById('ui-name').value;
-  state.age = document.getElementById('ui-age').value;
-  state.nationality = document.getElementById('ui-nationality').value;
-  state.profession = document.getElementById('ui-profession').value;
-  state.year = document.getElementById('ui-year').value;
-  state.appearance = document.getElementById('ui-appearance').value;
-  state.phobias = document.getElementById('ui-phobias').value;
-  state.history = document.getElementById('ui-history').value;
-  state.notes = document.getElementById('ui-notes').value;
-  localStorage.setItem('rpg_sheet_data_v2', JSON.stringify(state));
-}
-
-function bindBasicInputs() {
-  const ids = ['name', 'age', 'nationality', 'profession', 'year', 'appearance', 'phobias', 'history', 'notes'];
-  ids.forEach(id => { if(state[id]) document.getElementById('ui-' + id).value = state[id]; });
-  if(state.photo) document.getElementById('ui-photo').src = state.photo;
-}
-
-/* =========================================
-   SISTEMA DE CARREGAR/SALVAR (FAB)
-========================================= */
-function toggleFab() {
-  document.getElementById('fab-save').classList.toggle('open');
-}
-
-function saveToFile() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-  const dlAnchorElem = document.createElement('a');
-  dlAnchorElem.setAttribute("href", dataStr);
-  dlAnchorElem.setAttribute("download", "ficha_re_timed.json");
-  dlAnchorElem.click();
-  toggleFab();
-}
-
-function loadFromFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const loadedState = JSON.parse(e.target.result);
-      if (loadedState && typeof loadedState === 'object') {
-        localStorage.setItem('rpg_sheet_data_v2', JSON.stringify(loadedState));
-        alert('Ficha carregada com sucesso!');
-        window.location.reload(); 
-      } else {
-        alert('O arquivo selecionado é inválido.');
-      }
-    } catch (error) {
-      alert('Erro ao ler o arquivo JSON.');
-      console.error(error);
-    }
-  };
-  reader.readAsText(file);
-  toggleFab();
-}
-
-// Fechar FAB ao clicar fora
-document.addEventListener('click', (e) => {
-  const fab = document.getElementById('fab-save');
-  if (fab.classList.contains('open') && !fab.contains(e.target)) {
-    fab.classList.remove('open');
-  }
-});
-
-/* =========================================
-   PALETA DE CORES
-========================================= */
-function hexToRgb(hex) {
-  let c = hex.substring(1);
-  return `${parseInt(c.substring(0, 2), 16)}, ${parseInt(c.substring(2, 4), 16)}, ${parseInt(c.substring(4, 6), 16)}`;
-}
-
-function renderColorPicker() {
-  const container = document.getElementById('ui-color-picker');
-  container.innerHTML = '';
-  COLOR_PALETTES.forEach((palette, index) => {
-    const opt = document.createElement('div');
-    opt.className = `color-option ${index === state.paletteIndex ? 'active' : ''}`;
-    opt.style.backgroundColor = palette.primary;
-    opt.dataset.index = index;
-    opt.onclick = () => applyPalette(index);
-    container.appendChild(opt);
+  calcAll();
+  renderDyn('traits');
+  renderInv();
+  renderDyn('equipments');
+  renderDyn('spirits');
+  SECS.forEach(applyCollapsed);
+  scrollSpy();
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.skill-row') && !e.target.closest('.skill-base') && !e.target.closest('#tt')) hideTT();
+    const fab = document.getElementById('fab');
+    if (fab.classList.contains('open') && !fab.contains(e.target)) fab.classList.remove('open');
   });
 }
 
-function applyPalette(index, shouldSave = true) {
-  const root = document.documentElement;
-  const palette = COLOR_PALETTES[index];
-  const rgb = hexToRgb(palette.primary);
-  
-  root.style.setProperty('--primary', palette.primary);
-  root.style.setProperty('--secondary', palette.secondary);
-  root.style.setProperty('--border', `rgba(${rgb}, 0.3)`);
-  root.style.setProperty('--border-subtle', `rgba(${rgb}, 0.1)`);
-  root.style.setProperty('--bg-hover', `rgba(${rgb}, 0.15)`);
-  root.style.setProperty('--bg-card', `rgba(${rgb}, 0.08)`);
-  
-  document.querySelectorAll('#ui-color-picker .color-option').forEach(opt => opt.classList.remove('active'));
-  const activeOpt = document.querySelector(`#ui-color-picker .color-option[data-index="${index}"]`);
-  if (activeOpt) activeOpt.classList.add('active');
+/* ================================================
+   SAVE / LOAD
+================================================ */
+function saveData() {
+  ['name','age','nationality','profession','year','appearance','phobias','history','notes'].forEach(k => {
+    const el = document.getElementById('ui-'+k);
+    if (el) S[k] = el.value;
+  });
+  localStorage.setItem('rpt_v4', JSON.stringify(S));
+}
+function bindInputs() {
+  ['name','age','nationality','profession','year','appearance','phobias','history','notes'].forEach(k => {
+    const el = document.getElementById('ui-'+k);
+    if (el && S[k]) el.value = S[k];
+  });
+  if (S.photo) document.getElementById('ui-photo').src = S.photo;
+}
+function saveFile() {
+  const a = document.createElement('a');
+  a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(S));
+  a.download = "ficha_retimed.json"; a.click();
+  closeFab();
+}
+function loadFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d && typeof d === 'object') { localStorage.setItem('rpt_v4', JSON.stringify(d)); location.reload(); }
+      else alert('Arquivo inválido.');
+    } catch { alert('Erro ao ler JSON.'); }
+  };
+  r.readAsText(f); closeFab();
+}
 
-  if (shouldSave) {
-    state.paletteIndex = index;
-    saveData();
+/* ================================================
+   FAB
+================================================ */
+function togFab()  { document.getElementById('fab').classList.toggle('open'); }
+function closeFab(){ document.getElementById('fab').classList.remove('open'); }
+
+/* ================================================
+   PALETTE
+================================================ */
+function h2rgb(h) {
+  const c = h.replace('#','');
+  return `${parseInt(c.slice(0,2),16)},${parseInt(c.slice(2,4),16)},${parseInt(c.slice(4,6),16)}`;
+}
+function renderPal() {
+  const g = document.getElementById('ui-pal'); g.innerHTML = '';
+  PALS.forEach((pal, i) => {
+    const d = document.createElement('div');
+    d.className = 'c-dot' + (i===S.paletteIndex?' on':'');
+    d.style.backgroundColor = pal.p; d.dataset.i = i;
+    d.onclick = () => applyPal(i);
+    g.appendChild(d);
+  });
+}
+function applyPal(i, save=true) {
+  const r = document.documentElement, pal = PALS[i], rgb = h2rgb(pal.p);
+  r.style.setProperty('--acc',  pal.p);
+  r.style.setProperty('--acc2', pal.s);
+  r.style.setProperty('--acc-d',pal.s);
+  r.style.setProperty('--dim',  `rgba(${rgb},0.12)`);
+  r.style.setProperty('--dim2', `rgba(${rgb},0.06)`);
+  r.style.setProperty('--line', `rgba(${rgb},0.18)`);
+  r.style.setProperty('--line2',`rgba(${rgb},0.08)`);
+  document.querySelectorAll('.c-dot').forEach(d => d.classList.toggle('on', +d.dataset.i===i));
+  if (save) { S.paletteIndex = i; saveData(); }
+}
+function togPal(e) {
+  e.stopPropagation();
+  palOpen = !palOpen;
+  document.getElementById('ui-pal').classList.toggle('open', palOpen);
+  document.getElementById('pal-chev').style.transform = palOpen ? 'rotate(180deg)' : '';
+}
+
+/* ================================================
+   VITALS
+================================================ */
+function calcAll() {
+  let total = 0;
+  for (const cat in S.skills) {
+    const vs = Object.values(S.skills[cat]);
+    const sum = vs.reduce((a,v)=>a+v,0);
+    total += sum;
+    const base = Math.floor(Math.floor(sum/vs.length)/5)*5;
+    const el = document.getElementById('base-'+cat);
+    if (el) { el.innerText = `Base: ${base}`; el.dataset.val = base; }
   }
+  document.getElementById('ui-total-pts').innerText = total;
+  const sp = S.skills['Específicas'];
+  const mPV = sp.fortitude||0;
+  const mPS = Math.floor(((sp.sanidade||0)+(sp.vontade||0))/2);
+  const mPE = (sp.sobrenatural||0)*2;
+  if(S.vital.pv>mPV) S.vital.pv=mPV;
+  if(S.vital.ps>mPS) S.vital.ps=mPS;
+  if(S.vital.pe>mPE) S.vital.pe=mPE;
+  updHUD('PV',S.vital.pv,mPV);
+  updHUD('PS',S.vital.ps,mPS);
+  updHUD('PE',S.vital.pe,mPE);
 }
-
-function togglePalette() {
-  state.showPalette = !state.showPalette;
-  saveData();
-  applyPaletteToggleState();
-}
-
-function applyPaletteToggleState() {
-  const picker = document.getElementById('ui-color-picker');
-  const icon = document.getElementById('palette-toggle-icon');
-  if (state.showPalette) {
-    picker.style.maxHeight = '200px'; 
-    icon.style.transform = 'rotate(0deg)';
-  } else {
-    picker.style.maxHeight = '0px';
-    icon.style.transform = 'rotate(-90deg)';
-  }
-}
-
-/* =========================================
-   CÁLCULOS & REGRAS
-========================================= */
-function updateCalculations() {
-  let totalPoints = 0;
-  for (let cat in state.skills) {
-    let sum = 0, count = 0;
-    for (let sk in state.skills[cat]) { sum += state.skills[cat][sk]; count++; }
-    const base = Math.floor(Math.floor(sum / count) / 5) * 5;
-    const baseEl = document.getElementById(`base-${cat}`);
-    if(baseEl) { baseEl.innerText = `Base: ${base}`; baseEl.dataset.val = base; }
-    totalPoints += sum;
-  }
-  document.getElementById('ui-total-points').innerText = totalPoints;
-
-  const f = state.skills['Específicas'];
-  const maxPV = f.fortitude || 0;
-  const maxPS = Math.floor(((f.sanidade || 0) + (f.vontade || 0)) / 2);
-  const maxPE = (f.sobrenatural || 0) * 2;
-
-  if(state.vital.pv > maxPV) state.vital.pv = maxPV;
-  if(state.vital.ps > maxPS) state.vital.ps = maxPS;
-  if(state.vital.pe > maxPE) state.vital.pe = maxPE;
-
-  updateHUD('PV', state.vital.pv, maxPV);
-  updateHUD('PS', state.vital.ps, maxPS);
-  updateHUD('PE', state.vital.pe, maxPE);
-}
-
-function modVital(type, amount) {
-  const max = getMaxVital(type);
-  let cur = state.vital[type.toLowerCase()] + amount;
-  if (cur < 0) cur = 0; if (cur > max) cur = max;
-  state.vital[type.toLowerCase()] = cur;
-  updateHUD(type, cur, max);
-  saveData();
-}
-
-function setVital(type, val) {
-  const max = getMaxVital(type);
-  let cur = parseInt(val) || 0;
-  if (cur < 0) cur = 0; if (cur > max) cur = max;
-  state.vital[type.toLowerCase()] = cur;
-  updateHUD(type, cur, max);
-  saveData();
-}
-
-function getMaxVital(type) {
-  const f = state.skills['Específicas'];
-  if(type==='PV') return f.fortitude || 0;
-  if(type==='PS') return Math.floor(((f.sanidade || 0) + (f.vontade || 0)) / 2);
-  if(type==='PE') return (f.sobrenatural || 0) * 2;
+function getMax(t) {
+  const sp = S.skills['Específicas'];
+  if(t==='PV') return sp.fortitude||0;
+  if(t==='PS') return Math.floor(((sp.sanidade||0)+(sp.vontade||0))/2);
+  if(t==='PE') return (sp.sobrenatural||0)*2;
   return 0;
 }
-
-function updateHUD(type, cur, max) {
-  const t = type.toLowerCase();
-  document.getElementById(`ui-${t}-cur`).value = cur;
-  document.getElementById(`ui-${t}-max`).innerText = max;
-  const pct = max > 0 ? (cur / max) * 100 : 0;
-  document.getElementById(`ui-${t}-bar`).style.width = `${pct}%`;
-
-  const group = document.getElementById(`ui-${t}-cur`).closest('.hud-controls-group');
-  const btns = group.querySelectorAll('.hud-btn');
-  btns[0].disabled = (cur === 0); btns[1].disabled = (cur === 0);
-  btns[2].disabled = (cur >= max); btns[3].disabled = (cur >= max);
+function modVital(t,a) {
+  const mx=getMax(t), k=t.toLowerCase();
+  S.vital[k]=Math.max(0,Math.min(mx,S.vital[k]+a));
+  updHUD(t,S.vital[k],mx); saveData();
+}
+function setVital(t,v) {
+  const mx=getMax(t), k=t.toLowerCase();
+  S.vital[k]=Math.max(0,Math.min(mx,parseInt(v)||0));
+  updHUD(t,S.vital[k],mx); saveData();
+}
+function updHUD(t,cur,max) {
+  const k=t.toLowerCase();
+  document.getElementById(`ui-${k}-cur`).value=cur;
+  document.getElementById(`ui-${k}-max`).innerText=max;
+  document.getElementById(`ui-${k}-bar`).style.width=max>0?`${cur/max*100}%`:'0%';
+  const ctrl=document.getElementById(`ui-${k}-cur`).closest('.hud-ctrl');
+  const bs=ctrl.querySelectorAll('.hud-btn');
+  bs[0].disabled=bs[1].disabled=cur===0;
+  bs[2].disabled=bs[3].disabled=cur>=max;
 }
 
-function handleSkillChange(cat, skill, valStr) {
-  let v = parseInt(valStr) || 0;
-  v = Math.floor(v / 5) * 5;
-  if(v < 0) v = 0;
-  state.skills[cat][skill] = v;
-  document.getElementById(`sk-${cat}-${skill}`).value = v;
-  
-  if (tooltipEl.classList.contains('show') && tooltipEl.dataset.activeId === `row-${cat}-${skill}`) {
-    showTooltip(v, null, true);
-  }
-  updateCalculations();
-  saveData();
+/* ================================================
+   SKILLS
+================================================ */
+function chgSkill(cat,sk,v) {
+  let n=Math.max(0,Math.floor((parseInt(v)||0)/5)*5);
+  S.skills[cat][sk]=n;
+  document.getElementById(`sk-${cat}-${sk}`).value=n;
+  if(TT.classList.contains('show') && TT.dataset.aid===`row-${cat}-${sk}`) showTT(n,null,true);
+  calcAll(); saveData();
 }
-
-/* =========================================
-   TOOLTIP D100 (Ordem Decrescente)
-========================================= */
-function showTooltip(P, event = null, keepPos = false) {
-  P = parseInt(P) || 0;
-  const extremo = Math.floor(P * 0.10);
-  const bom = Math.floor(P / 3);
-  const sucesso = Math.floor(P * 0.60);
-  
-  const desastreInicio = P >= 60 ? 96 : 90;
-
-  const maxE = extremo; const minE = 1;
-  const maxB = bom; const minB = extremo + 1;
-  const maxS = sucesso; const minS = bom + 1;
-  const maxF = desastreInicio - 1; const minF = sucesso + 1;
-  const maxD = 100; const minD = desastreInicio;
-
-  const formatRange = (min, max) => min > max ? "—" : (min === max ? pad(min) : `${pad(min)}–${pad(max)}`);
-
-  const strD = P >= 130 ? "—" : formatRange(minD, maxD);
-  const strF = formatRange(minF, maxF);
-  const strS = formatRange(minS, maxS);
-  const strB = formatRange(minB, maxB);
-  const strE = formatRange(minE, maxE);
-
-  document.getElementById('tt-val-d').innerText = strD;
-  document.getElementById('tt-val-f').innerText = strF;
-  document.getElementById('tt-val-s').innerText = strS;
-  document.getElementById('tt-val-b').innerText = strB;
-  document.getElementById('tt-val-e').innerText = strE;
-
-  tooltipEl.classList.add('show');
-
-  if (!keepPos && event) {
-    if (window.innerWidth < 768) {
-      tooltipEl.style.left = '50%'; tooltipEl.style.top = '50%';
-      tooltipEl.style.transform = 'translate(-50%, -50%) scale(1)';
-    } else {
-      const rect = event.currentTarget.getBoundingClientRect();
-      let top = rect.top + window.scrollY;
-      let left = rect.right + 15 + window.scrollX;
-      tooltipEl.style.transform = 'scale(1)';
-      if (left + tooltipEl.offsetWidth > window.innerWidth) left = rect.left - tooltipEl.offsetWidth - 15 + window.scrollX;
-      if (top + tooltipEl.offsetHeight > window.scrollY + window.innerHeight) top -= (tooltipEl.offsetHeight - rect.height);
-      tooltipEl.style.left = `${left}px`; tooltipEl.style.top = `${top}px`;
-    }
-    tooltipEl.dataset.activeId = event.currentTarget.id;
-  }
-}
-
-function hideTooltip() { tooltipEl.classList.remove('show'); tooltipEl.style.transform = 'scale(0.95)'; tooltipEl.dataset.activeId = ''; }
-function setupTooltipClose() {
-  document.addEventListener('click', (e) => { if (!e.target.closest('.skill-row') && !e.target.closest('.skill-base') && !e.target.closest('#d100-tooltip')) hideTooltip(); });
-  document.addEventListener('touchstart', (e) => { if (!e.target.closest('.skill-row') && !e.target.closest('.skill-base') && !e.target.closest('#d100-tooltip')) hideTooltip(); });
-}
-function pad(n) { return n < 10 ? '0'+n : n; }
-function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
-
-/* =========================================
-   RENDERIZAÇÃO
-========================================= */
-function renderCorruption() {
-  const cont = document.getElementById('ui-corruption'); cont.innerHTML = '';
-  for(let i=1; i<=6; i++) {
-    const sq = document.createElement('div');
-    sq.className = `corr-square ${i <= state.corruption ? 'active' : ''}`;
-    sq.onclick = () => { if(state.corruption === i) state.corruption--; else state.corruption = i; saveData(); renderCorruption(); };
-    cont.appendChild(sq);
-  }
-}
-
 function renderSkills() {
-  const container = document.getElementById('ui-skills-container'); container.innerHTML = '';
-  const colA = document.createElement('div'); const colB = document.createElement('div');
-  const catA = ['Físicas', 'Práticas', 'Sociais', 'Condução']; const catB = ['Conhecimento', 'Investigativas', 'Específicas'];
-
-  const renderCat = (catName) => {
-    const wrap = document.createElement('div'); wrap.className = 'skill-category';
-    const head = document.createElement('div'); head.className = 'skill-cat-header';
-    head.innerHTML = `<span>${catName.toUpperCase()}</span> <span class="skill-base" id="base-${catName}" id-cat="${catName}">Base: 0</span>`;
-    wrap.appendChild(head);
-    const list = document.createElement('div'); list.className = 'skill-list';
-    Object.keys(state.skills[catName]).sort().forEach(sk => {
-      const val = state.skills[catName][sk]; const row = document.createElement('div'); row.className = 'skill-row'; row.id = `row-${catName}-${sk}`;
-      row.innerHTML = `<span class="skill-name">${capitalize(sk)}</span><div class="skill-input-wrapper"><input type="number" class="skill-input" id="sk-${catName}-${sk}" value="${val}" onclick="event.stopPropagation()"></div>`;
-      row.addEventListener('mouseenter', (e) => showTooltip(state.skills[catName][sk], e)); row.addEventListener('mouseleave', () => hideTooltip()); row.addEventListener('click', (e) => showTooltip(state.skills[catName][sk], e));
-      const inp = row.querySelector('input');
-      inp.addEventListener('change', (e) => handleSkillChange(catName, sk, e.target.value)); inp.addEventListener('blur', (e) => handleSkillChange(catName, sk, e.target.value));
+  const cont=document.getElementById('ui-skills-container'); cont.innerHTML='';
+  const cA=['Físicas','Práticas','Sociais','Condução'];
+  const cB=['Conhecimento','Investigativas','Específicas'];
+  const colA=document.createElement('div');
+  const colB=document.createElement('div');
+  function mkCat(cat) {
+    const wrap=document.createElement('div'); wrap.className='skill-cat';
+    const hd=document.createElement('div'); hd.className='skill-cat-hd';
+    hd.innerHTML=`<span>${cat.toUpperCase()}</span><span class="skill-base" id="base-${cat}" data-val="0">Base: 0</span>`;
+    const list=document.createElement('div');
+    Object.keys(S.skills[cat]).sort().forEach(sk => {
+      const v=S.skills[cat][sk];
+      const row=document.createElement('div'); row.className='skill-row'; row.id=`row-${cat}-${sk}`;
+      row.innerHTML=`<span class="sk-name">${cap(sk)}</span><div class="sk-inp-wrap"><input type="number" class="sk-inp" id="sk-${cat}-${sk}" value="${v}" onclick="event.stopPropagation()"></div>`;
+      row.addEventListener('mouseenter',e=>showTT(S.skills[cat][sk],e));
+      row.addEventListener('mouseleave',hideTT);
+      row.addEventListener('click',e=>showTT(S.skills[cat][sk],e));
+      const inp=row.querySelector('input');
+      inp.addEventListener('change',e=>chgSkill(cat,sk,e.target.value));
+      inp.addEventListener('blur',  e=>chgSkill(cat,sk,e.target.value));
       list.appendChild(row);
     });
-    const baseEl = head.querySelector('.skill-base');
-    baseEl.addEventListener('mouseenter', (e) => showTooltip(e.target.dataset.val, e)); baseEl.addEventListener('mouseleave', () => hideTooltip()); baseEl.addEventListener('click', (e) => showTooltip(e.target.dataset.val, e));
-    wrap.appendChild(list); return wrap;
-  };
-  catA.forEach(c => colA.appendChild(renderCat(c))); catB.forEach(c => colB.appendChild(renderCat(c)));
-  container.appendChild(colA); container.appendChild(colB);
-}
-
-function renderDynamicList(listName) {
-  const container = document.getElementById(`ui-${listName}-list`); container.innerHTML = '';
-  state[listName].forEach((item, index) => {
-    const card = document.createElement('div'); card.className = 'item-card';
-    card.innerHTML = `
-      <div class="item-header">
-        <input type="text" class="item-title-input" value="${item.name}" placeholder="Nome..." onchange="updateDynamicItem('${listName}', ${index}, 'name', this.value)">
-        <button class="btn-danger" style="padding: 4px 8px; min-height: 32px;" onclick="removeDynamicItem('${listName}', ${index})">×</button>
-      </div>
-      <button class="toggle-desc-btn ${item.expanded ? 'expanded' : ''}" onclick="toggleDynamicDesc('${listName}', ${index})">
-        ${item.expanded ? '▲ Ocultar Descrição' : '▼ Expandir Descrição'} <span>▼</span>
-      </button>
-      <div class="item-body ${item.expanded ? 'expanded' : ''}">
-        ${listName !== 'traits' ? `<label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom: 5px;"><input type="checkbox" style="width:auto; min-height:auto;" ${item.active ? 'checked' : ''} onchange="updateDynamicItem('${listName}', ${index}, 'active', this.checked)"> Usado/Equipado</label>` : ''}
-        <textarea class="item-desc" placeholder="Detalhes..." onchange="updateDynamicItem('${listName}', ${index}, 'desc', this.value)">${item.desc || ''}</textarea>
-      </div>`;
-    container.appendChild(card);
-  });
-}
-function addDynamicItem(listName) { state[listName].unshift({ name: 'Novo Item', desc: '', expanded: true, active: false }); saveData(); renderDynamicList(listName); }
-function removeDynamicItem(listName, index) { if(confirm('Remover?')) { state[listName].splice(index, 1); saveData(); renderDynamicList(listName); } }
-function updateDynamicItem(listName, index, field, val) { state[listName][index][field] = val; saveData(); }
-function toggleDynamicDesc(listName, index) { state[listName][index].expanded = !state[listName][index].expanded; saveData(); renderDynamicList(listName); }
-
-function renderInventory() {
-  const container = document.getElementById('ui-inv-list'); container.innerHTML = '';
-  const cats = ['Mochila', 'Equipamentos', 'Consumíveis', 'Utilidades'];
-  cats.forEach(cat => {
-    if (currentInvFilter !== 'Todos' && currentInvFilter !== cat) return;
-    const items = state.inventory.filter(i => i.category === cat);
-    if (currentInvFilter === 'Todos') { const sep = document.createElement('div'); sep.className = 'category-separator'; sep.innerText = `── ${cat} ──`; container.appendChild(sep); }
-    if (items.length === 0 && currentInvFilter === 'Todos') { const p = document.createElement('p'); p.className = 'empty-msg'; p.innerText = '(Vazio)'; container.appendChild(p); return; }
-    items.forEach(item => {
-      const globalIndex = state.inventory.indexOf(item);
-      const card = document.createElement('div'); card.className = 'item-card';
-      card.innerHTML = `
-        <div class="item-header">
-          <input type="text" class="item-title-input" value="${item.name}" placeholder="Nome..." onchange="updateInvItem(${globalIndex}, 'name', this.value)">
-          <div class="item-qty-controls"><button onclick="modInvQty(${globalIndex}, -1)">-</button><input type="number" class="item-qty-input" value="${item.qty}" onchange="updateInvItem(${globalIndex}, 'qty', this.value)"><button onclick="modInvQty(${globalIndex}, 1)">+</button><button class="btn-danger" style="margin-left:5px;" onclick="removeInvItem(${globalIndex})">×</button></div>
-        </div>
-        <select style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text); padding: 5px; border-radius: 4px;" onchange="updateInvItem(${globalIndex}, 'category', this.value)">${cats.map(c => `<option value="${c}" ${c===item.category ? 'selected' : ''}>${c}</option>`).join('')}</select>
-        <button class="toggle-desc-btn ${item.expanded ? 'expanded' : ''}" onclick="toggleInvDesc(${globalIndex})">Desc. <span>▼</span></button>
-        <div class="item-body ${item.expanded ? 'expanded' : ''}"><textarea class="item-desc" placeholder="Detalhes..." onchange="updateInvItem(${globalIndex}, 'desc', this.value)">${item.desc || ''}</textarea></div>`;
-      container.appendChild(card);
-    });
-  });
-}
-function setInvFilter(f) { currentInvFilter = f; document.querySelectorAll('#ui-inv-filters .filter-btn').forEach(b => b.classList.toggle('active', b.innerText === f)); renderInventory(); }
-function addInventoryItem() { const cat = currentInvFilter === 'Todos' ? 'Mochila' : currentInvFilter; state.inventory.unshift({ name: 'Novo Item', category: cat, qty: 1, desc: '', expanded: true }); saveData(); renderInventory(); }
-function removeInvItem(i) { if(confirm('Remover?')) { state.inventory.splice(i, 1); saveData(); renderInventory(); } }
-function updateInvItem(i, f, v) { if(f === 'qty') v = parseInt(v) || 0; state.inventory[i][f] = v; saveData(); if(f === 'category') renderInventory(); }
-function modInvQty(i, a) { let q = (parseInt(state.inventory[i].qty) || 0) + a; if(q < 0) q = 0; state.inventory[i].qty = q; saveData(); renderInventory(); }
-function toggleInvDesc(i) { state.inventory[i].expanded = !state.inventory[i].expanded; saveData(); renderInventory(); }
-
-/* =========================================
-   UI & UTILITÁRIOS
-========================================= */
-function handleImageUpload(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas'); const MAX_WIDTH = 400; const MAX_HEIGHT = 533; 
-      let width = img.width; let height = img.height;
-      if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-      canvas.width = width; canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      document.getElementById('ui-photo').src = dataUrl; state.photo = dataUrl; saveData();
-    }
-    img.src = event.target.result;
+    const be=hd.querySelector('.skill-base');
+    be.addEventListener('mouseenter',e=>showTT(e.target.dataset.val,e));
+    be.addEventListener('mouseleave',hideTT);
+    be.addEventListener('click',e=>showTT(e.target.dataset.val,e));
+    wrap.appendChild(hd); wrap.appendChild(list);
+    return wrap;
   }
-  reader.readAsDataURL(file);
+  cA.forEach(c=>colA.appendChild(mkCat(c)));
+  cB.forEach(c=>colB.appendChild(mkCat(c)));
+  cont.appendChild(colA); cont.appendChild(colB);
 }
 
-function toggleSection(secId) {
-  state.collapsed[secId] = !state.collapsed[secId];
-  saveData();
-  applyCollapsedState(secId);
+/* ================================================
+   D100 TOOLTIP
+================================================ */
+function showTT(P,e=null,keep=false) {
+  P=parseInt(P)||0;
+  const ext=Math.floor(P*0.10), bon=Math.floor(P/3), suc=Math.floor(P*0.60), ds=P>=60?96:90;
+  const fmt=(mn,mx)=>mn>mx?'—':mn===mx?pad(mn):`${pad(mn)}–${pad(mx)}`;
+  document.getElementById('tt-d').innerText=P>=130?'—':fmt(ds,100);
+  document.getElementById('tt-f').innerText=fmt(suc+1,ds-1);
+  document.getElementById('tt-s').innerText=fmt(bon+1,suc);
+  document.getElementById('tt-b').innerText=fmt(ext+1,bon);
+  document.getElementById('tt-e').innerText=fmt(1,ext);
+  TT.classList.add('show');
+  if(!keep&&e) {
+    if(window.innerWidth<480) return;
+    const rc=e.currentTarget.getBoundingClientRect();
+    let top=rc.top+window.scrollY, left=rc.right+12+window.scrollX;
+    if(left+180>window.innerWidth) left=rc.left-180+window.scrollX;
+    if(top+160>window.scrollY+window.innerHeight) top-=100;
+    TT.style.left=`${left}px`; TT.style.top=`${top}px`;
+    TT.style.transform='scale(1) translateY(0)';
+    TT.dataset.aid=e.currentTarget.id;
+  }
 }
-function applyCollapsedState(secId) {
-  const content = document.getElementById('content-' + secId);
-  const title = document.querySelector(`#${secId} .section-title`);
-  if (state.collapsed[secId]) { content.classList.add('collapsed'); title.classList.add('collapsed'); }
-  else { content.classList.remove('collapsed'); title.classList.remove('collapsed'); }
+function hideTT() { TT.classList.remove('show'); TT.dataset.aid=''; }
+function pad(n) { return n<10?'0'+n:''+n; }
+function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* ================================================
+   CORRUPTION
+================================================ */
+function renderCorr() {
+  const c=document.getElementById('ui-corruption'); c.innerHTML='';
+  for(let i=1;i<=6;i++) {
+    const sq=document.createElement('div');
+    sq.className='corr-sq'+(i<=S.corruption?' on':'');
+    sq.onclick=()=>{ S.corruption=S.corruption===i?i-1:i; saveData(); renderCorr(); };
+    c.appendChild(sq);
+  }
 }
 
-function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-document.querySelectorAll('#nav-menu a').forEach(link => { link.addEventListener('click', () => { if(window.innerWidth < 768) toggleMenu(); document.querySelectorAll('#nav-menu a').forEach(l => l.classList.remove('active')); link.classList.add('active'); }); });
+/* ================================================
+   DYNAMIC LISTS
+================================================ */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderDyn(list) {
+  const cont=document.getElementById(`ui-${list}-list`); cont.innerHTML='';
+  S[list].forEach((item,i)=>{
+    const card=document.createElement('div'); card.className='item-card';
+    card.innerHTML=`
+      <div class="item-hd">
+        <input type="text" class="item-name-in" value="${esc(item.name)}" placeholder="Nome..." onchange="updDyn('${list}',${i},'name',this.value)">
+        <button class="del-btn btn-x" onclick="delDyn('${list}',${i})">×</button>
+      </div>
+      <button class="tog-btn ${item.expanded?'open':''}" onclick="togDyn('${list}',${i})">
+        ${item.expanded?'▲ OCULTAR':'▼ DETALHES'} <span class="tog-icon">▼</span>
+      </button>
+      <div class="item-body ${item.expanded?'open':''}">
+        ${list!=='traits'?`<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;"><input type="checkbox" ${item.active?'checked':''} onchange="updDyn('${list}',${i},'active',this.checked)"> Usado / Equipado</label>`:''}
+        <textarea class="item-desc" placeholder="Detalhes..." onchange="updDyn('${list}',${i},'desc',this.value)">${esc(item.desc||'')}</textarea>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+function addDyn(list){ S[list].unshift({name:'Novo Item',desc:'',expanded:true,active:false}); saveData(); renderDyn(list); }
+function delDyn(list,i){ if(confirm('Remover?')){ S[list].splice(i,1); saveData(); renderDyn(list); } }
+function updDyn(list,i,f,v){ S[list][i][f]=v; saveData(); }
+function togDyn(list,i){ S[list][i].expanded=!S[list][i].expanded; saveData(); renderDyn(list); }
 
-function setupScrollSpy() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        document.querySelectorAll('#nav-menu a').forEach(link => { link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`); });
-      }
+/* ================================================
+   INVENTORY
+================================================ */
+function renderInv() {
+  const cont=document.getElementById('ui-inv-list'); cont.innerHTML='';
+  INV_CATS.forEach(cat=>{
+    if(invF!=='Todos'&&invF!==cat) return;
+    const items=S.inventory.filter(it=>it.category===cat);
+    if(invF==='Todos'){
+      const sep=document.createElement('div'); sep.className='cat-sep'; sep.innerText=`── ${cat} ──`;
+      cont.appendChild(sep);
+      if(!items.length){ const p=document.createElement('p'); p.className='empty-note'; p.innerText='(Vazio)'; cont.appendChild(p); return; }
+    }
+    items.forEach(item=>{
+      const gi=S.inventory.indexOf(item);
+      const card=document.createElement('div'); card.className='item-card';
+      card.innerHTML=`
+        <div class="item-hd">
+          <input type="text" class="item-name-in" value="${esc(item.name)}" placeholder="Nome..." onchange="updInv(${gi},'name',this.value)">
+          <div class="qty-row">
+            <button class="sq-btn" onclick="modQty(${gi},-1)">−</button>
+            <input type="number" class="qty-in" value="${item.qty}" onchange="updInv(${gi},'qty',this.value)">
+            <button class="sq-btn" onclick="modQty(${gi},1)">+</button>
+            <button class="del-btn btn-x" onclick="delInv(${gi})">×</button>
+          </div>
+        </div>
+        <select onchange="updInv(${gi},'category',this.value)">${INV_CATS.map(c=>`<option value="${c}"${c===item.category?' selected':''}>${c}</option>`).join('')}</select>
+        <button class="tog-btn ${item.expanded?'open':''}" onclick="togInv(${gi})">
+          ${item.expanded?'▲ OCULTAR':'▼ DESCRIÇÃO'} <span class="tog-icon">▼</span>
+        </button>
+        <div class="item-body ${item.expanded?'open':''}">
+          <textarea class="item-desc" placeholder="Detalhes..." onchange="updInv(${gi},'desc',this.value)">${esc(item.desc||'')}</textarea>
+        </div>`;
+      cont.appendChild(card);
     });
-  }, { rootMargin: '-20% 0px -60% 0px' });
-  document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+  });
+}
+function setFilter(f){
+  invF=f;
+  document.querySelectorAll('#inv-filters .f-btn').forEach(b=>b.classList.toggle('on',b.textContent.trim()===f));
+  renderInv();
+}
+function addInv(){
+  const cat=invF==='Todos'?'Mochila':invF;
+  S.inventory.unshift({name:'Novo Item',category:cat,qty:1,desc:'',expanded:true});
+  saveData(); renderInv();
+}
+function delInv(i){ if(confirm('Remover?')){ S.inventory.splice(i,1); saveData(); renderInv(); } }
+function updInv(i,f,v){ if(f==='qty') v=parseInt(v)||0; S.inventory[i][f]=v; saveData(); if(f==='category') renderInv(); }
+function modQty(i,a){ S.inventory[i].qty=Math.max(0,(parseInt(S.inventory[i].qty)||0)+a); saveData(); renderInv(); }
+function togInv(i){ S.inventory[i].expanded=!S.inventory[i].expanded; saveData(); renderInv(); }
+
+/* ================================================
+   IMAGE
+================================================ */
+function handleImg(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      let w=img.width,h=img.height,M=480;
+      if(w>h){if(w>M){h*=M/w;w=M;}}else{if(h>M){w*=M/h;h=M;}}
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const url=canvas.toDataURL('image/jpeg',0.82);
+      document.getElementById('ui-photo').src=url; S.photo=url; saveData();
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(f);
+}
+
+/* ================================================
+   SECTIONS
+================================================ */
+function toggleSec(id){
+  S.collapsed[id]=!S.collapsed[id]; saveData(); applyCollapsed(id);
+}
+function applyCollapsed(id){
+  const b=document.getElementById('bd-'+id);
+  const h=document.querySelector(`#${id} .sec-hd`);
+  b.classList.toggle('hidden',!!S.collapsed[id]);
+  h.classList.toggle('closed',!!S.collapsed[id]);
+}
+function toggleMenu(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+document.querySelectorAll('#nav-menu a').forEach(a=>{
+  a.addEventListener('click',()=>{
+    if(window.innerWidth<480) toggleMenu();
+    document.querySelectorAll('#nav-menu a').forEach(l=>l.classList.remove('active'));
+    a.classList.add('active');
+  });
+});
+function scrollSpy(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting)
+        document.querySelectorAll('#nav-menu a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));
+    });
+  },{rootMargin:'-20% 0px -60% 0px'});
+  document.querySelectorAll('section').forEach(s=>obs.observe(s));
 }
 
 window.onload = init;
