@@ -90,7 +90,7 @@ button:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
 button:active{opacity:.75}
 /* REMOVED transform:scale on :active — was causing layout reflow bugs on mobile */
 button:disabled{opacity:.28;cursor:not-allowed}
-.bp{background:rgba(0,229,200,.1);border-color:var(--acc);color:var(--acc);font-size:.9rem}
+.bp{background:var(--acc-dim);border-color:var(--acc);color:var(--acc);font-size:.9rem}
 .bp:hover{background:var(--acc);color:#000}
 .bd{background:var(--danger-dim);border-color:var(--danger);color:var(--danger)}
 .bd:hover{background:var(--danger);color:#fff}
@@ -194,7 +194,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
   opacity:.55;
   transition:opacity var(--tr),border-color var(--tr),background var(--tr);
 }
-.photo-wrap:hover .photo-edit-icon{opacity:1;border-color:var(--acc);background:rgba(0,229,200,.15)}
+.photo-wrap:hover .photo-edit-icon{opacity:1;border-color:var(--acc);background:var(--acc-dim)}
 .photo-edit-icon svg{width:14px;height:14px;fill:none;stroke:var(--acc);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 .flbl{font-family:var(--mono);font-size:.72rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:5px}
@@ -220,7 +220,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
   transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);
   flex-shrink:0;
 }
-.csq:hover{background:rgba(0,229,200,.25);border-color:var(--acc)}
+.csq:hover{background:var(--acc-dim);border-color:var(--acc)}
 .csq.on{background:var(--acc)!important;border-color:var(--acc);box-shadow:0 0 8px var(--acc-glow)}
 
 /* ═══ VITAL HUD ═══ */
@@ -261,7 +261,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .sbase{font-family:var(--mono);font-size:.74rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:3px;transition:all .15s}
 .sbase:hover{background:var(--acc-dim);color:var(--acc)}
 .srow{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
-.srow:hover{background:rgba(0,229,200,.06)}
+.srow:hover{background:var(--acc-dim)}
 .srow:last-child{border-bottom:none}
 .skname{font-size:.92rem;font-weight:500;flex-grow:1;pointer-events:none}
 .skinw{display:flex;align-items:center}
@@ -290,7 +290,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 /* ═══ ITEM CARDS ═══ */
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .icard{background:rgba(6,11,24,.75);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s}
-.icard:hover{border-color:rgba(0,229,200,.35)}
+.icard:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
 .ihd{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .ititle{font-weight:700;font-size:1rem;color:var(--acc);flex-grow:1;background:transparent;border:none;min-height:unset;padding:0;height:auto;border-radius:0;font-family:var(--sans)}
 .ititle:focus{background:rgba(0,0,0,.25);border-bottom:1px solid var(--acc);box-shadow:none;padding:0 4px}
@@ -349,12 +349,14 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 /* ═══ FAB ═══ */
 .fabwrap{position:fixed;bottom:24px;right:20px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .fabmenu{
-  display:flex;flex-direction:column;gap:5px;opacity:0;visibility:hidden;
-  transform:translateY(10px) scale(.97);transition:all .2s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;gap:5px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(10px) scale(.97);
+  transition:opacity .2s cubic-bezier(.4,0,.2,1),visibility .2s,transform .2s cubic-bezier(.4,0,.2,1);
   background:rgba(3,6,15,.98);border:1px solid var(--border);border-radius:var(--r);
   padding:12px;width:220px;box-shadow:0 8px 32px rgba(0,0,0,.85);
 }
-.fabwrap.open .fabmenu{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.fabwrap.open .fabmenu{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
 .fabmain{border-radius:99px;padding:12px 22px;font-weight:700;font-family:var(--mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;min-height:48px;box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 20px var(--acc-glow)}
 .fopt{background:transparent;border:1px solid var(--border2);border-radius:4px;padding:10px 14px;text-align:left;width:100%;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-height:42px;justify-content:flex-start}
 .fopt:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
@@ -772,13 +774,13 @@ section{margin-bottom:50px;scroll-margin-top:80px}
    DATA DEFAULTS
 ═══════════════════════════════════════════ */
 const DEF_SK={
-  Físicas:{agilidade:65,bloquear:25,escalar:10,esquivar:100,furtividade:35,luta:120,natacao:10,pontaria:20,prestidigitacao:10,reflexos:60},
-  Práticas:{aph:100,arte:10,mecanica:65,medicina:70,psicanalise:50,psicologia:80},
-  Sociais:{atuacao:30,barganha:40,intimidacao:30,labia:35,persuasao:50},
-  Condução:{dirigir:20,navegar:20,pilotar:5},
-  Conhecimento:{antropologia:20,arcano:105,arqueologia:25,ciencias:45,coliso:20,contabilidade:30,criptografia:25,farmacia:55,historia:25,linguagem:45},
-  Investigativas:{biblioteca:45,encontrar:75,ouvir:70,rastrear:55,falsificar:25},
-  Específicas:{sanidade:55,vontade:55,sorte:30,sobrenatural:120,fortitude:115}
+Físicas:{agilidade:0,bloquear:0,escalar:0,esquivar:0,furtividade:0,luta:0,natação:0,pontaria:0,prestidigitação:0,reflexos:0},
+  Práticas:{aph:0,arte:0,mecânica:0,medicina:0,psicanálise:0,psicologia:0},
+  Sociais:{atuação:0,barganha:0,intimidação:0,lábia:0,persuasão:0},
+  Condução:{dirigir:0,navegar:0,pilotar:0},
+  Conhecimento:{antropologia:0,arcano:0,arqueologia:0,ciências:0,coliso:0,contabilidade:0,criptografia:0,farmácia:0,história:0,linguagem:0},
+  Investigativas:{biblioteca:0,encontrar:0,ouvir:0,rastrear:0,falsificar:0},
+  Específicas:{sanidade:0,vontade:0,sorte:0,sobrenatural:0,fortitude:0}
 };
 const PALS=[
   {p:'#00e5c8',s:'#005544'},{p:'#ff4757',s:'#7f1d1d'},{p:'#FF9F1C',s:'#7c3a08'},
