@@ -88,7 +88,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .card::after{content:'';position:absolute;top:0;right:0;border-style:solid;border-width:0 14px 14px 0;border-color:transparent var(--acc) transparent transparent;opacity:.22;border-radius:0 var(--r) 0 0}
 
 /* ── CHAR LAYOUT ── */
-.char-grid{display:grid;grid-template-columns:190px 1fr;gap:24px}
+.char-grid{display:grid;grid-template-columns:230px 1fr;gap:24px}
 .char-photo-col{display:flex;flex-direction:column;gap:12px}
 .photo-wrap{position:relative;width:100%;cursor:pointer;border-radius:var(--r);overflow:hidden}
 .char-photo{width:100%;aspect-ratio:3/4;object-fit:cover;border:1px solid var(--border);border-radius:var(--r);display:block;background:var(--bg1);transition:border-color var(--tr),box-shadow var(--tr)}
@@ -146,138 +146,166 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .ttv{text-align:right;font-family:var(--mono);font-size:.75rem}
 .td{color:#f87171}.tf{color:#fbbf24}.ts{color:#cbd5e1}.tb{color:#60a5fa}.te{color:#34d399}
 
-/* ══════════════════════════════════════
-   ITEM CARDS — sandwich layout
-══════════════════════════════════════ */
+/* ── ITEM CARDS — new layout ── */
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-
-/* Dragging */
 .icard.dragging{opacity:.4;border-style:dashed}
 .icard.drag-over{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-glow)}
-
 .icard{
   background:rgba(6,11,24,.75);border:1px solid var(--border);border-radius:var(--r);
   display:flex;flex-direction:column;
   transition:border-color .15s,box-shadow .15s,opacity .15s;
-  cursor:default;
 }
 .icard:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
 
-/* Single header row — sandwich bar */
+/* Top bar: name + qty + delete ONLY (no arrow) */
 .ibar{
   display:flex;align-items:center;gap:6px;
-  padding:9px 10px;
-  cursor:pointer;
-  user-select:none;
-  min-height:44px;
-}
-.ibar-arrow{
-  font-size:.65rem;color:var(--muted);
-  transition:transform .22s;flex-shrink:0;width:14px;text-align:center;
-}
-.icard.open .ibar-arrow{transform:rotate(180deg)}
-.ibar-name{
-  flex-grow:1;font-size:.95rem;font-weight:600;color:var(--text);
-  font-family:var(--sans);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  /* Editable inline */
-  cursor:text;
-  min-width:0;
+  padding:9px 10px 8px;
+  min-height:42px;
 }
 .ibar-name-input{
   flex-grow:1;font-size:.95rem;font-weight:600;color:var(--text);
   font-family:var(--sans);background:transparent;border:none;
-  padding:0;min-height:unset;height:auto;border-radius:0;
-  min-width:0;width:100%;
+  padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%;
 }
 .ibar-name-input:focus{outline:none;border-bottom:1px solid var(--acc);background:rgba(0,0,0,.2);padding:0 2px;box-shadow:none}
-/* Qty badge */
-.ibar-qty{
-  display:flex;align-items:center;gap:3px;flex-shrink:0;
-}
+.ibar-qty{display:flex;align-items:center;gap:3px;flex-shrink:0}
 .iqbtn{width:22px;height:22px;min-height:22px;padding:0;font-size:.75rem;border-radius:3px;border-color:var(--border2);color:var(--muted)}
 .iqbtn:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
 .iqnum{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:20px;text-align:center}
-/* X delete button — minimal red, no border */
-.idel{
-  width:24px;height:24px;min-height:24px;padding:0;flex-shrink:0;
-  border:none;background:transparent;
-  color:var(--danger);font-size:1rem;
-  border-radius:3px;
-  opacity:.55;
-}
+.idel{width:22px;height:22px;min-height:22px;padding:0;flex-shrink:0;border:none;background:transparent;color:var(--danger);font-size:.95rem;border-radius:3px;opacity:.5}
 .idel:hover{background:var(--danger-dim);opacity:1;border:none}
 
-/* Drag handle */
-.ibar-drag{
-  font-size:.7rem;color:var(--border);cursor:grab;flex-shrink:0;
-  padding:0 2px;letter-spacing:0;line-height:1;
-  opacity:.5;
+/* Damage row — shows below name bar for equip-type inventory items */
+.ibar-dmg{
+  padding:0 10px 7px;display:flex;align-items:center;gap:6px;
 }
-.ibar-drag:hover{color:var(--acc);opacity:1}
-.ibar-drag:active{cursor:grabbing}
+.ibar-dmg-lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.ibar-dmg-inp{
+  flex-grow:1;font-size:.85rem;font-family:var(--mono);
+  background:rgba(0,0,0,.3);border:1px solid var(--border2);
+  border-radius:3px;padding:3px 7px;height:28px;min-height:28px;color:var(--text);
+}
+.ibar-dmg-inp:focus{border-color:var(--acc);outline:none;box-shadow:none}
+
+/* Bottom expand/drag strip — the "=" handle */
+.ibar-strip{
+  display:flex;align-items:center;justify-content:center;
+  height:22px;cursor:pointer;
+  border-top:1px solid var(--border2);
+  background:transparent;
+  transition:background .15s;
+  border-radius:0 0 var(--r) var(--r);
+  user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.ibar-strip:hover{background:var(--acc-dim)}
+.ibar-strip-icon{
+  font-size:.7rem;color:var(--acc);opacity:.45;
+  letter-spacing:2px;transition:opacity .15s;
+  pointer-events:none;
+}
+.ibar-strip:hover .ibar-strip-icon{opacity:.9}
 
 /* Card body */
-.ibody{display:none;flex-direction:column;gap:8px;padding:0 10px 10px}
+.ibody{display:none;flex-direction:column;gap:8px;padding:8px 10px 4px;border-top:1px solid var(--border2)}
 .icard.open .ibody{display:flex}
 
-/* Desc area */
-.idesc{min-height:65px;resize:vertical;font-size:.9rem}
+/* Textarea wrapper with magnify button */
+.ta-wrap{position:relative;display:flex;flex-direction:column}
+.ta-magnify{
+  position:absolute;bottom:6px;right:6px;
+  width:24px;height:24px;min-height:24px;padding:0;
+  background:rgba(0,0,0,.55);border:1px solid var(--border);
+  border-radius:4px;color:var(--muted);font-size:.8rem;
+  z-index:2;opacity:.6;
+}
+.ta-magnify:hover{opacity:1;border-color:var(--acc);color:var(--acc);background:rgba(0,0,0,.8)}
+.idesc{min-height:65px;resize:vertical;font-size:.9rem;padding-bottom:28px}
 
 /* Sub-label inside card */
 .ifield-lbl{font-family:var(--mono);font-size:.65rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:3px;margin-top:6px}
+.ifield-lbl:first-child{margin-top:0}
 
-/* Collapsible desc toggle inside ibody */
-.desc-tog{
-  background:none;border:none;color:var(--muted);
-  font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
-  min-height:24px;padding:2px 0;justify-content:flex-start;
-}
+/* Collapsible desc toggle */
+.desc-tog{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;min-height:24px;padding:2px 0;justify-content:flex-start}
 .desc-tog:hover{color:var(--acc);background:none;border:none}
 
 /* ── ABILITIES ── */
-.abilities-wrap{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-/* Equipment: inline list */
+.abilities-wrap{display:flex;flex-direction:column;gap:5px;margin-top:4px}
 .ab-card{background:rgba(0,0,0,.3);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
-.ab-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer}
-.ab-arrow{font-size:.6rem;color:var(--muted);transition:transform .2s;flex-shrink:0}
-.ab-card.open .ab-arrow{transform:rotate(180deg)}
+/* Ability top bar: name + del */
+.ab-bar{display:flex;align-items:center;gap:5px;padding:5px 8px;min-height:34px}
 .ab-name-inp{flex-grow:1;font-size:.88rem;font-weight:600;color:var(--text);font-family:var(--sans);background:transparent;border:none;padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%}
 .ab-name-inp:focus{outline:none;border-bottom:1px solid var(--acc);box-shadow:none}
-.ab-del{width:20px;height:20px;min-height:20px;padding:0;border:none;background:transparent;color:var(--danger);font-size:.9rem;border-radius:2px;opacity:.5;flex-shrink:0}
+.ab-del{width:18px;height:18px;min-height:18px;padding:0;border:none;background:transparent;color:var(--danger);font-size:.85rem;border-radius:2px;opacity:.45;flex-shrink:0}
 .ab-del:hover{background:var(--danger-dim);opacity:1;border:none}
+/* Ability bottom strip */
+.ab-strip{
+  display:flex;align-items:center;justify-content:center;
+  height:18px;cursor:pointer;border-top:1px solid var(--border2);
+  background:transparent;transition:background .12s;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.ab-strip:hover{background:rgba(0,229,200,.07)}
+.ab-strip-icon{font-size:.6rem;color:var(--acc);opacity:.35;letter-spacing:2px;pointer-events:none}
+.ab-strip:hover .ab-strip-icon{opacity:.75}
 .ab-body{display:none;padding:6px 8px 8px;border-top:1px solid var(--border2)}
 .ab-card.open .ab-body{display:block}
-.ab-desc{min-height:52px;resize:vertical;font-size:.85rem}
-.add-ab-btn{min-height:30px;padding:4px 10px;font-size:.72rem;border-color:var(--border2);color:var(--muted);margin-top:4px}
+.ab-desc{min-height:52px;resize:vertical;font-size:.85rem;padding-bottom:28px}
+
+/* Add ability button — just a + square */
+.add-ab-btn{
+  min-height:30px;width:30px;height:30px;padding:0;font-size:1rem;font-weight:600;
+  border-color:var(--border2);color:var(--muted);border-radius:4px;
+  align-self:flex-start;margin-top:4px;
+}
 .add-ab-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
 
 /* Spirit: grouped abilities */
-.ab-group-wrap{display:flex;flex-direction:column;gap:4px}
+.ab-group-wrap{display:flex;flex-direction:column;gap:5px}
 .ab-group{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:4px}
-.ab-group-hd{display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;border-bottom:1px solid transparent}
-.ab-group.open .ab-group-hd{border-bottom-color:var(--border2)}
-.ab-group-arrow{font-size:.6rem;color:var(--muted);transition:transform .2s;flex-shrink:0}
-.ab-group.open .ab-group-arrow{transform:rotate(180deg)}
+.ab-group-hd{display:flex;align-items:center;gap:6px;padding:5px 8px;min-height:32px}
 .ab-group-name{flex-grow:1;font-size:.85rem;font-weight:600;color:var(--muted);font-family:var(--sans);background:transparent;border:none;padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%}
 .ab-group-name:focus{outline:none;border-bottom:1px solid var(--acc);box-shadow:none;color:var(--text)}
 .ab-group-del{width:18px;height:18px;min-height:18px;padding:0;border:none;background:transparent;color:var(--danger);font-size:.85rem;border-radius:2px;opacity:.4;flex-shrink:0}
 .ab-group-del:hover{background:var(--danger-dim);opacity:1;border:none}
+/* Group expand strip */
+.ab-group-strip{
+  display:flex;align-items:center;justify-content:center;
+  height:18px;cursor:pointer;border-top:1px solid var(--border2);
+  background:transparent;transition:background .12s;
+  user-select:none;-webkit-tap-highlight-color:transparent;border-bottom:1px solid transparent;
+}
+.ab-group.open .ab-group-strip{border-bottom:1px solid var(--border2)}
+.ab-group-strip:hover{background:rgba(0,229,200,.07)}
+.ab-group-strip-icon{font-size:.6rem;color:var(--acc);opacity:.35;letter-spacing:2px;pointer-events:none}
+.ab-group-strip:hover .ab-group-strip-icon{opacity:.75}
 .ab-group-body{display:none;padding:6px 8px 8px;flex-direction:column;gap:5px}
 .ab-group.open .ab-group-body{display:flex}
 
-/* ── CATEGORY SEPARATORS (inventory) ── */
+/* CATEGORY SEPARATORS */
 .catsep{grid-column:1/-1;font-family:var(--mono);font-size:.74rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;padding:8px 4px 5px;border-bottom:1px solid var(--border);margin-top:6px}
 .catsep[data-cat].drag-cat-over{background:var(--acc-dim);border-color:var(--acc)}
 .emptyn{grid-column:1/-1;font-size:.9rem;color:var(--muted);font-style:italic;padding:4px}
 
 /* ── LIST CONTROLS ── */
-.lc{margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap}
-.fbtn{font-size:.8rem;padding:8px 14px;min-height:40px;font-family:var(--mono);letter-spacing:.08em}
+.lc{margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* + button — small square */
+.add-btn{
+  width:36px;height:36px;min-height:36px;padding:0;
+  font-size:1.2rem;font-weight:600;border-radius:var(--r);
+  border-color:var(--acc);color:var(--acc);background:var(--acc-dim);
+}
+.add-btn:hover{background:var(--acc);color:#000}
+
+/* Filter buttons — fully filled with accent color when active */
+.fbtn{font-size:.8rem;padding:7px 14px;min-height:36px;font-family:var(--mono);letter-spacing:.07em;border-color:var(--border)}
 .fbtn:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
 .fbtn.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
-.fbtn.on:hover{background:var(--acc);color:#000}
-.fta{min-height:240px;resize:vertical;line-height:1.65;font-size:.95rem}
+.fbtn.on:hover{filter:brightness(1.1)}
+
+.fta{min-height:240px;resize:vertical;line-height:1.65;font-size:.95rem;padding-bottom:32px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 
 /* ── MOBILE HEADER ── */
@@ -295,16 +323,53 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 #tabbar a.act{color:var(--acc);border-top-color:var(--acc)}
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99}
 
-/* ── FAB ── */
-.fabwrap{position:fixed;bottom:24px;right:20px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.fabmenu{display:flex;flex-direction:column;gap:5px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(10px) scale(.97);transition:opacity .2s cubic-bezier(.4,0,.2,1),visibility .2s,transform .2s cubic-bezier(.4,0,.2,1);background:rgba(3,6,15,.98);border:1px solid var(--border);border-radius:var(--r);padding:12px;width:220px;box-shadow:0 8px 32px rgba(0,0,0,.85)}
-.fabwrap.open .fabmenu{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
-/* Gear icon button */
-.fabmain{border-radius:50%;width:52px;height:52px;min-height:52px;padding:0;font-weight:700;font-size:1.3rem;box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 20px var(--acc-glow);transition:transform .3s,box-shadow .2s,background var(--tr),border-color var(--tr),color var(--tr)}
-.fabwrap.open .fabmain{transform:rotate(45deg)}
+/* ── FAB ── 
+   The entire menu uses max-height expansion (same as palette).
+   The gear button sits alone at the bottom-right.
+   No invisible block ever intercepts clicks below.
+── */
+.fabwrap{
+  position:fixed;bottom:24px;right:20px;z-index:200;
+  display:flex;flex-direction:column;align-items:flex-end;
+  /* NO gap — gap creates dead space even when menu is hidden */
+}
+/* Menu slides up above the gear button using max-height */
+.fabmenu{
+  overflow:hidden;
+  max-height:0;
+  pointer-events:none;
+  opacity:0;
+  transition:max-height .28s cubic-bezier(.4,0,.2,1),
+             opacity .2s ease,
+             padding .28s ease;
+  background:rgba(3,6,15,.98);
+  border:1px solid transparent;
+  border-radius:var(--r);
+  padding:0 12px;
+  width:220px;
+  margin-bottom:0;
+  box-shadow:none;
+  display:flex;flex-direction:column;gap:5px;
+}
+.fabwrap.open .fabmenu{
+  max-height:400px;
+  pointer-events:auto;
+  opacity:1;
+  padding:12px;
+  margin-bottom:10px;
+  border-color:var(--border);
+  box-shadow:0 8px 32px rgba(0,0,0,.85);
+}
+.fabmain{
+  border-radius:50%;width:52px;height:52px;min-height:52px;padding:0;
+  font-weight:700;font-size:1.3rem;flex-shrink:0;
+  box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 20px var(--acc-glow);
+  transition:transform .35s,box-shadow .2s,background var(--tr),border-color var(--tr),color var(--tr);
+}
+.fabwrap.open .fabmain{transform:rotate(90deg)}
 .fopt{background:transparent;border:1px solid var(--border2);border-radius:4px;padding:10px 14px;text-align:left;width:100%;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-height:42px;justify-content:flex-start}
 .fopt:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
-.fdiv{height:1px;background:var(--border2);margin:3px 0}
+.fdiv{height:1px;background:var(--border2);margin:3px 0;flex-shrink:0}
 .paltog{width:100%;justify-content:space-between;background:transparent;border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-height:42px}
 .paltog:hover{border-color:var(--acc);color:var(--acc)}
 .palchev{transition:transform .25s}
@@ -352,7 +417,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
   .ptbox .lbl{display:none}
   .ptbox .val{font-size:1rem}
   #main{padding:24px 20px 100px}
-  .char-grid{grid-template-columns:160px 1fr}
+  .char-grid{grid-template-columns:180px 1fr}
 }
 
 /* ── MOBILE ── */
@@ -548,7 +613,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-tracos" class="sec-body">
-      <div class="lc"><button class="bp" onclick="addDyn('traits')">+ Traço</button></div>
+      <div class="lc"><button class="add-btn" onclick="addDyn('traits')" title="Adicionar Traço">+</button></div>
       <div id="ui-traits-list" class="igrid"></div>
     </div>
   </section>
@@ -567,7 +632,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
         <button class="fbtn" onclick="setF('Consumíveis')">Cons.</button>
         <button class="fbtn" onclick="setF('Utilidades')">Util.</button>
       </div>
-      <div class="lc"><button class="bp" onclick="addInv()">+ Item</button></div>
+      <div class="lc"><button class="add-btn" onclick="addInv()" title="Adicionar Item">+</button></div>
       <div id="ui-inv-list" class="igrid"></div>
     </div>
   </section>
@@ -579,7 +644,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-equipamentos" class="sec-body">
-      <div class="lc"><button class="bp" onclick="addEquip()">+ Equipamento</button></div>
+      <div class="lc"><button class="add-btn" onclick="addEquip()" title="Adicionar Equipamento">+</button></div>
       <div id="ui-equipments-list" class="igrid"></div>
     </div>
   </section>
@@ -591,7 +656,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-espiritos" class="sec-body">
-      <div class="lc"><button class="bp" onclick="addSpirit()">+ Espírito</button></div>
+      <div class="lc"><button class="add-btn" onclick="addSpirit()" title="Adicionar Espírito">+</button></div>
       <div id="ui-spirits-list" class="igrid"></div>
     </div>
   </section>
@@ -613,9 +678,12 @@ section{margin-bottom:50px;scroll-margin-top:80px}
       <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">07</span></div>
       <span class="sec-arr">▼</span>
     </div>
-    <div id="bd-historico" class="sec-body">
-      <textarea id="ui-history" class="fta" oninput="saveData()" placeholder="A história do personagem..." onmousedown="maybePopup(event,this,'Histórico')"></textarea>
-    </div>
+      <div class="sec-body" id="bd-historico">
+        <div class="ta-wrap">
+          <textarea id="ui-history" class="fta" oninput="saveData()" placeholder="A história do personagem..."></textarea>
+          <button class="ta-magnify" onclick="openPopup(document.getElementById('ui-history'),'Histórico')" title="Expandir">🔍</button>
+        </div>
+      </div>
   </section>
 
   <!-- ANOTAÇÕES -->
@@ -624,9 +692,12 @@ section{margin-bottom:50px;scroll-margin-top:80px}
       <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">08</span></div>
       <span class="sec-arr">▼</span>
     </div>
-    <div id="bd-anotacoes" class="sec-body">
-      <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..." onmousedown="maybePopup(event,this,'Anotações')"></textarea>
-    </div>
+      <div class="sec-body" id="bd-anotacoes">
+        <div class="ta-wrap">
+          <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
+          <button class="ta-magnify" onclick="openPopup(document.getElementById('ui-notes'),'Anotações')" title="Expandir">🔍</button>
+        </div>
+      </div>
   </section>
 
 </main>
@@ -1028,17 +1099,19 @@ function renderCorr(){
 let dragSrc=null,dragList=null,dragCat=null;
 
 function setupCardDrag(card,list,idx){
-  card.setAttribute('draggable','true');
-  card.dataset.idx=idx;
-  card.dataset.list=list;
+  // Drag is initiated from the bottom strip only
+  const strip=card.querySelector('.ibar-strip');
+  if(!strip)return;
+  card.dataset.idx=idx;card.dataset.list=list;
 
-  card.addEventListener('dragstart',e=>{
+  strip.setAttribute('draggable','true');
+  strip.addEventListener('dragstart',e=>{
     dragSrc=card;dragList=list;dragCat=null;
     e.dataTransfer.effectAllowed='move';
     e.dataTransfer.setData('text/plain',idx);
     setTimeout(()=>card.classList.add('dragging'),0);
   });
-  card.addEventListener('dragend',()=>{
+  strip.addEventListener('dragend',()=>{
     card.classList.remove('dragging');
     document.querySelectorAll('.drag-over,.drag-cat-over').forEach(el=>el.classList.remove('drag-over','drag-cat-over'));
     dragSrc=null;
@@ -1054,30 +1127,28 @@ function setupCardDrag(card,list,idx){
     if(!dragSrc||dragSrc===card)return;
     const from=parseInt(dragSrc.dataset.idx);
     const to=parseInt(card.dataset.idx);
-    const srcList=dragSrc.dataset.list;
-    const tgtList=card.dataset.list;
-    if(srcList!==tgtList)return; // different lists — ignore
-    const arr=S[srcList];
-    const [item]=arr.splice(from,1);arr.splice(to,0,item);
+    if(dragSrc.dataset.list!==card.dataset.list)return;
+    const arr=S[dragSrc.dataset.list];
+    const[item]=arr.splice(from,1);arr.splice(to,0,item);
     saveData();
-    if(srcList==='inventory')renderInv();
-    else if(srcList==='equipments')renderEquipments();
-    else if(srcList==='spirits')renderSpirits();
-    else renderDyn(srcList);
+    const l=dragSrc.dataset.list;
+    if(l==='inventory')renderInv();
+    else if(l==='equipments')renderEquipments();
+    else if(l==='spirits')renderSpirits();
+    else renderDyn(l);
   });
 }
 
-/* ═══════════════════════════════════
-   TRAITS  (simple sandwich)
-═══════════════════════════════════ */
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
+/* ═══════════════════════════════════
+   TRAITS
+═══════════════════════════════════ */
 function renderDyn(list){
   const cont=document.getElementById('ui-'+list+'-list');cont.innerHTML='';
   S[list].forEach((item,i)=>{
     const card=mkBaseCard(item,i,list,{hasDesc:true,hasQty:false});
-    cont.appendChild(card);
-    setupCardDrag(card,list,i);
+    cont.appendChild(card);setupCardDrag(card,list,i);
   });
 }
 function addDyn(list){S[list].unshift(newTrait());saveData();renderDyn(list);}
@@ -1086,73 +1157,73 @@ function togDyn(list,i){S[list][i].expanded=!S[list][i].expanded;saveData();rend
 function updDyn(list,i,f,v){S[list][i][f]=v;saveData();}
 
 /* ═══════════════════════════════════
-   BASE CARD BUILDER (sandwich)
+   BASE CARD BUILDER
+   Layout: [name | qty | del]  top bar
+           [damage row]        optional, always visible
+           [body]              hidden until open
+           [== strip]          bottom — click=expand, drag=reorder
 ═══════════════════════════════════ */
 function mkBaseCard(item,i,list,opts={}){
-  // opts: hasDesc, hasQty, extraBody (fn→HTMLElement)
   const card=document.createElement('div');
   card.className='icard'+(item.expanded?' open':'');
 
-  // ── HEADER BAR ──
+  /* ── TOP BAR: name + qty + del ── */
   const bar=document.createElement('div');bar.className='ibar';
-
-  const drag=document.createElement('span');drag.className='ibar-drag';drag.textContent='⠿';
-  drag.addEventListener('mousedown',e=>e.stopPropagation());
-
-  const arrow=document.createElement('span');arrow.className='ibar-arrow';arrow.textContent='▼';
 
   const nameInp=document.createElement('input');
   nameInp.type='text';nameInp.className='ibar-name-input';
   nameInp.value=item.name||'';nameInp.placeholder='Nome...';
   nameInp.addEventListener('click',e=>e.stopPropagation());
   nameInp.addEventListener('change',e=>{
-    if(list==='inventory'){S.inventory[i].name=e.target.value;saveData();}
-    else if(list==='equipments'){S.equipments[i].name=e.target.value;saveData();}
-    else if(list==='spirits'){S.spirits[i].name=e.target.value;saveData();}
-    else updDyn(list,i,'name',e.target.value);
+    if(list==='inventory')S.inventory[i].name=e.target.value;
+    else if(list==='equipments')S.equipments[i].name=e.target.value;
+    else if(list==='spirits')S.spirits[i].name=e.target.value;
+    else S[list][i].name=e.target.value;
+    saveData();
   });
-
-  bar.appendChild(drag);
-  bar.appendChild(arrow);
   bar.appendChild(nameInp);
 
   if(opts.hasQty){
-    const qtyWrap=document.createElement('div');qtyWrap.className='ibar-qty';
-    const qm=document.createElement('button');qm.className='iqbtn';qm.textContent='−';qm.addEventListener('click',e=>{e.stopPropagation();modQ(i,-1);});
+    const qw=document.createElement('div');qw.className='ibar-qty';
+    const qm=document.createElement('button');qm.className='iqbtn';qm.textContent='−';
+    qm.addEventListener('click',e=>{e.stopPropagation();modQ(i,-1);});
     const qn=document.createElement('span');qn.className='iqnum';qn.textContent=item.qty||1;
-    const qp=document.createElement('button');qp.className='iqbtn';qp.textContent='+';qp.addEventListener('click',e=>{e.stopPropagation();modQ(i,1);});
-    qtyWrap.appendChild(qm);qtyWrap.appendChild(qn);qtyWrap.appendChild(qp);
-    bar.appendChild(qtyWrap);
+    const qp=document.createElement('button');qp.className='iqbtn';qp.textContent='+';
+    qp.addEventListener('click',e=>{e.stopPropagation();modQ(i,1);});
+    qw.appendChild(qm);qw.appendChild(qn);qw.appendChild(qp);
+    bar.appendChild(qw);
   }
 
-  const del=document.createElement('button');del.className='idel';del.textContent='×';
-  del.title='Remover';
+  const del=document.createElement('button');del.className='idel';del.textContent='×';del.title='Remover';
   del.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(!confirm('Remover?'))return;
+    e.stopPropagation();if(!confirm('Remover?'))return;
     if(list==='inventory'){S.inventory.splice(i,1);saveData();renderInv();}
     else if(list==='equipments'){S.equipments.splice(i,1);saveData();renderEquipments();}
     else if(list==='spirits'){S.spirits.splice(i,1);saveData();renderSpirits();}
-    else delDyn(list,i);
+    else{S[list].splice(i,1);saveData();renderDyn(list);}
   });
   bar.appendChild(del);
-
-  // Toggle expand on bar click
-  bar.addEventListener('click',e=>{
-    if(e.target===nameInp||e.target===del||e.target.classList.contains('iqbtn')||e.target.classList.contains('ibar-drag'))return;
-    if(list==='inventory'){S.inventory[i].expanded=!S.inventory[i].expanded;saveData();renderInv();}
-    else if(list==='equipments'){S.equipments[i].expanded=!S.equipments[i].expanded;saveData();renderEquipments();}
-    else if(list==='spirits'){S.spirits[i].expanded=!S.spirits[i].expanded;saveData();renderSpirits();}
-    else togDyn(list,i);
-  });
-
   card.appendChild(bar);
 
-  // ── BODY ──
+  /* ── DAMAGE ROW (inventory equip type, or equip/spirit with damage filled) ── */
+  if(opts.dmgAlwaysVisible){
+    // Inventory equipment: always show
+    const dmgRow=document.createElement('div');dmgRow.className='ibar-dmg';
+    const dmgLbl=document.createElement('span');dmgLbl.className='ibar-dmg-lbl';dmgLbl.textContent='Dano';
+    const dmgInp=document.createElement('input');dmgInp.type='text';dmgInp.className='ibar-dmg-inp';
+    dmgInp.value=item.damage||'';dmgInp.placeholder='—';
+    dmgInp.addEventListener('click',e=>e.stopPropagation());
+    dmgInp.addEventListener('change',e=>{S.inventory[i].damage=e.target.value;saveData();});
+    dmgRow.appendChild(dmgLbl);dmgRow.appendChild(dmgInp);
+    card.appendChild(dmgRow);
+  }
+
+  /* ── BODY ── */
   const body=document.createElement('div');body.className='ibody';
 
   if(opts.hasDesc){
     const lbl=document.createElement('span');lbl.className='ifield-lbl';lbl.textContent='Descrição';
+    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const ta=document.createElement('textarea');ta.className='idesc';ta.placeholder='Detalhes...';ta.value=item.desc||'';
     ta.addEventListener('input',e=>{
       if(list==='inventory')S.inventory[i].desc=e.target.value;
@@ -1161,17 +1232,32 @@ function mkBaseCard(item,i,list,opts={}){
       else S[list][i].desc=e.target.value;
       saveData();
     });
-    ta.addEventListener('mousedown',ev=>maybePopup(ev,ta,'Descrição'));
-    body.appendChild(lbl);
-    body.appendChild(ta);
+    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';mag.title='Expandir';
+    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(ta,'Descrição');});
+    taWrap.appendChild(ta);taWrap.appendChild(mag);
+    body.appendChild(lbl);body.appendChild(taWrap);
   }
 
   if(opts.extraBody){
     const extra=opts.extraBody();
     body.appendChild(extra);
   }
-
   card.appendChild(body);
+
+  /* ── BOTTOM STRIP: click=expand, drag=reorder ── */
+  const strip=document.createElement('div');strip.className='ibar-strip';
+  strip.title='Clique para expandir · Arraste para mover';
+  const stripIcon=document.createElement('span');stripIcon.className='ibar-strip-icon';stripIcon.textContent='= =';
+  strip.appendChild(stripIcon);
+  // Click to toggle
+  strip.addEventListener('click',()=>{
+    if(list==='inventory'){S.inventory[i].expanded=!S.inventory[i].expanded;saveData();renderInv();}
+    else if(list==='equipments'){S.equipments[i].expanded=!S.equipments[i].expanded;saveData();renderEquipments();}
+    else if(list==='spirits'){S.spirits[i].expanded=!S.spirits[i].expanded;saveData();renderSpirits();}
+    else{S[list][i].expanded=!S[list][i].expanded;saveData();renderDyn(list);}
+  });
+  card.appendChild(strip);
+
   return card;
 }
 
@@ -1209,10 +1295,9 @@ function renderInv(){
     const items=S.inventory.filter(it=>it.category===cat);
     items.forEach(item=>{
       const gi=S.inventory.indexOf(item);
-      const card=mkBaseCard(item,gi,'inventory',{hasDesc:true,hasQty:true});
-      cont.appendChild(card);
-      setupCardDrag(card,'inventory',gi);
-      card.dataset.cat=cat;
+      const isDmgItem=(item.category==='Equipamentos');
+      const card=mkBaseCard(item,gi,'inventory',{hasDesc:true,hasQty:true,dmgAlwaysVisible:isDmgItem});
+      cont.appendChild(card);setupCardDrag(card,'inventory',gi);card.dataset.cat=cat;
     });
   });
 }
@@ -1249,62 +1334,76 @@ function addEquip(){S.equipments.unshift(newEquip());saveData();renderEquipments
 function buildEquipBody(eq,i){
   const wrap=document.createElement('div');
 
-  // Element field
+  // Element
   const elbl=document.createElement('span');elbl.className='ifield-lbl';elbl.textContent='Elemento';
   const einp=document.createElement('input');einp.type='text';einp.value=eq.element||'';einp.placeholder='Tipo / Elemento...';
   einp.addEventListener('change',e=>{S.equipments[i].element=e.target.value;saveData();});
   wrap.appendChild(elbl);wrap.appendChild(einp);
 
-  // Description (collapsible)
-  const dtog=document.createElement('button');
-  dtog.className='desc-tog';
-  dtog.innerHTML=(eq.descOpen?'▲ Ocultar Descrição':'▼ Descrição');
-  dtog.addEventListener('click',e=>{
-    e.stopPropagation();
-    S.equipments[i].descOpen=!S.equipments[i].descOpen;
-    saveData();renderEquipments();
-  });
-  wrap.appendChild(dtog);
-  if(eq.descOpen){
-    const dta=document.createElement('textarea');dta.className='idesc';dta.placeholder='Descrição do equipamento...';dta.value=eq.desc||'';
-    dta.addEventListener('input',e=>{S.equipments[i].desc=e.target.value;saveData();});
-    dta.addEventListener('mousedown',ev=>maybePopup(ev,dta,'Descrição'));
-    wrap.appendChild(dta);
+  // Damage (optional — hidden if empty like description)
+  const hasDmg=!!(eq.damage);
+  const dmgTog=document.createElement('button');dmgTog.className='desc-tog';
+  dmgTog.textContent=hasDmg?'▲ Ocultar Dano':'▼ Dano';
+  dmgTog.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].dmgOpen=!S.equipments[i].dmgOpen;saveData();renderEquipments();});
+  wrap.appendChild(dmgTog);
+  if(eq.dmgOpen||hasDmg){
+    const dinp=document.createElement('input');dinp.type='text';dinp.className='ibar-dmg-inp';dinp.style.marginBottom='4px';
+    dinp.value=eq.damage||'';dinp.placeholder='Ex: 2d6+3';
+    dinp.addEventListener('change',e=>{S.equipments[i].damage=e.target.value;saveData();});
+    wrap.appendChild(dinp);
   }
 
-  // Abilities (inline list)
+  // Description (collapsible)
+  const dtog=document.createElement('button');dtog.className='desc-tog';
+  dtog.textContent=(eq.descOpen?'▲ Ocultar Descrição':'▼ Descrição');
+  dtog.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].descOpen=!S.equipments[i].descOpen;saveData();renderEquipments();});
+  wrap.appendChild(dtog);
+  if(eq.descOpen){
+    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
+    const dta=document.createElement('textarea');dta.className='idesc';dta.placeholder='Descrição...';dta.value=eq.desc||'';
+    dta.addEventListener('input',e=>{S.equipments[i].desc=e.target.value;saveData();});
+    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';
+    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(dta,'Descrição');});
+    taWrap.appendChild(dta);taWrap.appendChild(mag);
+    wrap.appendChild(taWrap);
+  }
+
+  // Abilities
   const ablbl=document.createElement('span');ablbl.className='ifield-lbl';ablbl.textContent='Habilidades';
   wrap.appendChild(ablbl);
   const abWrap=document.createElement('div');abWrap.className='abilities-wrap';
 
   (eq.abilities||[]).forEach((ab,ai)=>{
     const abCard=document.createElement('div');abCard.className='ab-card'+(ab.open?' open':'');
+    // Top bar
     const abBar=document.createElement('div');abBar.className='ab-bar';
-    const abArr=document.createElement('span');abArr.className='ab-arrow';abArr.textContent='▶';
     const abName=document.createElement('input');abName.type='text';abName.className='ab-name-inp';
     abName.value=ab.name||'';abName.placeholder='Nome da habilidade...';
     abName.addEventListener('click',e=>e.stopPropagation());
     abName.addEventListener('change',e=>{S.equipments[i].abilities[ai].name=e.target.value;saveData();});
     const abDel=document.createElement('button');abDel.className='ab-del';abDel.textContent='×';
     abDel.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].abilities.splice(ai,1);saveData();renderEquipments();});
-    abBar.appendChild(abArr);abBar.appendChild(abName);abBar.appendChild(abDel);
-    abBar.addEventListener('click',e=>{
-      if(e.target===abName||e.target===abDel)return;
-      S.equipments[i].abilities[ai].open=!S.equipments[i].abilities[ai].open;saveData();renderEquipments();
-    });
-    abCard.appendChild(abBar);
+    abBar.appendChild(abName);abBar.appendChild(abDel);abCard.appendChild(abBar);
+    // Body
     const abBody=document.createElement('div');abBody.className='ab-body';
-    const abDesc=document.createElement('textarea');abDesc.className='ab-desc';abDesc.placeholder='Descrição da habilidade...';abDesc.value=ab.desc||'';
+    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
+    const abDesc=document.createElement('textarea');abDesc.className='ab-desc';abDesc.placeholder='Descrição...';abDesc.value=ab.desc||'';
     abDesc.addEventListener('input',e=>{S.equipments[i].abilities[ai].desc=e.target.value;saveData();});
-    abDesc.addEventListener('mousedown',ev=>maybePopup(ev,abDesc,'Habilidade'));
-    abBody.appendChild(abDesc);abCard.appendChild(abBody);
+    const abMag=document.createElement('button');abMag.className='ta-magnify';abMag.textContent='🔍';
+    abMag.addEventListener('click',e=>{e.stopPropagation();openPopup(abDesc,'Habilidade');});
+    taWrap.appendChild(abDesc);taWrap.appendChild(abMag);abBody.appendChild(taWrap);abCard.appendChild(abBody);
+    // Bottom strip
+    const abStrip=document.createElement('div');abStrip.className='ab-strip';
+    const abSI=document.createElement('span');abSI.className='ab-strip-icon';abSI.textContent='= =';
+    abStrip.appendChild(abSI);
+    abStrip.addEventListener('click',()=>{S.equipments[i].abilities[ai].open=!ab.open;saveData();renderEquipments();});
+    abCard.appendChild(abStrip);
     abWrap.appendChild(abCard);
   });
 
-  const addAb=document.createElement('button');addAb.className='add-ab-btn';addAb.textContent='+ Habilidade';
+  const addAb=document.createElement('button');addAb.className='add-ab-btn';addAb.textContent='+';addAb.title='Adicionar Habilidade';
   addAb.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].abilities.push(newAbility());saveData();renderEquipments();});
-  abWrap.appendChild(addAb);
-  wrap.appendChild(abWrap);
+  abWrap.appendChild(addAb);wrap.appendChild(abWrap);
   return wrap;
 }
 
@@ -1333,74 +1432,93 @@ function buildSpiritBody(sp,i){
   einp.addEventListener('change',e=>{S.spirits[i].element=e.target.value;saveData();});
   wrap.appendChild(elbl);wrap.appendChild(einp);
 
+  // Damage (optional)
+  const hasDmg=!!(sp.damage);
+  const dmgTog=document.createElement('button');dmgTog.className='desc-tog';
+  dmgTog.textContent=hasDmg?'▲ Ocultar Dano':'▼ Dano';
+  dmgTog.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].dmgOpen=!S.spirits[i].dmgOpen;saveData();renderSpirits();});
+  wrap.appendChild(dmgTog);
+  if(sp.dmgOpen||hasDmg){
+    const dinp=document.createElement('input');dinp.type='text';dinp.className='ibar-dmg-inp';dinp.style.marginBottom='4px';
+    dinp.value=sp.damage||'';dinp.placeholder='Ex: 2d6+3';
+    dinp.addEventListener('change',e=>{S.spirits[i].damage=e.target.value;saveData();});
+    wrap.appendChild(dinp);
+  }
+
   // Description (collapsible)
   const dtog=document.createElement('button');dtog.className='desc-tog';
   dtog.textContent=(sp.descOpen?'▲ Ocultar Descrição':'▼ Descrição');
   dtog.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].descOpen=!S.spirits[i].descOpen;saveData();renderSpirits();});
   wrap.appendChild(dtog);
   if(sp.descOpen){
+    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const dta=document.createElement('textarea');dta.className='idesc';dta.placeholder='Descrição do espírito...';dta.value=sp.desc||'';
     dta.addEventListener('input',e=>{S.spirits[i].desc=e.target.value;saveData();});
-    dta.addEventListener('mousedown',ev=>maybePopup(ev,dta,'Descrição'));
-    wrap.appendChild(dta);
+    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';
+    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(dta,'Descrição');});
+    taWrap.appendChild(dta);taWrap.appendChild(mag);wrap.appendChild(taWrap);
   }
 
-  // Groups of abilities
+  // Groups
   const glbl=document.createElement('span');glbl.className='ifield-lbl';glbl.textContent='Grupos de Habilidades';
   wrap.appendChild(glbl);
   const groupWrap=document.createElement('div');groupWrap.className='ab-group-wrap';
 
   (sp.groups||[]).forEach((grp,gi)=>{
     const grpEl=document.createElement('div');grpEl.className='ab-group'+(grp.open?' open':'');
-
-    // Group header
+    // Group header (name + del only — no expand arrow)
     const ghd=document.createElement('div');ghd.className='ab-group-hd';
-    const garr=document.createElement('span');garr.className='ab-group-arrow';garr.textContent='▶';
     const gname=document.createElement('input');gname.type='text';gname.className='ab-group-name';
     gname.value=grp.name||'';gname.placeholder='Nome do grupo...';
     gname.addEventListener('click',e=>e.stopPropagation());
     gname.addEventListener('change',e=>{S.spirits[i].groups[gi].name=e.target.value;saveData();});
     const gdel=document.createElement('button');gdel.className='ab-group-del';gdel.textContent='×';
     gdel.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups.splice(gi,1);saveData();renderSpirits();});
-    ghd.appendChild(garr);ghd.appendChild(gname);ghd.appendChild(gdel);
-    ghd.addEventListener('click',e=>{if(e.target===gname||e.target===gdel)return;S.spirits[i].groups[gi].open=!S.spirits[i].groups[gi].open;saveData();renderSpirits();});
-    grpEl.appendChild(ghd);
+    ghd.appendChild(gname);ghd.appendChild(gdel);grpEl.appendChild(ghd);
 
-    // Group body (ability list)
+    // Group body
     const gbody=document.createElement('div');gbody.className='ab-group-body';
     (grp.abilities||[]).forEach((ab,ai)=>{
       const abCard=document.createElement('div');abCard.className='ab-card'+(ab.open?' open':'');
       const abBar=document.createElement('div');abBar.className='ab-bar';
-      const abArr=document.createElement('span');abArr.className='ab-arrow';abArr.textContent='▶';
       const abName=document.createElement('input');abName.type='text';abName.className='ab-name-inp';
       abName.value=ab.name||'';abName.placeholder='Habilidade...';
       abName.addEventListener('click',e=>e.stopPropagation());
       abName.addEventListener('change',e=>{S.spirits[i].groups[gi].abilities[ai].name=e.target.value;saveData();});
       const abDel=document.createElement('button');abDel.className='ab-del';abDel.textContent='×';
       abDel.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups[gi].abilities.splice(ai,1);saveData();renderSpirits();});
-      abBar.appendChild(abArr);abBar.appendChild(abName);abBar.appendChild(abDel);
-      abBar.addEventListener('click',e=>{if(e.target===abName||e.target===abDel)return;S.spirits[i].groups[gi].abilities[ai].open=!ab.open;saveData();renderSpirits();});
-      abCard.appendChild(abBar);
+      abBar.appendChild(abName);abBar.appendChild(abDel);abCard.appendChild(abBar);
       const abBody=document.createElement('div');abBody.className='ab-body';
+      const taWrap=document.createElement('div');taWrap.className='ta-wrap';
       const abDesc=document.createElement('textarea');abDesc.className='ab-desc';abDesc.placeholder='Descrição...';abDesc.value=ab.desc||'';
       abDesc.addEventListener('input',e=>{S.spirits[i].groups[gi].abilities[ai].desc=e.target.value;saveData();});
-      abDesc.addEventListener('mousedown',ev=>maybePopup(ev,abDesc,'Habilidade'));
-      abBody.appendChild(abDesc);abCard.appendChild(abBody);
+      const abMag=document.createElement('button');abMag.className='ta-magnify';abMag.textContent='🔍';
+      abMag.addEventListener('click',e=>{e.stopPropagation();openPopup(abDesc,'Habilidade');});
+      taWrap.appendChild(abDesc);taWrap.appendChild(abMag);abBody.appendChild(taWrap);abCard.appendChild(abBody);
+      // Strip
+      const abStrip=document.createElement('div');abStrip.className='ab-strip';
+      const abSI=document.createElement('span');abSI.className='ab-strip-icon';abSI.textContent='= =';
+      abStrip.appendChild(abSI);
+      abStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].abilities[ai].open=!ab.open;saveData();renderSpirits();});
+      abCard.appendChild(abStrip);
       gbody.appendChild(abCard);
     });
-    // Add ability to group
-    const addAb=document.createElement('button');addAb.className='add-ab-btn';addAb.textContent='+ Habilidade';
+    const addAb=document.createElement('button');addAb.className='add-ab-btn';addAb.textContent='+';addAb.title='Adicionar Habilidade';
     addAb.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups[gi].abilities.push(newAbility());saveData();renderSpirits();});
-    gbody.appendChild(addAb);
-    grpEl.appendChild(gbody);
+    gbody.appendChild(addAb);grpEl.appendChild(gbody);
+
+    // Group strip
+    const gStrip=document.createElement('div');gStrip.className='ab-group-strip';
+    const gSI=document.createElement('span');gSI.className='ab-group-strip-icon';gSI.textContent='= =';
+    gStrip.appendChild(gSI);
+    gStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].open=!grp.open;saveData();renderSpirits();});
+    grpEl.insertBefore(gStrip,ghd.nextSibling);
     groupWrap.appendChild(grpEl);
   });
 
-  // Add group button
-  const addGrp=document.createElement('button');addGrp.className='add-ab-btn';addGrp.textContent='+ Grupo';
+  const addGrp=document.createElement('button');addGrp.className='add-ab-btn';addGrp.textContent='+';addGrp.title='Adicionar Grupo';
   addGrp.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups.push(newGroup());saveData();renderSpirits();});
-  groupWrap.appendChild(addGrp);
-  wrap.appendChild(groupWrap);
+  groupWrap.appendChild(addGrp);wrap.appendChild(groupWrap);
   return wrap;
 }
 
