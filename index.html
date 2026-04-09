@@ -24,7 +24,7 @@ html{scroll-behavior:smooth}
 #starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
 #atmo{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 10% 15%,rgba(0,229,200,.04) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 90% 80%,rgba(0,100,255,.05) 0%,transparent 60%),radial-gradient(ellipse 80% 60% at 50% 50%,rgba(0,0,0,.55) 0%,transparent 100%)}
 #scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.035) 3px,rgba(0,0,0,.035) 4px)}
-#app,#mhdr,#tabbar,.fabwrap,#tt,#overlay,#text-popup{position:relative;z-index:10}
+#app,#mhdr,#tabbar,.fabwrap,#tt,#overlay{position:relative;z-index:10}
 body{font-family:var(--sans);font-size:16px;font-weight:400;color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden;line-height:1.5}
 a{text-decoration:none;color:inherit}
 img{max-width:100%;display:block}
@@ -36,7 +36,7 @@ input[type=number]{-moz-appearance:textfield}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=checkbox]{width:20px;min-height:20px;accent-color:var(--acc);cursor:pointer}
 select option{background:var(--bg1)}
-textarea{resize:vertical;line-height:1.6}
+/* textarea auto-resize handled below */
 
 /* ── BUTTONS ── */
 button{background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer;border-radius:var(--r);padding:10px 18px;font-size:.9rem;font-family:var(--sans);font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:background var(--tr),border-color var(--tr),color var(--tr),opacity var(--tr);min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
@@ -65,7 +65,7 @@ button:disabled{opacity:.28;cursor:not-allowed}
 #sidebar nav a.act{border-left-color:var(--acc);background:var(--acc-dim);color:var(--acc)}
 .nic{font-size:.85rem;width:16px;text-align:center;flex-shrink:0}
 .sbfoot{padding:10px;border-top:1px solid var(--border2)}
-.ptbox{background:var(--acc-dim);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
+.ptbox{background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
 .ptbox .lbl{font-family:var(--mono);font-size:.62rem;color:var(--acc);letter-spacing:.16em;text-transform:uppercase;display:block;margin-bottom:3px}
 .ptbox .val{font-family:var(--mono);font-size:1.25rem;color:var(--text)}
 
@@ -146,23 +146,29 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .ttv{text-align:right;font-family:var(--mono);font-size:.75rem}
 .td{color:#f87171}.tf{color:#fbbf24}.ts{color:#cbd5e1}.tb{color:#60a5fa}.te{color:#34d399}
 
-/* ── ITEM CARDS — new layout ── */
-.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+/* ── ITEM CARDS — fixed layout ── */
+.igrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  /* Crucial: align-items:start prevents grid cells from stretching
+     to match the tallest card in the row — this was the visual bug */
+  align-items:start;
+}
 .icard.dragging{opacity:.4;border-style:dashed}
 .icard.drag-over{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-glow)}
 .icard{
-  background:rgba(6,11,24,.75);border:1px solid var(--border);border-radius:var(--r);
+  background:rgba(6,11,24,.75);
+  border:1px solid var(--border);
+  border-radius:var(--r);
   display:flex;flex-direction:column;
+  /* No min/max height — card is only as tall as its contents */
   transition:border-color .15s,box-shadow .15s,opacity .15s;
 }
 .icard:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
 
-/* Top bar: name + qty + delete ONLY (no arrow) */
-.ibar{
-  display:flex;align-items:center;gap:6px;
-  padding:9px 10px 8px;
-  min-height:42px;
-}
+/* Top bar: name + qty + del */
+.ibar{display:flex;align-items:center;gap:6px;padding:9px 10px 8px;min-height:42px}
 .ibar-name-input{
   flex-grow:1;font-size:.95rem;font-weight:600;color:var(--text);
   font-family:var(--sans);background:transparent;border:none;
@@ -176,10 +182,45 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .idel{width:22px;height:22px;min-height:22px;padding:0;flex-shrink:0;border:none;background:transparent;color:var(--danger);font-size:.95rem;border-radius:3px;opacity:.5}
 .idel:hover{background:var(--danger-dim);opacity:1;border:none}
 
-/* Damage row — shows below name bar for equip-type inventory items */
-.ibar-dmg{
-  padding:0 10px 7px;display:flex;align-items:center;gap:6px;
+/* ── TOP COLLAPSE STRIP (only visible when card is open) ── */
+.ibar-top-strip{
+  display:none; /* hidden by default */
+  align-items:center;justify-content:center;gap:0;
+  height:20px;cursor:pointer;
+  border-bottom:1px solid var(--border2);
+  background:transparent;
+  transition:background .15s;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+  position:relative;
 }
+.icard.open .ibar-top-strip{display:flex}
+.ibar-top-strip:hover{background:var(--acc-dim)}
+/* Two lines spanning full width with arrow in center */
+.ibar-top-strip::before,
+.ibar-top-strip::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;
+  height:1px;
+  background:var(--acc);
+  opacity:.3;
+}
+.ibar-top-strip::before{top:5px}
+.ibar-top-strip::after{top:11px}
+.ibar-top-strip-arrow{
+  font-size:.55rem;color:var(--acc);opacity:.7;
+  pointer-events:none;
+  position:relative;z-index:1;
+  background:rgba(6,11,24,.9);
+  padding:0 4px;
+  transition:opacity .15s;
+  /* Arrow points UP to indicate "collapse" */
+  transform:rotate(180deg);
+}
+.ibar-top-strip:hover .ibar-top-strip-arrow{opacity:1}
+
+/* Damage row */
+.ibar-dmg{padding:0 10px 7px;display:flex;align-items:center;gap:6px}
 .ibar-dmg-lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
 .ibar-dmg-inp{
   flex-grow:1;font-size:.85rem;font-family:var(--mono);
@@ -188,98 +229,231 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 }
 .ibar-dmg-inp:focus{border-color:var(--acc);outline:none;box-shadow:none}
 
-/* Bottom expand/drag strip — the "=" handle */
+/* ── HIERARCHY DEPTH ──
+   icard           → bg: rgba(6,11,24,.75)   level 0
+   ibody           → bg: rgba(0,0,0,.15)      level 1 tint (subtle)
+   abilities-wrap  → level 1
+   ab-group        → bg: rgba(0,0,0,.25)      level 2
+   ab-group-body   → bg: rgba(0,0,0,.15)      level 2 inner
+   ab-card         → bg: rgba(0,0,0,.35)      level 3
+   ab-body         → bg: rgba(0,0,0,.2)       level 3 inner
+── */
+.ibody{
+  background:rgba(0,0,0,.12);
+  display:none;flex-direction:column;gap:8px;padding:8px 10px 8px;
+  border-left:2px solid var(--border2);
+  margin:0 4px 4px;
+  border-radius:0 0 3px 3px;
+}
+.icard.open .ibody{display:flex}
+.ab-group{
+  background:rgba(0,0,0,.28);
+  border:1px solid var(--border2);
+  border-radius:4px;
+  display:flex;flex-direction:column;
+  border-left:2px solid rgba(var(--acc-rgb,.25));
+}
+.ab-group-body{
+  background:rgba(0,0,0,.15);
+  display:none;padding:6px 8px 8px;flex-direction:column;gap:5px;
+}
+.ab-group.open .ab-group-body{display:flex}
+.ab-card{
+  background:rgba(0,0,0,.38);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:4px;
+  display:flex;flex-direction:column;
+}
+.ab-body{
+  background:rgba(0,0,0,.2);
+  display:none;padding:6px 8px 8px;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.ab-card.open .ab-body{display:block}
+
+/* Modificadores section */
+.mod-list{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.mod-item{
+  display:flex;flex-direction:column;gap:4px;
+  background:rgba(6,11,24,.75);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;
+  min-width:180px;flex:1 1 180px;max-width:280px;
+  transition:border-color .15s;
+  user-select:none;
+}
+.mod-item:hover{border-color:var(--acc)}
+.mod-item[style*="cursor:pointer"]:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
+.mod-title{
+  font-family:var(--sans);font-size:.85rem;font-weight:700;
+  color:var(--acc);letter-spacing:.06em;text-transform:uppercase;
+}
+.mod-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.mod-lbl{
+  font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
+}
+.mod-val{
+  font-family:var(--mono);font-size:.82rem;color:var(--text);
+  font-weight:600;
+  border:1px solid var(--border);border-radius:3px;
+  padding:1px 7px;min-width:26px;text-align:center;
+  background:rgba(0,0,0,.3);white-space:nowrap;flex-shrink:0;margin-left:auto;
+}
+
+/* ── BOTTOM EXPAND STRIP ── */
 .ibar-strip{
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;gap:0;
   height:22px;cursor:pointer;
   border-top:1px solid var(--border2);
   background:transparent;
   transition:background .15s;
   border-radius:0 0 var(--r) var(--r);
   user-select:none;-webkit-tap-highlight-color:transparent;
+  position:relative;flex-shrink:0;
 }
 .ibar-strip:hover{background:var(--acc-dim)}
-.ibar-strip-icon{
-  font-size:.7rem;color:var(--acc);opacity:.45;
-  letter-spacing:2px;transition:opacity .15s;
-  pointer-events:none;
+/* Two lines spanning full width */
+.ibar-strip::before,
+.ibar-strip::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;
+  height:1px;
+  background:var(--acc);
+  opacity:.28;
+  transition:opacity .15s;
 }
-.ibar-strip:hover .ibar-strip-icon{opacity:.9}
-
-/* Card body */
-.ibody{display:none;flex-direction:column;gap:8px;padding:8px 10px 4px;border-top:1px solid var(--border2)}
-.icard.open .ibody{display:flex}
-
-/* Textarea wrapper with magnify button */
-.ta-wrap{position:relative;display:flex;flex-direction:column}
-.ta-magnify{
-  position:absolute;bottom:6px;right:6px;
-  width:24px;height:24px;min-height:24px;padding:0;
-  background:rgba(0,0,0,.55);border:1px solid var(--border);
-  border-radius:4px;color:var(--muted);font-size:.8rem;
-  z-index:2;opacity:.6;
+.ibar-strip::before{top:6px}
+.ibar-strip::after{top:13px}
+.ibar-strip:hover::before,
+.ibar-strip:hover::after{opacity:.7}
+.ibar-strip-arrow{
+  font-size:.55rem;color:var(--acc);opacity:.6;
+  transition:transform .22s,opacity .15s;pointer-events:none;
+  position:relative;z-index:1;
+  background:rgba(6,11,24,.9);
+  padding:0 4px;
+  flex-shrink:0;
 }
-.ta-magnify:hover{opacity:1;border-color:var(--acc);color:var(--acc);background:rgba(0,0,0,.8)}
-.idesc{min-height:65px;resize:vertical;font-size:.9rem;padding-bottom:28px}
+.icard.open .ibar-strip-arrow{transform:rotate(180deg)}
+.ibar-strip:hover .ibar-strip-arrow{opacity:1}
+/* Hide old text icon */
+.ibar-strip-icon{display:none}
 
-/* Sub-label inside card */
+/* Auto-resize textareas */
+textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
+.idesc{min-height:52px;font-size:.9rem}
+.ab-desc{min-height:44px;font-size:.85rem}
+.fta{min-height:120px}
+
+/* Element field — label in accent color, value in white */
+.elem-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.elem-lbl{
+  font-family:var(--mono);font-size:.62rem;color:var(--acc);
+  letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;white-space:nowrap;
+}
+.elem-inp{
+  flex-grow:1;font-size:.85rem;font-family:var(--mono);
+  background:transparent;border:none;border-bottom:1px solid var(--border2);
+  border-radius:0;padding:2px 4px;height:26px;min-height:26px;
+  color:#fff;transition:border-color .15s;
+}
+.elem-inp:focus{outline:none;border-bottom-color:var(--acc);box-shadow:none;background:transparent}
+.elem-inp::placeholder{color:var(--muted);font-size:.8rem}
+
+/* Sub-labels */
 .ifield-lbl{font-family:var(--mono);font-size:.65rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:3px;margin-top:6px}
 .ifield-lbl:first-child{margin-top:0}
 
-/* Collapsible desc toggle */
+/* Desc toggle */
 .desc-tog{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;min-height:24px;padding:2px 0;justify-content:flex-start}
 .desc-tog:hover{color:var(--acc);background:none;border:none}
 
 /* ── ABILITIES ── */
 .abilities-wrap{display:flex;flex-direction:column;gap:5px;margin-top:4px}
-.ab-card{background:rgba(0,0,0,.3);border:1px solid var(--border2);border-radius:4px;overflow:hidden}
-/* Ability top bar: name + del */
+.ab-card{background:rgba(0,0,0,.3);border:1px solid var(--border2);border-radius:4px;display:flex;flex-direction:column}
 .ab-bar{display:flex;align-items:center;gap:5px;padding:5px 8px;min-height:34px}
 .ab-name-inp{flex-grow:1;font-size:.88rem;font-weight:600;color:var(--text);font-family:var(--sans);background:transparent;border:none;padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%}
 .ab-name-inp:focus{outline:none;border-bottom:1px solid var(--acc);box-shadow:none}
 .ab-del{width:18px;height:18px;min-height:18px;padding:0;border:none;background:transparent;color:var(--danger);font-size:.85rem;border-radius:2px;opacity:.45;flex-shrink:0}
 .ab-del:hover{background:var(--danger-dim);opacity:1;border:none}
-/* Ability bottom strip */
+/* Ability expand strip — same double-line style, draggable */
 .ab-strip{
-  display:flex;align-items:center;justify-content:center;
-  height:18px;cursor:pointer;border-top:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;gap:0;
+  height:18px;cursor:pointer;
+  border-top:1px solid var(--border2);
   background:transparent;transition:background .12s;
   user-select:none;-webkit-tap-highlight-color:transparent;
+  border-radius:0 0 4px 4px;
+  position:relative;flex-shrink:0;
 }
-.ab-strip:hover{background:rgba(0,229,200,.07)}
-.ab-strip-icon{font-size:.6rem;color:var(--acc);opacity:.35;letter-spacing:2px;pointer-events:none}
-.ab-strip:hover .ab-strip-icon{opacity:.75}
+.ab-strip[draggable=true]{cursor:grab}
+.ab-strip[draggable=true]:active{cursor:grabbing}
+.ab-strip:hover{background:var(--acc-dim)}
+.ab-strip::before,.ab-strip::after{
+  content:'';position:absolute;left:0;right:0;height:1px;
+  background:var(--acc);opacity:.25;transition:opacity .12s;
+}
+.ab-strip::before{top:4px}
+.ab-strip::after{top:10px}
+.ab-strip:hover::before,.ab-strip:hover::after{opacity:.7}
+.ab-strip-arrow{
+  font-size:.52rem;color:var(--acc);opacity:.55;
+  pointer-events:none;position:relative;z-index:1;
+  background:rgba(0,0,0,.7);padding:0 4px;
+  transition:transform .2s,opacity .12s;flex-shrink:0;
+}
+.ab-card.open .ab-strip-arrow{transform:rotate(180deg)}
+.ab-strip:hover .ab-strip-arrow{opacity:1}
+.ab-strip-icon{display:none}
 .ab-body{display:none;padding:6px 8px 8px;border-top:1px solid var(--border2)}
 .ab-card.open .ab-body{display:block}
-.ab-desc{min-height:52px;resize:vertical;font-size:.85rem;padding-bottom:28px}
 
-/* Add ability button — just a + square */
+/* Add buttons — themed with accent */
 .add-ab-btn{
-  min-height:30px;width:30px;height:30px;padding:0;font-size:1rem;font-weight:600;
-  border-color:var(--border2);color:var(--muted);border-radius:4px;
+  min-height:28px;width:28px;height:28px;padding:0;
+  font-size:1rem;font-weight:700;border-radius:4px;
+  border:1px solid var(--acc);color:var(--acc);background:var(--acc-dim);
   align-self:flex-start;margin-top:4px;
 }
-.add-ab-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
+.add-ab-btn:hover{background:var(--acc);color:#000}
 
 /* Spirit: grouped abilities */
 .ab-group-wrap{display:flex;flex-direction:column;gap:5px}
-.ab-group{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:4px}
+.ab-group{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:4px;display:flex;flex-direction:column}
 .ab-group-hd{display:flex;align-items:center;gap:6px;padding:5px 8px;min-height:32px}
 .ab-group-name{flex-grow:1;font-size:.85rem;font-weight:600;color:var(--muted);font-family:var(--sans);background:transparent;border:none;padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%}
 .ab-group-name:focus{outline:none;border-bottom:1px solid var(--acc);box-shadow:none;color:var(--text)}
 .ab-group-del{width:18px;height:18px;min-height:18px;padding:0;border:none;background:transparent;color:var(--danger);font-size:.85rem;border-radius:2px;opacity:.4;flex-shrink:0}
 .ab-group-del:hover{background:var(--danger-dim);opacity:1;border:none}
-/* Group expand strip */
+/* Group strip — same style */
 .ab-group-strip{
   display:flex;align-items:center;justify-content:center;
-  height:18px;cursor:pointer;border-top:1px solid var(--border2);
+  height:18px;cursor:pointer;
+  border-top:1px solid var(--border2);
   background:transparent;transition:background .12s;
-  user-select:none;-webkit-tap-highlight-color:transparent;border-bottom:1px solid transparent;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+  position:relative;flex-shrink:0;
 }
 .ab-group.open .ab-group-strip{border-bottom:1px solid var(--border2)}
-.ab-group-strip:hover{background:rgba(0,229,200,.07)}
-.ab-group-strip-icon{font-size:.6rem;color:var(--acc);opacity:.35;letter-spacing:2px;pointer-events:none}
-.ab-group-strip:hover .ab-group-strip-icon{opacity:.75}
+.ab-group-strip:hover{background:var(--acc-dim)}
+.ab-group-strip::before,.ab-group-strip::after{
+  content:'';position:absolute;left:0;right:0;height:1px;
+  background:var(--acc);opacity:.25;transition:opacity .12s;
+}
+.ab-group-strip::before{top:4px}
+.ab-group-strip::after{top:10px}
+.ab-group-strip:hover::before,.ab-group-strip:hover::after{opacity:.7}
+.ab-group-strip-icon{display:none}
+/* Reuse ab-strip-arrow style for group arrow too */
+.ab-group-strip .ab-strip-arrow{
+  font-size:.52rem;color:var(--acc);opacity:.55;
+  pointer-events:none;position:relative;z-index:1;
+  background:rgba(0,0,0,.7);padding:0 4px;
+  transition:transform .2s,opacity .12s;
+}
+.ab-group.open .ab-group-strip .ab-strip-arrow{transform:rotate(180deg)}
+.ab-group-strip:hover .ab-strip-arrow{opacity:1}
 .ab-group-body{display:none;padding:6px 8px 8px;flex-direction:column;gap:5px}
 .ab-group.open .ab-group-body{display:flex}
 
@@ -288,25 +462,20 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .catsep[data-cat].drag-cat-over{background:var(--acc-dim);border-color:var(--acc)}
 .emptyn{grid-column:1/-1;font-size:.9rem;color:var(--muted);font-style:italic;padding:4px}
 
-/* ── LIST CONTROLS ── */
+/* LIST CONTROLS */
 .lc{margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-
-/* + button — small square */
 .add-btn{
   width:36px;height:36px;min-height:36px;padding:0;
-  font-size:1.2rem;font-weight:600;border-radius:var(--r);
-  border-color:var(--acc);color:var(--acc);background:var(--acc-dim);
+  font-size:1.2rem;font-weight:700;border-radius:var(--r);
+  border:1px solid var(--acc);color:var(--acc);background:var(--acc-dim);
 }
 .add-btn:hover{background:var(--acc);color:#000}
-
-/* Filter buttons — fully filled with accent color when active */
 .fbtn{font-size:.8rem;padding:7px 14px;min-height:36px;font-family:var(--mono);letter-spacing:.07em;border-color:var(--border)}
 .fbtn:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
-.fbtn.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.fbtn.on{background:var(--acc)!important;color:#000!important;border-color:var(--acc)!important;font-weight:700}
 .fbtn.on:hover{filter:brightness(1.1)}
-
-.fta{min-height:240px;resize:vertical;line-height:1.65;font-size:.95rem;padding-bottom:32px}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.fta{min-height:120px}
+.g2{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 
 /* ── MOBILE HEADER ── */
 #mhdr{display:none;align-items:center;justify-content:space-between;background:rgba(3,6,15,.97);padding:0 16px;height:56px;border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;z-index:110}
@@ -379,31 +548,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .cdot:hover{transform:scale(1.25)}
 .cdot.on{border-color:#fff;transform:scale(1.25);box-shadow:0 0 8px currentColor}
 
-/* ── TEXT POPUP ── */
-#text-popup{
-  display:none;position:fixed;inset:0;z-index:2000;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(6px);
-  align-items:center;justify-content:center;padding:20px;
-}
-#text-popup.show{display:flex}
-.popup-box{
-  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
-  width:100%;max-width:540px;max-height:80vh;
-  display:flex;flex-direction:column;gap:0;
-  box-shadow:0 12px 48px rgba(0,0,0,.9);
-}
-.popup-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;border-bottom:1px solid var(--border2);
-  font-family:var(--mono);font-size:.72rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;
-}
-.popup-close{width:28px;height:28px;min-height:28px;padding:0;border:none;background:transparent;color:var(--muted);font-size:1.1rem;border-radius:3px}
-.popup-close:hover{color:var(--danger);background:var(--danger-dim);border:none}
-.popup-body{flex-grow:1;overflow-y:auto;padding:14px 16px}
-.popup-ta{width:100%;min-height:200px;resize:none;font-size:.95rem;line-height:1.65;background:transparent;border:none;padding:0;color:var(--text);font-family:var(--sans)}
-.popup-ta:focus{outline:none;box-shadow:none;border:none}
-.popup-foot{padding:10px 16px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:8px}
-.popup-save{min-height:36px;padding:6px 18px;font-size:.8rem}
+/* popup removed */
 
 /* ── TABLET ── */
 @media(min-width:768px) and (max-width:1023px){
@@ -473,22 +618,6 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 <div id="atmo"></div>
 <div id="scanlines"></div>
 
-<!-- TEXT POPUP -->
-<div id="text-popup">
-  <div class="popup-box">
-    <div class="popup-hd">
-      <span id="popup-title">Texto</span>
-      <button class="popup-close" onclick="closePopup()">×</button>
-    </div>
-    <div class="popup-body">
-      <textarea class="popup-ta" id="popup-ta"></textarea>
-    </div>
-    <div class="popup-foot">
-      <button class="popup-save bp" onclick="savePopup()">Salvar</button>
-    </div>
-  </div>
-</div>
-
 <div id="app">
 <header id="mhdr">
   <button class="hambtn" onclick="togMenu()" aria-label="Menu">≡</button>
@@ -509,6 +638,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
     <a href="#equipamentos"><span class="nic">⚙</span><span>Equip.</span></a>
     <a href="#espiritos"><span class="nic">✦</span><span>Espíritos</span></a>
     <a href="#pericias"><span class="nic">◉</span><span>Perícias</span></a>
+    <a href="#modificadores"><span class="nic">⊞</span><span>Modif.</span></a>
     <a href="#historico"><span class="nic">▤</span><span>Histórico</span></a>
     <a href="#anotacoes"><span class="nic">✎</span><span>Anotações</span></a>
   </nav>
@@ -543,7 +673,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
           <input type="file" id="fileup" style="display:none" accept="image/*" onchange="handleImg(event)">
           <div class="frow">
             <span class="flbl">Aparência</span>
-            <textarea id="ui-appearance" rows="3" oninput="saveData()" onmousedown="maybePopup(event,this,'Aparência')"></textarea>
+            <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
           </div>
         </div>
         <div>
@@ -555,8 +685,8 @@ section{margin-bottom:50px;scroll-margin-top:80px}
             <span class="flbl">Ano</span>        <input type="text" id="ui-year" oninput="saveData()">
           </div>
           <div class="frow">
-            <span class="flbl">Fobias</span>
-            <textarea id="ui-phobias" rows="2" oninput="saveData()" onmousedown="maybePopup(event,this,'Fobias')"></textarea>
+            <span class="flbl">Fobias / Obsessões</span>
+            <textarea id="ui-phobias" rows="2" oninput="saveData()"></textarea>
           </div>
           <div class="corr-row">
             <span class="corr-lbl">Corrupção</span>
@@ -626,11 +756,11 @@ section{margin-bottom:50px;scroll-margin-top:80px}
     </div>
     <div id="bd-inventario" class="sec-body">
       <div class="lc" id="invfilt">
-        <button class="fbtn on" onclick="setF('Todos')">Todos</button>
-        <button class="fbtn" onclick="setF('Mochila')">Mochila</button>
-        <button class="fbtn" onclick="setF('Equipamentos')">Equip.</button>
-        <button class="fbtn" onclick="setF('Consumíveis')">Cons.</button>
-        <button class="fbtn" onclick="setF('Utilidades')">Util.</button>
+        <button class="fbtn on" data-f="Todos" onclick="setF('Todos')">Todos</button>
+        <button class="fbtn" data-f="Mochila" onclick="setF('Mochila')">Mochila</button>
+        <button class="fbtn" data-f="Equipamentos" onclick="setF('Equipamentos')">Equip.</button>
+        <button class="fbtn" data-f="Consumíveis" onclick="setF('Consumíveis')">Cons.</button>
+        <button class="fbtn" data-f="Utilidades" onclick="setF('Utilidades')">Util.</button>
       </div>
       <div class="lc"><button class="add-btn" onclick="addInv()" title="Adicionar Item">+</button></div>
       <div id="ui-inv-list" class="igrid"></div>
@@ -672,31 +802,36 @@ section{margin-bottom:50px;scroll-margin-top:80px}
     </div>
   </section>
 
+  <!-- MODIFICADORES -->
+  <section id="modificadores">
+    <div class="sec-hd" onclick="togSec('modificadores')">
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Modificadores</span><span class="sec-num">07</span></div>
+      <span class="sec-arr">▼</span>
+    </div>
+    <div id="bd-modificadores" class="sec-body">
+      <div class="mod-list" id="ui-mod-list"></div>
+    </div>
+  </section>
+
   <!-- HISTÓRICO -->
   <section id="historico">
     <div class="sec-hd" onclick="togSec('historico')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">07</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">08</span></div>
       <span class="sec-arr">▼</span>
     </div>
       <div class="sec-body" id="bd-historico">
-        <div class="ta-wrap">
-          <textarea id="ui-history" class="fta" oninput="saveData()" placeholder="A história do personagem..."></textarea>
-          <button class="ta-magnify" onclick="openPopup(document.getElementById('ui-history'),'Histórico')" title="Expandir">🔍</button>
-        </div>
+        <textarea id="ui-history" class="fta" oninput="saveData()" placeholder="A história do personagem..."></textarea>
       </div>
   </section>
 
   <!-- ANOTAÇÕES -->
   <section id="anotacoes">
     <div class="sec-hd" onclick="togSec('anotacoes')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">08</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">09</span></div>
       <span class="sec-arr">▼</span>
     </div>
       <div class="sec-body" id="bd-anotacoes">
-        <div class="ta-wrap">
-          <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
-          <button class="ta-magnify" onclick="openPopup(document.getElementById('ui-notes'),'Anotações')" title="Expandir">🔍</button>
-        </div>
+        <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
       </div>
   </section>
 
@@ -712,6 +847,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
     <a href="#equipamentos"><span class="tbi">⚙</span><span>Equip.</span></a>
     <a href="#espiritos"><span class="tbi">✦</span><span>Espíritos</span></a>
     <a href="#pericias"><span class="tbi">◉</span><span>Perícias</span></a>
+    <a href="#modificadores"><span class="tbi">⊞</span><span>Modif.</span></a>
     <a href="#historico"><span class="tbi">▤</span><span>Histórico</span></a>
     <a href="#anotacoes"><span class="tbi">✎</span><span>Anotações</span></a>
   </div>
@@ -776,13 +912,19 @@ section{margin-bottom:50px;scroll-margin-top:80px}
    DATA
 ═══════════════════════════════════ */
 const DEF_SK={
-  Físicas:{agilidade:65,bloquear:25,escalar:10,esquivar:100,furtividade:35,luta:120,natacao:10,pontaria:20,prestidigitacao:10,reflexos:60},
-  Práticas:{aph:100,arte:10,mecanica:65,medicina:70,psicanalise:50,psicologia:80},
-  Sociais:{atuacao:30,barganha:40,intimidacao:30,labia:35,persuasao:50},
-  Condução:{dirigir:20,navegar:20,pilotar:5},
-  Conhecimento:{antropologia:20,arcano:105,arqueologia:25,ciencias:45,coliso:20,contabilidade:30,criptografia:25,farmacia:55,historia:25,linguagem:45},
-  Investigativas:{biblioteca:45,encontrar:75,ouvir:70,rastrear:55,falsificar:25},
-  Específicas:{sanidade:55,vontade:55,sorte:30,sobrenatural:120,fortitude:115}
+  Físicas:{agilidade:0,bloquear:0,escalar:0,esquivar:0,furtividade:0,luta:0,natação:0,pontaria:0,prestidigitação:0,reflexos:0},
+  Práticas:{aph:0,arte:0,mecânica:0,medicina:0,psicanálise:0,psicologia:0},
+  Sociais:{atuação:0,barganha:0,intimidação:0,lábia:0,persuasão:0},
+  Condução:{dirigir:0,navegar:0,pilotar:0},
+  Conhecimento:{antropologia:0,arcano:0,arqueologia:0,ciências:0,coliso:0,contabilidade:0,criptografia:0,farmácia:0,história:0,linguagem:0},
+  Investigativas:{biblioteca:0,encontrar:0,ouvir:0,rastrear:0,falsificar:0},
+  Específicas:{sanidade:0,vontade:0,sorte:0,sobrenatural:0,fortitude:0}
+};
+
+/* Labels extras para perícias específicas */
+const SK_LABELS={
+  'aph':'Primeiros Socorros',
+  'coliso':'Mitologia Coliso'
 };
 const PALS=[
   {p:'#00e5c8',s:'#005544'},{p:'#ff4757',s:'#7f1d1d'},{p:'#FF9F1C',s:'#7c3a08'},
@@ -800,15 +942,15 @@ const DEF_ST={
 };
 /* Default item shapes */
 function newTrait(){return{name:'Novo Traço',desc:'',expanded:false}}
-function newInvItem(cat){return{name:'Novo Item',category:cat||'Mochila',qty:1,desc:'',expanded:false}}
-function newEquip(){return{name:'Novo Equipamento',element:'',desc:'',descOpen:true,abilities:[],expanded:false}}
+function newInvItem(cat){return{name:'Novo Item',category:cat||'Mochila',qty:1,desc:'',damage:'',defeito:'',alcance:'',usoPorRodada:'',expanded:false}}
+function newEquip(){return{name:'Novo Equipamento',element:'',desc:'',descOpen:true,damage:'',dmgOpen:false,defeito:'',alcance:'',usoPorRodada:'',abilities:[],expanded:false}}
 function newSpirit(){return{name:'Novo Espírito',element:'',desc:'',descOpen:true,groups:[],expanded:false}}
 function newAbility(){return{name:'Nova Habilidade',desc:'',open:false}}
 function newGroup(){return{name:'Grupo',abilities:[newAbility()],open:false}}
 
-let S=null,invF='Todos',palOpen=false;
+let S=null,invFilters=new Set(['Todos']),palOpen=false;
 const TT=document.getElementById('tt');
-const SECS=['personagem','tracos','inventario','equipamentos','espiritos','pericias','historico','anotacoes'];
+const SECS=['personagem','tracos','inventario','equipamentos','espiritos','pericias','modificadores','historico','anotacoes'];
 const ICATS=['Mochila','Equipamentos','Consumíveis','Utilidades'];
 
 /* ═══════════════════════════════════
@@ -832,7 +974,7 @@ function init(){
       if(!S.equipments)S.equipments=[];
       if(!S.spirits)S.spirits=[];
       // Migrate old equipments/spirits that lack new fields
-      S.equipments.forEach(e=>{if(e.element===undefined)e.element='';if(!e.abilities)e.abilities=[];if(e.descOpen===undefined)e.descOpen=true;});
+      S.equipments.forEach(e=>{if(e.element===undefined)e.element='';if(!e.abilities)e.abilities=[];if(e.descOpen===undefined)e.descOpen=true;if(e.defeito===undefined)e.defeito='';if(e.alcance===undefined)e.alcance='';if(e.usoPorRodada===undefined)e.usoPorRodada='';});
       S.spirits.forEach(sp=>{if(sp.element===undefined)sp.element='';if(!sp.groups)sp.groups=[];if(sp.descOpen===undefined)sp.descOpen=true;});
     }catch{S=JSON.parse(JSON.stringify(DEF_ST));}
   }else{
@@ -840,8 +982,13 @@ function init(){
   }
   renderPal();applyPal(S.paletteIndex,false);
   bindInputs();renderCorr();renderSkills();calcAll();
-  renderDyn('traits');renderInv();renderEquipments();renderSpirits();
+  renderDyn('traits');renderInv();renderEquipments();renderSpirits();renderMod();
   SECS.forEach(applyColl);scrollSpy();
+  // Bind autoResize to main textareas
+  ['ui-history','ui-notes','ui-appearance','ui-phobias'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)bindAutoResize(el);
+  });
   document.addEventListener('click',e=>{
     if(!e.target.closest('.srow')&&!e.target.closest('.sbase')&&!e.target.closest('#tt'))hideTT();
     const fab=document.getElementById('fab');
@@ -889,39 +1036,16 @@ function saveFile(){
 }
 
 /* ═══════════════════════════════════
-   TEXT POPUP
-   Long-press (500ms) on any textarea opens popup
+   AUTO-RESIZE TEXTAREAS
 ═══════════════════════════════════ */
-let popupTarget=null,popupTimer=null;
-function maybePopup(e,el,title){
-  // Only trigger on long-press (pointerdown held > 500ms)
-  if(e.type!=='mousedown'&&e.type!=='pointerdown')return;
-  popupTimer=setTimeout(()=>{
-    openPopup(el,title);
-    popupTimer=null;
-  },500);
-  el.addEventListener('mouseup',cancelPopup,{once:true});
-  el.addEventListener('mousemove',cancelPopup,{once:true});
-  el.addEventListener('touchend',cancelPopup,{once:true});
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
 }
-function cancelPopup(){if(popupTimer){clearTimeout(popupTimer);popupTimer=null;}}
-function openPopup(el,title){
-  popupTarget=el;
-  document.getElementById('popup-title').textContent=title||'Texto';
-  document.getElementById('popup-ta').value=el.value;
-  document.getElementById('text-popup').classList.add('show');
-  setTimeout(()=>document.getElementById('popup-ta').focus(),50);
+function bindAutoResize(el){
+  autoResize(el);
+  el.addEventListener('input',()=>autoResize(el));
 }
-function savePopup(){
-  if(popupTarget){
-    popupTarget.value=document.getElementById('popup-ta').value;
-    popupTarget.dispatchEvent(new Event('input',{bubbles:true}));
-  }
-  closePopup();
-}
-function closePopup(){document.getElementById('text-popup').classList.remove('show');popupTarget=null;}
-document.getElementById('text-popup').addEventListener('click',e=>{if(e.target===e.currentTarget)closePopup();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePopup();});
 
 /* ═══════════════════════════════════
    FAB / PALETTE
@@ -973,6 +1097,7 @@ function calcAll(){
   if(S.vital.ps>mPS)S.vital.ps=mPS;
   if(S.vital.pe>mPE)S.vital.pe=mPE;
   updH('PV',S.vital.pv,mPV);updH('PS',S.vital.ps,mPS);updH('PE',S.vital.pe,mPE);
+  renderMod();
 }
 function getMax(t){
   const sp=S.skills['Específicas'];
@@ -1009,6 +1134,150 @@ function updH(t,cur,max){
 }
 
 /* ═══════════════════════════════════
+   MODIFICADORES
+═══════════════════════════════════ */
+function renderMod(){
+  const cont=document.getElementById('ui-mod-list');
+  if(!cont)return;
+  cont.innerHTML='';
+
+  const sp=S.skills['Específicas']||{};
+  const pr=S.skills['Práticas']||{};
+  const medVal  = pr['medicina']||0;
+  const fortVal = sp['fortitude']||0;
+  const sanVal  = sp['sanidade']||0;
+  const volVal  = sp['vontade']||0;
+  const sobrVal = sp['sobrenatural']||0;
+
+  /* ── Helper: make a mod card ── */
+  function mkModCard(cfg){
+    const box=document.createElement('div');box.className='mod-item';
+
+    // Title row
+    const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:baseline;gap:8px;margin-bottom:6px';
+    const title=document.createElement('span');title.className='mod-title';title.textContent=cfg.title;
+    titleRow.appendChild(title);
+    if(cfg.subtitle){
+      const sub=document.createElement('span');
+      // subtitle in white
+      sub.style.cssText='font-family:var(--mono);font-size:.65rem;color:#fff;letter-spacing:.06em;opacity:.85';
+      sub.textContent=cfg.subtitle;
+      titleRow.appendChild(sub);
+    }
+    box.appendChild(titleRow);
+
+    // Optional editable field (long rest hours)
+    if(cfg.editField){
+      const ef=cfg.editField;
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px';
+      const lbl=document.createElement('span');
+      // "Horas:" in accent color
+      lbl.style.cssText='font-family:var(--mono);font-size:.68rem;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0';
+      lbl.textContent=ef.label;
+      const inp=document.createElement('input');inp.type='number';inp.className='ibar-dmg-inp';
+      inp.style.cssText='width:52px;flex-shrink:0';
+      inp.value=ef.getValue();inp.placeholder='?';
+      inp.addEventListener('click',e=>e.stopPropagation());
+      inp.addEventListener('change',e=>{ef.setValue(parseInt(e.target.value)||0);renderMod();});
+      row.appendChild(lbl);row.appendChild(inp);
+      box.appendChild(row);
+    }
+
+    // Stat rows
+    cfg.rows.forEach(r=>{
+      const row=document.createElement('div');row.className='mod-row';row.style.marginBottom='4px';
+      const lbl=document.createElement('span');
+      // stat label always in accent color
+      lbl.style.cssText='font-family:var(--mono);font-size:.72rem;color:var(--acc);font-weight:700;min-width:40px;flex-shrink:0;letter-spacing:.04em';
+      lbl.textContent=r.stat;
+      row.appendChild(lbl);
+
+      // Formula text
+      const fmla=document.createElement('span');
+      fmla.style.cssText='font-family:var(--mono);font-size:.62rem;color:var(--muted);flex-grow:1;letter-spacing:0';
+      fmla.textContent=r.formula;
+      row.appendChild(fmla);
+
+      // Computed value box
+      const val=document.createElement('span');val.className='mod-val';val.textContent=r.val;
+      row.appendChild(val);
+      box.appendChild(row);
+    });
+
+    // Tooltip ONLY on hover (mouseenter) and hold (pointerdown) — NOT on click
+    if(cfg.tooltipVal!==undefined){
+      const tv=cfg.tooltipVal;
+      // Hover to show
+      box.addEventListener('mouseenter',e=>{showTT(tv,{currentTarget:box});});
+      box.addEventListener('mouseleave',hideTT);
+      // Hold on mobile (pointerdown)
+      let ht=null;
+      box.addEventListener('pointerdown',e=>{ht=setTimeout(()=>showTT(tv,{currentTarget:box}),400);});
+      box.addEventListener('pointerup',()=>clearTimeout(ht));
+      box.addEventListener('pointercancel',()=>clearTimeout(ht));
+    }
+
+    cont.appendChild(box);
+  }
+
+  /* Long rest variable stored in S */
+  if(S.longRestHours===undefined)S.longRestHours=12;
+  const lh=S.longRestHours||12;
+
+  /* ── Teste de Medicina ── */
+  mkModCard({
+    title:'Teste de Medicina',
+    tooltipVal:medVal,
+    rows:[
+      {stat:'Normal', formula:'÷ 10',        val:Math.floor(medVal/10)},
+      {stat:'Bom',    formula:'÷ 5',         val:Math.floor(medVal/5)},
+      {stat:'Extremo',formula:'valor direto', val:medVal},
+    ]
+  });
+
+  /* ── Descanso Curto ── */
+  mkModCard({
+    title:'Descanso Curto',
+    subtitle:'2 a 6 horas',
+    rows:[
+      {stat:'PV', formula:'1d4 + Fort÷15',        val:'1d4 + '+Math.floor(fortVal/15)},
+      {stat:'PS', formula:'1d4 + (San+Vol)÷30',   val:'1d4 + '+Math.floor((sanVal+volVal)/30)},
+      {stat:'PE', formula:'1d6 + Sobr÷20',        val:'1d6 + '+Math.floor(sobrVal/20)},
+    ]
+  });
+
+  /* ── Descanso Normal ── */
+  mkModCard({
+    title:'Descanso Normal',
+    subtitle:'7 a 11 horas',
+    rows:[
+      {stat:'PV', formula:'2d6 + Fort÷15',        val:'2d6 + '+Math.floor(fortVal/15)},
+      {stat:'PS', formula:'2d6 + (San+Vol)÷30',   val:'2d6 + '+Math.floor((sanVal+volVal)/30)},
+      {stat:'PE', formula:'2d8 + Sobr÷15',        val:'2d8 + '+Math.floor(sobrVal/15)},
+    ]
+  });
+
+  /* ── Descanso Longo ── */
+  mkModCard({
+    title:'Descanso Longo',
+    subtitle:'12 a ? horas',
+    editField:{
+      label:'Horas:',
+      getValue:()=>S.longRestHours||12,
+      setValue:v=>{S.longRestHours=v;saveData();}
+    },
+    rows:[
+      {stat:'PV', formula:'3d8 + Fort÷15 + (h×2)',
+        val:'3d8 + '+(Math.floor(fortVal/15)+(lh*2))},
+      {stat:'PS', formula:'3d8 + (S+V)÷30 + (h×2)',
+        val:'3d8 + '+(Math.floor((sanVal+volVal)/30)+(lh*2))},
+      {stat:'PE', formula:'3d10 + Sobr÷15',
+        val:'3d10 + '+Math.floor(sobrVal/15)},
+    ]
+  });
+}
+
+/* ═══════════════════════════════════
    SKILLS
 ═══════════════════════════════════ */
 function chgSk(cat,sk,v){
@@ -1021,8 +1290,14 @@ function chgSk(cat,sk,v){
 }
 function renderSkills(){
   const cont=document.getElementById('ui-skills-container');cont.innerHTML='';
-  const cA=['Físicas','Práticas','Sociais','Condução'],cB=['Conhecimento','Investigativas','Específicas'];
-  const colA=document.createElement('div'),colB=document.createElement('div');
+  // 7 categories distributed across 4 columns
+  // col1: Físicas, Condução | col2: Práticas, Sociais | col3: Conhecimento | col4: Investigativas, Específicas
+  const cols=[
+    ['Físicas','Condução'],
+    ['Práticas','Sociais'],
+    ['Conhecimento'],
+    ['Investigativas','Específicas']
+  ];
   function mkCat(cat){
     const wrap=document.createElement('div');wrap.className='scat';
     const hd=document.createElement('div');hd.className='scath';
@@ -1031,7 +1306,13 @@ function renderSkills(){
     Object.keys(S.skills[cat]).sort().forEach(sk=>{
       const v=S.skills[cat][sk];
       const row=document.createElement('div');row.className='srow';row.id='row-'+cat+'-'+sk;
-      row.innerHTML='<span class="skname">'+cap(sk)+'</span><div class="skinw"><input type="number" class="skinp" id="sk-'+cat+'-'+sk+'" value="'+v+'" onclick="event.stopPropagation()"></div>';
+      const displayName=cap(sk);
+      const sublabel=SK_LABELS[sk]||'';
+      const sublabelHtml=sublabel
+        ?'<span style="font-size:.7rem;color:var(--muted);font-weight:400;margin-left:5px;font-family:var(--mono);letter-spacing:0;text-transform:none;">'+sublabel+'</span>'
+        :'';
+      row.innerHTML='<span class="skname">'+displayName+sublabelHtml+'</span>'
+        +'<div class="skinw"><input type="number" class="skinp" id="sk-'+cat+'-'+sk+'" value="'+v+'" onclick="event.stopPropagation()"></div>';
       row.addEventListener('mouseenter',e=>showTT(S.skills[cat][sk],e));
       row.addEventListener('mouseleave',hideTT);
       row.addEventListener('click',e=>showTT(S.skills[cat][sk],e));
@@ -1046,9 +1327,12 @@ function renderSkills(){
     be.addEventListener('click',e=>showTT(e.target.dataset.val,e));
     wrap.appendChild(hd);wrap.appendChild(list);return wrap;
   }
-  cA.forEach(c=>colA.appendChild(mkCat(c)));
-  cB.forEach(c=>colB.appendChild(mkCat(c)));
-  cont.appendChild(colA);cont.appendChild(colB);
+  cols.forEach(catList=>{
+    const col=document.createElement('div');
+    col.style.display='flex';col.style.flexDirection='column';col.style.gap='12px';
+    catList.forEach(cat=>col.appendChild(mkCat(cat)));
+    cont.appendChild(col);
+  });
 }
 
 /* ═══════════════════════════════════
@@ -1066,13 +1350,16 @@ function showTT(P,e=null,keep=false){
   TT.classList.add('show');
   if(!keep&&e){
     if(window.innerWidth<=767)return;
-    const rc=e.currentTarget.getBoundingClientRect();
+    // Accept both real DOM events and plain objects {currentTarget:el}
+    const el=e.currentTarget||e.target;
+    if(!el)return;
+    const rc=el.getBoundingClientRect();
     let top=rc.top+window.scrollY,left=rc.right+14+window.scrollX;
     if(left+200>window.innerWidth)left=rc.left-200+window.scrollX;
-    if(top+170>window.scrollY+window.innerHeight)top-=100;
+    if(top+170>window.scrollY+window.innerHeight)top=window.scrollY+window.innerHeight-180;
     TT.style.left=left+'px';TT.style.top=top+'px';
     TT.style.transform='scale(1) translateY(0)';
-    TT.dataset.aid=e.currentTarget.id;
+    TT.dataset.aid=el.id||'';
   }
 }
 function hideTT(){TT.classList.remove('show');TT.dataset.aid='';}
@@ -1127,15 +1414,32 @@ function setupCardDrag(card,list,idx){
     if(!dragSrc||dragSrc===card)return;
     const from=parseInt(dragSrc.dataset.idx);
     const to=parseInt(card.dataset.idx);
-    if(dragSrc.dataset.list!==card.dataset.list)return;
-    const arr=S[dragSrc.dataset.list];
-    const[item]=arr.splice(from,1);arr.splice(to,0,item);
-    saveData();
-    const l=dragSrc.dataset.list;
-    if(l==='inventory')renderInv();
-    else if(l==='equipments')renderEquipments();
-    else if(l==='spirits')renderSpirits();
-    else renderDyn(l);
+    const srcList=dragSrc.dataset.list;
+    const tgtList=card.dataset.list;
+    // Only handle inventory cross-category or same-list reorder
+    if(srcList!=='inventory'||tgtList!=='inventory'){
+      if(srcList!==tgtList)return;
+      const arr=S[srcList];
+      const[item]=arr.splice(from,1);arr.splice(to,0,item);
+      saveData();
+      if(srcList==='equipments')renderEquipments();
+      else if(srcList==='spirits')renderSpirits();
+      else renderDyn(srcList);
+      return;
+    }
+    // Inventory: check if same or different category
+    const srcCat=S.inventory[from]?.category;
+    const tgtCat=S.inventory[to]?.category;
+    if(srcCat===tgtCat){
+      // Same category — reorder
+      const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
+    } else {
+      // Different category — move item to target's category
+      S.inventory[from].category=tgtCat;
+      // Also reorder to sit near the target
+      const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
+    }
+    saveData();renderInv();
   });
 }
 
@@ -1205,17 +1509,41 @@ function mkBaseCard(item,i,list,opts={}){
   bar.appendChild(del);
   card.appendChild(bar);
 
-  /* ── DAMAGE ROW (inventory equip type, or equip/spirit with damage filled) ── */
+  /* ── TOP COLLAPSE STRIP (visible only when open, collapses card) ── */
+  const topStrip=document.createElement('div');topStrip.className='ibar-top-strip';
+  const topArrow=document.createElement('span');topArrow.className='ibar-top-strip-arrow';topArrow.textContent='▼';
+  topStrip.appendChild(topArrow);
+  topStrip.addEventListener('click',()=>{
+    // Collapse this card
+    if(list==='inventory'){S.inventory[i].expanded=false;saveData();renderInv();}
+    else if(list==='equipments'){S.equipments[i].expanded=false;saveData();renderEquipments();}
+    else if(list==='spirits'){S.spirits[i].expanded=false;saveData();renderSpirits();}
+    else{S[list][i].expanded=false;saveData();renderDyn(list);}
+  });
+  card.appendChild(topStrip);
+
+  /* ── DAMAGE + EXTRA STATS ROW (inventory Equipamentos category) ── */
   if(opts.dmgAlwaysVisible){
-    // Inventory equipment: always show
-    const dmgRow=document.createElement('div');dmgRow.className='ibar-dmg';
-    const dmgLbl=document.createElement('span');dmgLbl.className='ibar-dmg-lbl';dmgLbl.textContent='Dano';
-    const dmgInp=document.createElement('input');dmgInp.type='text';dmgInp.className='ibar-dmg-inp';
-    dmgInp.value=item.damage||'';dmgInp.placeholder='—';
-    dmgInp.addEventListener('click',e=>e.stopPropagation());
-    dmgInp.addEventListener('change',e=>{S.inventory[i].damage=e.target.value;saveData();});
-    dmgRow.appendChild(dmgLbl);dmgRow.appendChild(dmgInp);
-    card.appendChild(dmgRow);
+    const statsWrap=document.createElement('div');
+    statsWrap.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;padding:0 10px 8px';
+    const invStatFields=[
+      {key:'damage',      lbl:'Dano',            ph:'Ex: 2d6+3'},
+      {key:'defeito',     lbl:'Defeito',          ph:'Ex: 95'},
+      {key:'alcance',     lbl:'Alcance',          ph:'Ex: 5m'},
+      {key:'usoPorRodada',lbl:'Uso por Rodada',   ph:'Ex: 1/2'},
+    ];
+    invStatFields.forEach(f=>{
+      const cell=document.createElement('div');
+      const lbl=document.createElement('span');lbl.className='ibar-dmg-lbl';lbl.textContent=f.lbl;
+      lbl.style.display='block';lbl.style.marginBottom='2px';
+      const inp=document.createElement('input');inp.type='text';inp.className='ibar-dmg-inp';
+      inp.value=item[f.key]||'';inp.placeholder=f.ph;
+      inp.addEventListener('click',e=>e.stopPropagation());
+      inp.addEventListener('change',e=>{S.inventory[i][f.key]=e.target.value;saveData();});
+      cell.appendChild(lbl);cell.appendChild(inp);
+      statsWrap.appendChild(cell);
+    });
+    card.appendChild(statsWrap);
   }
 
   /* ── BODY ── */
@@ -1223,19 +1551,18 @@ function mkBaseCard(item,i,list,opts={}){
 
   if(opts.hasDesc){
     const lbl=document.createElement('span');lbl.className='ifield-lbl';lbl.textContent='Descrição';
-    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const ta=document.createElement('textarea');ta.className='idesc';ta.placeholder='Detalhes...';ta.value=item.desc||'';
     ta.addEventListener('input',e=>{
+      autoResize(ta);
       if(list==='inventory')S.inventory[i].desc=e.target.value;
       else if(list==='equipments')S.equipments[i].desc=e.target.value;
       else if(list==='spirits')S.spirits[i].desc=e.target.value;
       else S[list][i].desc=e.target.value;
       saveData();
     });
-    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';mag.title='Expandir';
-    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(ta,'Descrição');});
-    taWrap.appendChild(ta);taWrap.appendChild(mag);
-    body.appendChild(lbl);body.appendChild(taWrap);
+    body.appendChild(lbl);body.appendChild(ta);
+    // autoResize after render
+    requestAnimationFrame(()=>autoResize(ta));
   }
 
   if(opts.extraBody){
@@ -1244,17 +1571,19 @@ function mkBaseCard(item,i,list,opts={}){
   }
   card.appendChild(body);
 
-  /* ── BOTTOM STRIP: click=expand, drag=reorder ── */
+  /* ── BOTTOM STRIP: click=expand (one-at-a-time), drag handle ── */
   const strip=document.createElement('div');strip.className='ibar-strip';
   strip.title='Clique para expandir · Arraste para mover';
   const stripIcon=document.createElement('span');stripIcon.className='ibar-strip-icon';stripIcon.textContent='= =';
-  strip.appendChild(stripIcon);
-  // Click to toggle
+  const stripArrow=document.createElement('span');stripArrow.className='ibar-strip-arrow';stripArrow.textContent='▼';
+  strip.appendChild(stripIcon);strip.appendChild(stripArrow);
+
   strip.addEventListener('click',()=>{
-    if(list==='inventory'){S.inventory[i].expanded=!S.inventory[i].expanded;saveData();renderInv();}
-    else if(list==='equipments'){S.equipments[i].expanded=!S.equipments[i].expanded;saveData();renderEquipments();}
-    else if(list==='spirits'){S.spirits[i].expanded=!S.spirits[i].expanded;saveData();renderSpirits();}
-    else{S[list][i].expanded=!S[list][i].expanded;saveData();renderDyn(list);}
+    const newVal=!item.expanded;
+    if(list==='inventory'){S.inventory[i].expanded=newVal;saveData();renderInv();}
+    else if(list==='equipments'){S.equipments[i].expanded=newVal;saveData();renderEquipments();}
+    else if(list==='spirits'){S.spirits[i].expanded=newVal;saveData();renderSpirits();}
+    else{S[list][i].expanded=newVal;saveData();renderDyn(list);}
   });
   card.appendChild(strip);
 
@@ -1266,19 +1595,16 @@ function mkBaseCard(item,i,list,opts={}){
 ═══════════════════════════════════ */
 function renderInv(){
   const cont=document.getElementById('ui-inv-list');cont.innerHTML='';
+  const showAll=invFilters.has('Todos');
   ICATS.forEach(cat=>{
-    if(invF!=='Todos'&&invF!==cat)return;
+    if(!showAll&&!invFilters.has(cat))return;
 
-    if(invF==='Todos'){
-      // Category separator — also a drop target
+    // Category separator (always when showing multiple or all)
+    if(showAll||invFilters.size>1){
       const sep=document.createElement('div');
       sep.className='catsep';sep.textContent='── '+cat+' ──';
       sep.dataset.cat=cat;
-      // Allow dropping onto separator to move item into this category
-      sep.addEventListener('dragover',e=>{
-        if(!dragSrc)return;e.preventDefault();
-        sep.classList.add('drag-cat-over');
-      });
+      sep.addEventListener('dragover',e=>{if(!dragSrc)return;e.preventDefault();sep.classList.add('drag-cat-over');});
       sep.addEventListener('dragleave',()=>sep.classList.remove('drag-cat-over'));
       sep.addEventListener('drop',e=>{
         e.preventDefault();sep.classList.remove('drag-cat-over');
@@ -1302,12 +1628,30 @@ function renderInv(){
   });
 }
 function setF(f){
-  invF=f;
-  document.querySelectorAll('#invfilt .fbtn').forEach(b=>b.classList.toggle('on',b.textContent.trim()===f));
+  if(f==='Todos'){
+    // Toggle: if Todos already active and alone, do nothing; otherwise set to only Todos
+    invFilters=new Set(['Todos']);
+  } else {
+    // Remove Todos if adding a specific category
+    invFilters.delete('Todos');
+    if(invFilters.has(f)){
+      invFilters.delete(f);
+      // If nothing left, revert to Todos
+      if(invFilters.size===0) invFilters=new Set(['Todos']);
+    } else {
+      invFilters.add(f);
+    }
+  }
+  document.querySelectorAll('#invfilt .fbtn').forEach(b=>{
+    const bf=b.dataset.f;
+    b.classList.toggle('on', invFilters.has(bf));
+  });
   renderInv();
 }
 function addInv(){
-  const cat=invF==='Todos'?'Mochila':invF;
+  // Pick first active non-Todos category, else Mochila
+  const cats=[...invFilters].filter(f=>f!=='Todos');
+  const cat=cats.length>0?cats[0]:'Mochila';
   S.inventory.unshift(newInvItem(cat));saveData();renderInv();
 }
 function modQ(i,delta){
@@ -1334,38 +1678,40 @@ function addEquip(){S.equipments.unshift(newEquip());saveData();renderEquipments
 function buildEquipBody(eq,i){
   const wrap=document.createElement('div');
 
-  // Element
-  const elbl=document.createElement('span');elbl.className='ifield-lbl';elbl.textContent='Elemento';
-  const einp=document.createElement('input');einp.type='text';einp.value=eq.element||'';einp.placeholder='Tipo / Elemento...';
-  einp.addEventListener('change',e=>{S.equipments[i].element=e.target.value;saveData();});
-  wrap.appendChild(elbl);wrap.appendChild(einp);
+  // Element — discrete row
+  const elemRow=document.createElement('div');elemRow.className='elem-row';
+  const elemLbl=document.createElement('span');elemLbl.className='elem-lbl';elemLbl.textContent='Elemento';
+  const elemInp=document.createElement('input');elemInp.type='text';elemInp.className='elem-inp';
+  elemInp.value=eq.element||'';elemInp.placeholder='—';
+  elemInp.addEventListener('click',e=>e.stopPropagation());
+  elemInp.addEventListener('change',e=>{S.equipments[i].element=e.target.value;saveData();});
+  elemRow.appendChild(elemLbl);elemRow.appendChild(elemInp);
+  wrap.appendChild(elemRow);
 
-  // Damage (optional — hidden if empty like description)
-  const hasDmg=!!(eq.damage);
-  const dmgTog=document.createElement('button');dmgTog.className='desc-tog';
-  dmgTog.textContent=hasDmg?'▲ Ocultar Dano':'▼ Dano';
-  dmgTog.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].dmgOpen=!S.equipments[i].dmgOpen;saveData();renderEquipments();});
-  wrap.appendChild(dmgTog);
-  if(eq.dmgOpen||hasDmg){
-    const dinp=document.createElement('input');dinp.type='text';dinp.className='ibar-dmg-inp';dinp.style.marginBottom='4px';
+  // Stats block — only Dano for equipamentos especiais
+  const hasStats=!!(eq.damage);
+  const statsTog=document.createElement('button');statsTog.className='desc-tog';
+  statsTog.textContent=(eq.statsOpen||hasStats)?'▲ Ocultar Dano':'▼ Dano';
+  statsTog.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].statsOpen=!S.equipments[i].statsOpen;saveData();renderEquipments();});
+  wrap.appendChild(statsTog);
+  if(eq.statsOpen||hasStats){
+    const dinp=document.createElement('input');dinp.type='text';dinp.className='ibar-dmg-inp';dinp.style.marginBottom='6px';
     dinp.value=eq.damage||'';dinp.placeholder='Ex: 2d6+3';
+    dinp.addEventListener('click',e=>e.stopPropagation());
     dinp.addEventListener('change',e=>{S.equipments[i].damage=e.target.value;saveData();});
     wrap.appendChild(dinp);
   }
 
   // Description (collapsible)
   const dtog=document.createElement('button');dtog.className='desc-tog';
-  dtog.textContent=(eq.descOpen?'▲ Ocultar Descrição':'▼ Descrição');
+  dtog.textContent=eq.descOpen?'▲ Ocultar Descrição':'▼ Descrição';
   dtog.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].descOpen=!S.equipments[i].descOpen;saveData();renderEquipments();});
   wrap.appendChild(dtog);
   if(eq.descOpen){
-    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const dta=document.createElement('textarea');dta.className='idesc';dta.placeholder='Descrição...';dta.value=eq.desc||'';
-    dta.addEventListener('input',e=>{S.equipments[i].desc=e.target.value;saveData();});
-    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';
-    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(dta,'Descrição');});
-    taWrap.appendChild(dta);taWrap.appendChild(mag);
-    wrap.appendChild(taWrap);
+    dta.addEventListener('input',e=>{autoResize(dta);S.equipments[i].desc=e.target.value;saveData();});
+    wrap.appendChild(dta);
+    requestAnimationFrame(()=>autoResize(dta));
   }
 
   // Abilities
@@ -1375,7 +1721,6 @@ function buildEquipBody(eq,i){
 
   (eq.abilities||[]).forEach((ab,ai)=>{
     const abCard=document.createElement('div');abCard.className='ab-card'+(ab.open?' open':'');
-    // Top bar
     const abBar=document.createElement('div');abBar.className='ab-bar';
     const abName=document.createElement('input');abName.type='text';abName.className='ab-name-inp';
     abName.value=ab.name||'';abName.placeholder='Nome da habilidade...';
@@ -1384,19 +1729,38 @@ function buildEquipBody(eq,i){
     const abDel=document.createElement('button');abDel.className='ab-del';abDel.textContent='×';
     abDel.addEventListener('click',e=>{e.stopPropagation();S.equipments[i].abilities.splice(ai,1);saveData();renderEquipments();});
     abBar.appendChild(abName);abBar.appendChild(abDel);abCard.appendChild(abBar);
-    // Body
+
     const abBody=document.createElement('div');abBody.className='ab-body';
-    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const abDesc=document.createElement('textarea');abDesc.className='ab-desc';abDesc.placeholder='Descrição...';abDesc.value=ab.desc||'';
-    abDesc.addEventListener('input',e=>{S.equipments[i].abilities[ai].desc=e.target.value;saveData();});
-    const abMag=document.createElement('button');abMag.className='ta-magnify';abMag.textContent='🔍';
-    abMag.addEventListener('click',e=>{e.stopPropagation();openPopup(abDesc,'Habilidade');});
-    taWrap.appendChild(abDesc);taWrap.appendChild(abMag);abBody.appendChild(taWrap);abCard.appendChild(abBody);
-    // Bottom strip
+    abDesc.addEventListener('input',e=>{autoResize(abDesc);S.equipments[i].abilities[ai].desc=e.target.value;saveData();});
+    abBody.appendChild(abDesc);abCard.appendChild(abBody);
+    requestAnimationFrame(()=>autoResize(abDesc));
+
+    // Strip with arrow + draggable for reorder
     const abStrip=document.createElement('div');abStrip.className='ab-strip';
-    const abSI=document.createElement('span');abSI.className='ab-strip-icon';abSI.textContent='= =';
-    abStrip.appendChild(abSI);
-    abStrip.addEventListener('click',()=>{S.equipments[i].abilities[ai].open=!ab.open;saveData();renderEquipments();});
+    abStrip.setAttribute('draggable','true');
+    const abArr=document.createElement('span');abArr.className='ab-strip-arrow';abArr.textContent='▼';
+    if(ab.open)abArr.style.transform='rotate(180deg)';
+    abStrip.appendChild(abArr);
+    abStrip.addEventListener('click',()=>{
+      S.equipments[i].abilities[ai].open=!ab.open;saveData();renderEquipments();
+    });
+    // Drag reorder for abilities
+    abStrip.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('ab-from',ai);e.dataTransfer.effectAllowed='move';
+      setTimeout(()=>abCard.style.opacity='.4',0);
+    });
+    abStrip.addEventListener('dragend',()=>abCard.style.opacity='');
+    abCard.addEventListener('dragover',e=>{e.preventDefault();abCard.style.borderColor='var(--acc)';});
+    abCard.addEventListener('dragleave',()=>abCard.style.borderColor='');
+    abCard.addEventListener('drop',e=>{
+      e.preventDefault();abCard.style.borderColor='';
+      const from=parseInt(e.dataTransfer.getData('ab-from'));
+      if(isNaN(from)||from===ai)return;
+      const arr=S.equipments[i].abilities;
+      const[item2]=arr.splice(from,1);arr.splice(ai,0,item2);
+      saveData();renderEquipments();
+    });
     abCard.appendChild(abStrip);
     abWrap.appendChild(abCard);
   });
@@ -1426,37 +1790,40 @@ function addSpirit(){S.spirits.unshift(newSpirit());saveData();renderSpirits();}
 function buildSpiritBody(sp,i){
   const wrap=document.createElement('div');
 
-  // Element
-  const elbl=document.createElement('span');elbl.className='ifield-lbl';elbl.textContent='Elemento';
-  const einp=document.createElement('input');einp.type='text';einp.value=sp.element||'';einp.placeholder='Tipo / Elemento...';
-  einp.addEventListener('change',e=>{S.spirits[i].element=e.target.value;saveData();});
-  wrap.appendChild(elbl);wrap.appendChild(einp);
+  // Element — discrete
+  const elemRow=document.createElement('div');elemRow.className='elem-row';
+  const elemLbl=document.createElement('span');elemLbl.className='elem-lbl';elemLbl.textContent='Elemento';
+  const elemInp=document.createElement('input');elemInp.type='text';elemInp.className='elem-inp';
+  elemInp.value=sp.element||'';elemInp.placeholder='—';
+  elemInp.addEventListener('click',e=>e.stopPropagation());
+  elemInp.addEventListener('change',e=>{S.spirits[i].element=e.target.value;saveData();});
+  elemRow.appendChild(elemLbl);elemRow.appendChild(elemInp);
+  wrap.appendChild(elemRow);
 
   // Damage (optional)
   const hasDmg=!!(sp.damage);
   const dmgTog=document.createElement('button');dmgTog.className='desc-tog';
-  dmgTog.textContent=hasDmg?'▲ Ocultar Dano':'▼ Dano';
+  dmgTog.textContent=(sp.dmgOpen||hasDmg)?'▲ Ocultar Dano':'▼ Dano';
   dmgTog.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].dmgOpen=!S.spirits[i].dmgOpen;saveData();renderSpirits();});
   wrap.appendChild(dmgTog);
   if(sp.dmgOpen||hasDmg){
     const dinp=document.createElement('input');dinp.type='text';dinp.className='ibar-dmg-inp';dinp.style.marginBottom='4px';
     dinp.value=sp.damage||'';dinp.placeholder='Ex: 2d6+3';
+    dinp.addEventListener('click',e=>e.stopPropagation());
     dinp.addEventListener('change',e=>{S.spirits[i].damage=e.target.value;saveData();});
     wrap.appendChild(dinp);
   }
 
   // Description (collapsible)
   const dtog=document.createElement('button');dtog.className='desc-tog';
-  dtog.textContent=(sp.descOpen?'▲ Ocultar Descrição':'▼ Descrição');
+  dtog.textContent=sp.descOpen?'▲ Ocultar Descrição':'▼ Descrição';
   dtog.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].descOpen=!S.spirits[i].descOpen;saveData();renderSpirits();});
   wrap.appendChild(dtog);
   if(sp.descOpen){
-    const taWrap=document.createElement('div');taWrap.className='ta-wrap';
     const dta=document.createElement('textarea');dta.className='idesc';dta.placeholder='Descrição do espírito...';dta.value=sp.desc||'';
-    dta.addEventListener('input',e=>{S.spirits[i].desc=e.target.value;saveData();});
-    const mag=document.createElement('button');mag.className='ta-magnify';mag.textContent='🔍';
-    mag.addEventListener('click',e=>{e.stopPropagation();openPopup(dta,'Descrição');});
-    taWrap.appendChild(dta);taWrap.appendChild(mag);wrap.appendChild(taWrap);
+    dta.addEventListener('input',e=>{autoResize(dta);S.spirits[i].desc=e.target.value;saveData();});
+    wrap.appendChild(dta);
+    requestAnimationFrame(()=>autoResize(dta));
   }
 
   // Groups
@@ -1466,7 +1833,8 @@ function buildSpiritBody(sp,i){
 
   (sp.groups||[]).forEach((grp,gi)=>{
     const grpEl=document.createElement('div');grpEl.className='ab-group'+(grp.open?' open':'');
-    // Group header (name + del only — no expand arrow)
+
+    // Group header: name + del
     const ghd=document.createElement('div');ghd.className='ab-group-hd';
     const gname=document.createElement('input');gname.type='text';gname.className='ab-group-name';
     gname.value=grp.name||'';gname.placeholder='Nome do grupo...';
@@ -1475,6 +1843,13 @@ function buildSpiritBody(sp,i){
     const gdel=document.createElement('button');gdel.className='ab-group-del';gdel.textContent='×';
     gdel.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups.splice(gi,1);saveData();renderSpirits();});
     ghd.appendChild(gname);ghd.appendChild(gdel);grpEl.appendChild(ghd);
+
+    const gStrip=document.createElement('div');gStrip.className='ab-group-strip';
+    const gArr=document.createElement('span');gArr.className='ab-strip-arrow';gArr.textContent='▼';
+    if(grp.open)gArr.style.transform='rotate(180deg)';
+    gStrip.appendChild(gArr);
+    gStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].open=!grp.open;saveData();renderSpirits();});
+    grpEl.appendChild(gStrip);
 
     // Group body
     const gbody=document.createElement('div');gbody.className='ab-group-body';
@@ -1488,31 +1863,41 @@ function buildSpiritBody(sp,i){
       const abDel=document.createElement('button');abDel.className='ab-del';abDel.textContent='×';
       abDel.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups[gi].abilities.splice(ai,1);saveData();renderSpirits();});
       abBar.appendChild(abName);abBar.appendChild(abDel);abCard.appendChild(abBar);
+
       const abBody=document.createElement('div');abBody.className='ab-body';
-      const taWrap=document.createElement('div');taWrap.className='ta-wrap';
       const abDesc=document.createElement('textarea');abDesc.className='ab-desc';abDesc.placeholder='Descrição...';abDesc.value=ab.desc||'';
-      abDesc.addEventListener('input',e=>{S.spirits[i].groups[gi].abilities[ai].desc=e.target.value;saveData();});
-      const abMag=document.createElement('button');abMag.className='ta-magnify';abMag.textContent='🔍';
-      abMag.addEventListener('click',e=>{e.stopPropagation();openPopup(abDesc,'Habilidade');});
-      taWrap.appendChild(abDesc);taWrap.appendChild(abMag);abBody.appendChild(taWrap);abCard.appendChild(abBody);
-      // Strip
+      abDesc.addEventListener('input',e=>{autoResize(abDesc);S.spirits[i].groups[gi].abilities[ai].desc=e.target.value;saveData();});
+      abBody.appendChild(abDesc);abCard.appendChild(abBody);
+      requestAnimationFrame(()=>autoResize(abDesc));
+
       const abStrip=document.createElement('div');abStrip.className='ab-strip';
-      const abSI=document.createElement('span');abSI.className='ab-strip-icon';abSI.textContent='= =';
-      abStrip.appendChild(abSI);
+      abStrip.setAttribute('draggable','true');
+      const abArr=document.createElement('span');abArr.className='ab-strip-arrow';abArr.textContent='▼';
+      if(ab.open)abArr.style.transform='rotate(180deg)';
+      abStrip.appendChild(abArr);
       abStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].abilities[ai].open=!ab.open;saveData();renderSpirits();});
+      abStrip.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('sab-from',ai);e.dataTransfer.effectAllowed='move';
+        setTimeout(()=>abCard.style.opacity='.4',0);
+      });
+      abStrip.addEventListener('dragend',()=>abCard.style.opacity='');
+      abCard.addEventListener('dragover',e=>{e.preventDefault();abCard.style.borderColor='var(--acc)';});
+      abCard.addEventListener('dragleave',()=>abCard.style.borderColor='');
+      abCard.addEventListener('drop',e=>{
+        e.preventDefault();abCard.style.borderColor='';
+        const from=parseInt(e.dataTransfer.getData('sab-from'));
+        if(isNaN(from)||from===ai)return;
+        const arr=S.spirits[i].groups[gi].abilities;
+        const[item2]=arr.splice(from,1);arr.splice(ai,0,item2);
+        saveData();renderSpirits();
+      });
       abCard.appendChild(abStrip);
       gbody.appendChild(abCard);
     });
+
     const addAb=document.createElement('button');addAb.className='add-ab-btn';addAb.textContent='+';addAb.title='Adicionar Habilidade';
     addAb.addEventListener('click',e=>{e.stopPropagation();S.spirits[i].groups[gi].abilities.push(newAbility());saveData();renderSpirits();});
     gbody.appendChild(addAb);grpEl.appendChild(gbody);
-
-    // Group strip
-    const gStrip=document.createElement('div');gStrip.className='ab-group-strip';
-    const gSI=document.createElement('span');gSI.className='ab-group-strip-icon';gSI.textContent='= =';
-    gStrip.appendChild(gSI);
-    gStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].open=!grp.open;saveData();renderSpirits();});
-    grpEl.insertBefore(gStrip,ghd.nextSibling);
     groupWrap.appendChild(grpEl);
   });
 
