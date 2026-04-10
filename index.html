@@ -60,9 +60,27 @@ button:disabled{opacity:.28;cursor:not-allowed}
 #sidebar nav{display:flex;flex-direction:column;padding:6px 0;flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #sidebar nav::-webkit-scrollbar{width:2px}
 #sidebar nav::-webkit-scrollbar-thumb{background:var(--border)}
-#sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+/* ── CHAR GRID — 3 col: photo | radar | fields ── */
+.char-grid{display:grid;grid-template-columns:auto auto 1fr;gap:18px;align-items:start}
+.char-photo-col{display:flex;flex-direction:column;gap:10px;width:190px}
+.radar-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+#radar-canvas{display:block}
+.char-fields-col{display:flex;flex-direction:column;gap:12px}
+
+/* ── SIDEBAR NAV DRAG ── */
+#sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:grab}
 #sidebar nav a:hover{background:var(--acc-dim);color:var(--text)}
 #sidebar nav a.act{border-left-color:var(--acc);background:var(--acc-dim);color:var(--acc)}
+#sidebar nav a.drag-over-nav{border-top:2px solid var(--acc);background:var(--acc-dim)}
+#sidebar nav a.nav-dragging{opacity:.4}
+
+/* ── AB-GROUP BODY themed dark ── */
+.ab-group-body{
+  display:none;padding:6px 8px 8px;flex-direction:column;gap:5px;
+  background:rgba(0,10,20,.45);
+  border-top:1px solid var(--border2);
+}
+.ab-group.open .ab-group-body{display:flex}
 .nic{font-size:.85rem;width:16px;text-align:center;flex-shrink:0}
 .sbfoot{padding:10px;border-top:1px solid var(--border2)}
 .ptbox{background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
@@ -88,8 +106,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .card::after{content:'';position:absolute;top:0;right:0;border-style:solid;border-width:0 14px 14px 0;border-color:transparent var(--acc) transparent transparent;opacity:.22;border-radius:0 var(--r) 0 0}
 
 /* ── CHAR LAYOUT ── */
-.char-grid{display:grid;grid-template-columns:230px 1fr;gap:24px}
-.char-photo-col{display:flex;flex-direction:column;gap:12px}
+/* char-grid — see top */
 .photo-wrap{position:relative;width:100%;cursor:pointer;border-radius:var(--r);overflow:hidden}
 .char-photo{width:100%;aspect-ratio:3/4;object-fit:cover;border:1px solid var(--border);border-radius:var(--r);display:block;background:var(--bg1);transition:border-color var(--tr),box-shadow var(--tr)}
 .photo-wrap:hover .char-photo{border-color:var(--acc);box-shadow:0 0 18px var(--acc-glow)}
@@ -454,8 +471,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
 }
 .ab-group.open .ab-group-strip .ab-strip-arrow{transform:rotate(180deg)}
 .ab-group-strip:hover .ab-strip-arrow{opacity:1}
-.ab-group-body{display:none;padding:6px 8px 8px;flex-direction:column;gap:5px}
-.ab-group.open .ab-group-body{display:flex}
+/* ab-group-body — see above */
 
 /* CATEGORY SEPARATORS */
 .catsep{grid-column:1/-1;font-family:var(--mono);font-size:.74rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;padding:8px 4px 5px;border-bottom:1px solid var(--border);margin-top:6px}
@@ -562,7 +578,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   .ptbox .lbl{display:none}
   .ptbox .val{font-size:1rem}
   #main{padding:24px 20px 100px}
-  .char-grid{grid-template-columns:180px 1fr}
+  .char-grid{grid-template-columns:160px 160px 1fr}
 }
 
 /* ── MOBILE ── */
@@ -573,9 +589,16 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   #sidebar.open{transform:translateX(0)}
   #overlay.open{display:block}
   #main{margin-left:0;padding:68px 14px 84px}
-  .char-grid{grid-template-columns:1fr}
-  .char-photo-col{flex-direction:row;align-items:flex-start;gap:14px}
-  .photo-wrap{width:110px;flex-shrink:0}
+  /* Mobile char layout: photo+radar row on top, fields below */
+  .char-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:12px}
+  .char-photo-col{grid-column:1;grid-row:1;width:auto}
+  .radar-wrap{grid-column:2;grid-row:1;align-self:start}
+  .char-fields-col{grid-column:1/-1;grid-row:2}
+  .photo-wrap{width:100%;max-width:140px}
+  /* fobias below fields — already in char-fields-col */
+  /* single col mod-list on mobile */
+  .mod-list{flex-direction:column}
+  .mod-item{max-width:100%;flex:none;width:100%}
   .grid-fields{grid-template-columns:75px 1fr;gap:7px 10px}
   .hrow{flex-wrap:wrap;gap:6px}
   .hctrl{flex-wrap:wrap;align-items:center}
@@ -633,14 +656,14 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   </div>
   <nav id="snav">
     <a href="#personagem" class="act"><span class="nic">◈</span><span>Re-Timed</span></a>
+    <a href="#pericias"><span class="nic">◉</span><span>Perícias</span></a>
+    <a href="#modificadores"><span class="nic">⊞</span><span>Modif.</span></a>
+    <a href="#anotacoes"><span class="nic">✎</span><span>Anotações</span></a>
     <a href="#tracos"><span class="nic">◇</span><span>Traços</span></a>
     <a href="#inventario"><span class="nic">⊡</span><span>Inventário</span></a>
     <a href="#equipamentos"><span class="nic">⚙</span><span>Equip.</span></a>
     <a href="#espiritos"><span class="nic">✦</span><span>Espíritos</span></a>
-    <a href="#pericias"><span class="nic">◉</span><span>Perícias</span></a>
-    <a href="#modificadores"><span class="nic">⊞</span><span>Modif.</span></a>
     <a href="#historico"><span class="nic">▤</span><span>Histórico</span></a>
-    <a href="#anotacoes"><span class="nic">✎</span><span>Anotações</span></a>
   </nav>
   <div class="sbfoot">
     <div class="ptbox">
@@ -660,6 +683,8 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
     </div>
     <div id="bd-personagem" class="sec-body">
       <div class="card char-grid">
+
+        <!-- Col 1: Photo + Aparência -->
         <div class="char-photo-col">
           <div class="photo-wrap" onclick="document.getElementById('fileup').click()" title="Clique para alterar">
             <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo" id="ui-photo">
@@ -676,7 +701,14 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
             <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
           </div>
         </div>
-        <div>
+
+        <!-- Col 2: Radar chart -->
+        <div class="radar-wrap">
+          <canvas id="radar-canvas" width="190" height="254"></canvas>
+        </div>
+
+        <!-- Col 3: Fields + Fobias + Corruption + HUD + Links -->
+        <div class="char-fields-col">
           <div class="grid-fields">
             <span class="flbl">Nome</span>       <input type="text" id="ui-name" oninput="saveData()">
             <span class="flbl">Idade</span>      <input type="text" id="ui-age" oninput="saveData()">
@@ -732,14 +764,48 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
             <button class="blink" onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0','_blank')">▤ LIVRO</button>
           </div>
         </div>
+
       </div>
     </div>
+  </section>
+
+  <!-- PERÍCIAS -->
+  <section id="pericias">
+    <div class="sec-hd" onclick="togSec('pericias')">
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Perícias</span><span class="sec-num">02</span></div>
+      <span class="sec-arr">▼</span>
+    </div>
+    <div id="bd-pericias" class="sec-body">
+      <div class="g2" id="ui-skills-container"></div>
+    </div>
+  </section>
+
+  <!-- MODIFICADORES -->
+  <section id="modificadores">
+    <div class="sec-hd" onclick="togSec('modificadores')">
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Modificadores</span><span class="sec-num">03</span></div>
+      <span class="sec-arr">▼</span>
+    </div>
+    <div id="bd-modificadores" class="sec-body">
+      <div class="mod-list" id="ui-mod-list"></div>
+    </div>
+  </section>
+
+  <!-- ANOTAÇÕES -->
+  <section id="anotacoes">
+    <div class="sec-hd" onclick="togSec('anotacoes')">
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">04</span></div>
+      <span class="sec-arr">▼</span>
+    </div>
+      <div class="sec-body" id="bd-anotacoes">
+        <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
+      </div>
   </section>
 
   <!-- TRAÇOS -->
   <section id="tracos">
     <div class="sec-hd" onclick="togSec('tracos')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Traços</span><span class="sec-num">02</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Traços</span><span class="sec-num">05</span></div>
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-tracos" class="sec-body">
@@ -751,7 +817,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   <!-- INVENTÁRIO -->
   <section id="inventario">
     <div class="sec-hd" onclick="togSec('inventario')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Inventário</span><span class="sec-num">03</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Inventário</span><span class="sec-num">06</span></div>
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-inventario" class="sec-body">
@@ -770,7 +836,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   <!-- EQUIPAMENTOS -->
   <section id="equipamentos">
     <div class="sec-hd" onclick="togSec('equipamentos')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Equipamentos Especiais</span><span class="sec-num">04</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Equipamentos Especiais</span><span class="sec-num">07</span></div>
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-equipamentos" class="sec-body">
@@ -782,7 +848,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   <!-- ESPÍRITOS -->
   <section id="espiritos">
     <div class="sec-hd" onclick="togSec('espiritos')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Espíritos</span><span class="sec-num">05</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Espíritos</span><span class="sec-num">08</span></div>
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-espiritos" class="sec-body">
@@ -791,47 +857,14 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
     </div>
   </section>
 
-  <!-- PERÍCIAS -->
-  <section id="pericias">
-    <div class="sec-hd" onclick="togSec('pericias')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Perícias</span><span class="sec-num">06</span></div>
-      <span class="sec-arr">▼</span>
-    </div>
-    <div id="bd-pericias" class="sec-body">
-      <div class="g2" id="ui-skills-container"></div>
-    </div>
-  </section>
-
-  <!-- MODIFICADORES -->
-  <section id="modificadores">
-    <div class="sec-hd" onclick="togSec('modificadores')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Modificadores</span><span class="sec-num">07</span></div>
-      <span class="sec-arr">▼</span>
-    </div>
-    <div id="bd-modificadores" class="sec-body">
-      <div class="mod-list" id="ui-mod-list"></div>
-    </div>
-  </section>
-
   <!-- HISTÓRICO -->
   <section id="historico">
     <div class="sec-hd" onclick="togSec('historico')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">08</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Histórico</span><span class="sec-num">09</span></div>
       <span class="sec-arr">▼</span>
     </div>
       <div class="sec-body" id="bd-historico">
         <textarea id="ui-history" class="fta" oninput="saveData()" placeholder="A história do personagem..."></textarea>
-      </div>
-  </section>
-
-  <!-- ANOTAÇÕES -->
-  <section id="anotacoes">
-    <div class="sec-hd" onclick="togSec('anotacoes')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">09</span></div>
-      <span class="sec-arr">▼</span>
-    </div>
-      <div class="sec-body" id="bd-anotacoes">
-        <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
       </div>
   </section>
 
@@ -842,14 +875,14 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
 <nav id="tabbar">
   <div class="tbinner">
     <a href="#personagem" class="act"><span class="tbi">◈</span><span>Personagem</span></a>
+    <a href="#pericias"><span class="tbi">◉</span><span>Perícias</span></a>
+    <a href="#modificadores"><span class="tbi">⊞</span><span>Modif.</span></a>
+    <a href="#anotacoes"><span class="tbi">✎</span><span>Anotações</span></a>
     <a href="#tracos"><span class="tbi">◇</span><span>Traços</span></a>
     <a href="#inventario"><span class="tbi">⊡</span><span>Inventário</span></a>
     <a href="#equipamentos"><span class="tbi">⚙</span><span>Equip.</span></a>
     <a href="#espiritos"><span class="tbi">✦</span><span>Espíritos</span></a>
-    <a href="#pericias"><span class="tbi">◉</span><span>Perícias</span></a>
-    <a href="#modificadores"><span class="tbi">⊞</span><span>Modif.</span></a>
     <a href="#historico"><span class="tbi">▤</span><span>Histórico</span></a>
-    <a href="#anotacoes"><span class="tbi">✎</span><span>Anotações</span></a>
   </div>
 </nav>
 
@@ -950,7 +983,8 @@ function newGroup(){return{name:'Grupo',abilities:[newAbility()],open:false}}
 
 let S=null,invFilters=new Set(['Todos']),palOpen=false;
 const TT=document.getElementById('tt');
-const SECS=['personagem','tracos','inventario','equipamentos','espiritos','pericias','modificadores','historico','anotacoes'];
+const DEFAULT_SEC_ORDER=['personagem','pericias','modificadores','anotacoes','tracos','inventario','equipamentos','espiritos','historico'];
+const SECS=DEFAULT_SEC_ORDER.slice();
 const ICATS=['Mochila','Equipamentos','Consumíveis','Utilidades'];
 
 /* ═══════════════════════════════════
@@ -983,7 +1017,11 @@ function init(){
   renderPal();applyPal(S.paletteIndex,false);
   bindInputs();renderCorr();renderSkills();calcAll();
   renderDyn('traits');renderInv();renderEquipments();renderSpirits();renderMod();
-  SECS.forEach(applyColl);scrollSpy();
+  SECS.forEach(applyColl);
+  applySavedSectionOrder();
+  scrollSpy();
+  initSidebarDrag();
+  drawRadar();
   // Bind autoResize to main textareas
   ['ui-history','ui-notes','ui-appearance','ui-phobias'].forEach(id=>{
     const el=document.getElementById(id);
@@ -1098,6 +1136,7 @@ function calcAll(){
   if(S.vital.pe>mPE)S.vital.pe=mPE;
   updH('PV',S.vital.pv,mPV);updH('PS',S.vital.ps,mPS);updH('PE',S.vital.pe,mPE);
   renderMod();
+  drawRadar();
 }
 function getMax(t){
   const sp=S.skills['Específicas'];
@@ -1923,6 +1962,8 @@ function handleImg(e){
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       const url=canvas.toDataURL('image/jpeg',.82);
       document.getElementById('ui-photo').src=url;S.photo=url;saveData();
+      // Radar needs photo dimensions — redraw after image settles
+      setTimeout(drawRadar,100);
     };
     img.src=ev.target.result;
   };
@@ -1960,6 +2001,215 @@ function scrollSpy(){
   },{rootMargin:'-20% 0px -60% 0px'});
   document.querySelectorAll('section').forEach(s=>obs.observe(s));
 }
+
+/* ═══════════════════════════════════
+   RADAR CHART
+═══════════════════════════════════ */
+function drawRadar(){
+  const canvas=document.getElementById('radar-canvas');
+  if(!canvas)return;
+  // Size canvas to match photo element height
+  const photo=document.getElementById('ui-photo');
+  if(photo&&photo.offsetWidth>0){
+    canvas.width=photo.offsetWidth;
+    canvas.height=photo.offsetHeight>10?photo.offsetHeight:Math.round(photo.offsetWidth*4/3);
+  }
+  const W=canvas.width,H=canvas.height;
+  if(!W||!H)return;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const cats=['Físicas','Práticas','Sociais','Condução','Conhecimento','Investigativas','Específicas'];
+  const labels=['Físicas','Práticas','Sociais','Condução','Conhec.','Invest.','Específ.'];
+  const N=cats.length;
+  const cx=W/2, cy=H/2;
+  const maxR=Math.min(W,H)/2-28;
+  const maxVal=150;
+  const ringSteps=[30,60,90,120,150];
+
+  // Base values: average of category skills, clamped to 0-150
+  const vals=cats.map(cat=>{
+    const sk=S.skills[cat];
+    if(!sk)return 0;
+    const vs=Object.values(sk);
+    const avg=vs.reduce((a,v)=>a+v,0)/vs.length;
+    return Math.min(maxVal,Math.max(0,Math.floor(avg/5)*5));
+  });
+
+  // Read accent color from CSS variable
+  const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#00e5c8';
+  // Parse hex to rgb for alpha compositing
+  const hex=acc.replace('#','');
+  const ar=parseInt(hex.slice(0,2),16)||0;
+  const ag=parseInt(hex.slice(2,4),16)||229;
+  const ab=parseInt(hex.slice(4,6),16)||200;
+
+  function angle(i){return(Math.PI*2/N)*i - Math.PI/2;}
+  function pt(i,r){return{x:cx+Math.cos(angle(i))*r, y:cy+Math.sin(angle(i))*r};}
+
+  // Background
+  ctx.fillStyle='rgba(6,11,24,0.6)';
+  ctx.beginPath();
+  for(let i=0;i<N;i++){const p=pt(i,maxR);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+  ctx.closePath();ctx.fill();
+
+  // Grid rings
+  ringSteps.forEach(step=>{
+    const r=(step/maxVal)*maxR;
+    ctx.beginPath();
+    for(let i=0;i<N;i++){const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+    ctx.closePath();
+    ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;ctx.stroke();
+    // Ring value label
+    ctx.fillStyle='rgba(255,255,255,.18)';
+    ctx.font=`${Math.max(7,Math.round(W/28))}px monospace`;
+    ctx.textAlign='left';
+    ctx.fillText(step, cx+3, cy-r+3);
+  });
+
+  // Axes
+  for(let i=0;i<N;i++){
+    const p=pt(i,maxR);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1;ctx.stroke();
+  }
+
+  // Data polygon — fill
+  ctx.beginPath();
+  vals.forEach((v,i)=>{const r=(v/maxVal)*maxR;const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
+  ctx.closePath();
+  ctx.fillStyle=`rgba(${ar},${ag},${ab},0.2)`;ctx.fill();
+  ctx.strokeStyle=`rgba(${ar},${ag},${ab},0.9)`;ctx.lineWidth=1.5;ctx.stroke();
+
+  // Data points
+  vals.forEach((v,i)=>{
+    const r=(v/maxVal)*maxR;const p=pt(i,r);
+    ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${ar},${ag},${ab},1)`;ctx.fill();
+  });
+
+  // Category labels
+  const fontSize=Math.max(8,Math.round(W/24));
+  ctx.font=`600 ${fontSize}px sans-serif`;
+  ctx.textAlign='center';
+  labels.forEach((lbl,i)=>{
+    const p=pt(i,maxR+fontSize+4);
+    ctx.fillStyle='rgba(205,214,232,0.75)';
+    ctx.fillText(lbl,p.x,p.y+3);
+  });
+}
+
+/* ═══════════════════════════════════
+   SECTION REORDER via sidebar drag
+═══════════════════════════════════ */
+let secDragSrc=null;
+
+function initSidebarDrag(){
+  const nav=document.getElementById('snav');
+  if(!nav)return;
+  const links=nav.querySelectorAll('a');
+  links.forEach(a=>{
+    a.setAttribute('draggable','true');
+    a.addEventListener('dragstart',e=>{
+      secDragSrc=a;
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',a.getAttribute('href'));
+      setTimeout(()=>a.classList.add('nav-dragging'),0);
+    });
+    a.addEventListener('dragend',()=>{
+      a.classList.remove('nav-dragging');
+      nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
+      secDragSrc=null;
+    });
+    a.addEventListener('dragover',e=>{
+      if(!secDragSrc||secDragSrc===a)return;
+      e.preventDefault();
+      nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
+      a.classList.add('drag-over-nav');
+    });
+    a.addEventListener('drop',e=>{
+      e.preventDefault();
+      a.classList.remove('drag-over-nav');
+      if(!secDragSrc||secDragSrc===a)return;
+      // Reorder in sidebar
+      const parent=nav;
+      const children=[...parent.children];
+      const fromIdx=children.indexOf(secDragSrc);
+      const toIdx=children.indexOf(a);
+      if(fromIdx<toIdx) parent.insertBefore(secDragSrc,a.nextSibling);
+      else parent.insertBefore(secDragSrc,a);
+      // Reorder sections in main
+      reorderSectionsFromNav();
+      saveSectionOrder();
+    });
+  });
+}
+
+function reorderSectionsFromNav(){
+  const main=document.getElementById('main');
+  const nav=document.getElementById('snav');
+  const order=[...nav.querySelectorAll('a')].map(a=>a.getAttribute('href').slice(1));
+  order.forEach(id=>{
+    const sec=document.getElementById(id);
+    if(sec)main.appendChild(sec);
+  });
+  // Update scroll spy
+  scrollSpy();
+}
+
+function saveSectionOrder(){
+  const nav=document.getElementById('snav');
+  const order=[...nav.querySelectorAll('a')].map(a=>a.getAttribute('href').slice(1));
+  S.sectionOrder=order;
+  saveData();
+}
+
+function applySavedSectionOrder(){
+  const order=S.sectionOrder;
+  if(!order||!Array.isArray(order))return;
+  const nav=document.getElementById('snav');
+  const main=document.getElementById('main');
+  // Reorder nav links
+  order.forEach(id=>{
+    const link=nav.querySelector('a[href="#'+id+'"]');
+    if(link)nav.appendChild(link);
+  });
+  // Reorder sections
+  order.forEach(id=>{
+    const sec=document.getElementById(id);
+    if(sec)main.appendChild(sec);
+  });
+}
+
+/* ═══════════════════════════════════
+   MOBILE TOUCH DRAG FOR ABILITIES
+   HTML5 drag doesn't fire on touch — use pointer events
+═══════════════════════════════════ */
+function setupTouchDragStrip(strip,onDropIndex,getItems,setItems,rerender){
+  let startY=0,startIdx=onDropIndex,dragging=false;
+  strip.addEventListener('touchstart',e=>{
+    startY=e.touches[0].clientY;dragging=false;
+  },{passive:true});
+  strip.addEventListener('touchmove',e=>{
+    const dy=Math.abs(e.touches[0].clientY-startY);
+    if(dy>10){dragging=true;e.preventDefault();}
+  },{passive:false});
+  strip.addEventListener('touchend',e=>{
+    if(!dragging)return;
+    const endY=e.changedTouches[0].clientY;
+    const items=getItems();
+    const cardH=strip.closest('.ab-card')?.offsetHeight||40;
+    const delta=Math.round((endY-startY)/cardH);
+    if(delta===0)return;
+    const newIdx=Math.max(0,Math.min(items.length-1,startIdx+delta));
+    const[item]=items.splice(startIdx,1);items.splice(newIdx,0,item);
+    setItems(items);
+    rerender();
+  });
+}
+
+  // Redraw radar when window resizes
+  window.addEventListener('resize',()=>drawRadar());
 
 window.onload=init;
 </script>
