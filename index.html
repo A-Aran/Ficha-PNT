@@ -60,12 +60,19 @@ button:disabled{opacity:.28;cursor:not-allowed}
 #sidebar nav{display:flex;flex-direction:column;padding:6px 0;flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #sidebar nav::-webkit-scrollbar{width:2px}
 #sidebar nav::-webkit-scrollbar-thumb{background:var(--border)}
-/* ── CHAR GRID — 3 col: photo | radar | fields ── */
-.char-grid{display:grid;grid-template-columns:auto auto 1fr;gap:18px;align-items:start}
-.char-photo-col{display:flex;flex-direction:column;gap:10px;width:190px}
-.radar-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
-#radar-canvas{display:block}
-.char-fields-col{display:flex;flex-direction:column;gap:12px}
+/* ── CHAR GRID — 2 col: photo+aparência | info col (radar + fields) ── */
+.char-grid{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:start}
+.char-photo-col{display:flex;flex-direction:column;gap:10px}
+.char-fields-col{display:flex;flex-direction:column;gap:10px}
+/* Radar inside fields col, full width, high-DPI canvas */
+.radar-wrap{
+  position:relative;width:100%;
+  border:1.5px solid var(--acc);
+  border-radius:var(--r);
+  overflow:hidden;
+  background:var(--acc2,#196f67); /* secondary color fill */
+}
+#radar-canvas{display:block;width:100%;height:auto}
 
 /* ── SIDEBAR NAV DRAG ── */
 #sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:grab}
@@ -578,7 +585,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   .ptbox .lbl{display:none}
   .ptbox .val{font-size:1rem}
   #main{padding:24px 20px 100px}
-  .char-grid{grid-template-columns:160px 160px 1fr}
+  .char-grid{grid-template-columns:160px 1fr}
 }
 
 /* ── MOBILE ── */
@@ -589,14 +596,11 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   #sidebar.open{transform:translateX(0)}
   #overlay.open{display:block}
   #main{margin-left:0;padding:68px 14px 84px}
-  /* Mobile char layout: photo+radar row on top, fields below */
-  .char-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:12px}
-  .char-photo-col{grid-column:1;grid-row:1;width:auto}
-  .radar-wrap{grid-column:2;grid-row:1;align-self:start}
-  .char-fields-col{grid-column:1/-1;grid-row:2}
-  .photo-wrap{width:100%;max-width:140px}
-  /* fobias below fields — already in char-fields-col */
-  /* single col mod-list on mobile */
+  /* Mobile: single column, photo on top then fields */
+  .char-grid{grid-template-columns:1fr;gap:12px}
+  .char-photo-col{flex-direction:row;align-items:flex-start;gap:12px}
+  .photo-wrap{width:110px;flex-shrink:0}
+  /* Modificadores single column on mobile */
   .mod-list{flex-direction:column}
   .mod-item{max-width:100%;flex:none;width:100%}
   .grid-fields{grid-template-columns:75px 1fr;gap:7px 10px}
@@ -702,13 +706,14 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
           </div>
         </div>
 
-        <!-- Col 2: Radar chart -->
-        <div class="radar-wrap">
-          <canvas id="radar-canvas" width="190" height="254"></canvas>
-        </div>
-
-        <!-- Col 3: Fields + Fobias + Corruption + HUD + Links -->
+        <!-- Col 2: Fields (radar on top, then name/age/etc, then fobias/corruption/HUD) -->
         <div class="char-fields-col">
+
+          <!-- Radar chart — full width of this column -->
+          <div class="radar-wrap">
+            <canvas id="radar-canvas"></canvas>
+          </div>
+
           <div class="grid-fields">
             <span class="flbl">Nome</span>       <input type="text" id="ui-name" oninput="saveData()">
             <span class="flbl">Idade</span>      <input type="text" id="ui-age" oninput="saveData()">
@@ -1775,31 +1780,22 @@ function buildEquipBody(eq,i){
     abBody.appendChild(abDesc);abCard.appendChild(abBody);
     requestAnimationFrame(()=>autoResize(abDesc));
 
-    // Strip with arrow + draggable for reorder
+    // Strip — expand toggle + pointer drag to reorder
     const abStrip=document.createElement('div');abStrip.className='ab-strip';
-    abStrip.setAttribute('draggable','true');
     const abArr=document.createElement('span');abArr.className='ab-strip-arrow';abArr.textContent='▼';
     if(ab.open)abArr.style.transform='rotate(180deg)';
     abStrip.appendChild(abArr);
-    abStrip.addEventListener('click',()=>{
+    abStrip.addEventListener('click',e=>{
+      if(e.detail===0)return; // fired by pointer, not a real click
       S.equipments[i].abilities[ai].open=!ab.open;saveData();renderEquipments();
     });
-    // Drag reorder for abilities
-    abStrip.addEventListener('dragstart',e=>{
-      e.dataTransfer.setData('ab-from',ai);e.dataTransfer.effectAllowed='move';
-      setTimeout(()=>abCard.style.opacity='.4',0);
-    });
-    abStrip.addEventListener('dragend',()=>abCard.style.opacity='');
-    abCard.addEventListener('dragover',e=>{e.preventDefault();abCard.style.borderColor='var(--acc)';});
-    abCard.addEventListener('dragleave',()=>abCard.style.borderColor='');
-    abCard.addEventListener('drop',e=>{
-      e.preventDefault();abCard.style.borderColor='';
-      const from=parseInt(e.dataTransfer.getData('ab-from'));
-      if(isNaN(from)||from===ai)return;
-      const arr=S.equipments[i].abilities;
-      const[item2]=arr.splice(from,1);arr.splice(ai,0,item2);
-      saveData();renderEquipments();
-    });
+    setupAbilityDrag(
+      abStrip,
+      ()=>ai,
+      ()=>S.equipments[i].abilities,
+      arr=>{S.equipments[i].abilities=arr;},
+      ()=>{saveData();renderEquipments();}
+    );
     abCard.appendChild(abStrip);
     abWrap.appendChild(abCard);
   });
@@ -1910,26 +1906,20 @@ function buildSpiritBody(sp,i){
       requestAnimationFrame(()=>autoResize(abDesc));
 
       const abStrip=document.createElement('div');abStrip.className='ab-strip';
-      abStrip.setAttribute('draggable','true');
       const abArr=document.createElement('span');abArr.className='ab-strip-arrow';abArr.textContent='▼';
       if(ab.open)abArr.style.transform='rotate(180deg)';
       abStrip.appendChild(abArr);
-      abStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].abilities[ai].open=!ab.open;saveData();renderSpirits();});
-      abStrip.addEventListener('dragstart',e=>{
-        e.dataTransfer.setData('sab-from',ai);e.dataTransfer.effectAllowed='move';
-        setTimeout(()=>abCard.style.opacity='.4',0);
+      abStrip.addEventListener('click',e=>{
+        if(e.detail===0)return;
+        S.spirits[i].groups[gi].abilities[ai].open=!ab.open;saveData();renderSpirits();
       });
-      abStrip.addEventListener('dragend',()=>abCard.style.opacity='');
-      abCard.addEventListener('dragover',e=>{e.preventDefault();abCard.style.borderColor='var(--acc)';});
-      abCard.addEventListener('dragleave',()=>abCard.style.borderColor='');
-      abCard.addEventListener('drop',e=>{
-        e.preventDefault();abCard.style.borderColor='';
-        const from=parseInt(e.dataTransfer.getData('sab-from'));
-        if(isNaN(from)||from===ai)return;
-        const arr=S.spirits[i].groups[gi].abilities;
-        const[item2]=arr.splice(from,1);arr.splice(ai,0,item2);
-        saveData();renderSpirits();
-      });
+      setupAbilityDrag(
+        abStrip,
+        ()=>ai,
+        ()=>S.spirits[i].groups[gi].abilities,
+        arr=>{S.spirits[i].groups[gi].abilities=arr;},
+        ()=>{saveData();renderSpirits();}
+      );
       abCard.appendChild(abStrip);
       gbody.appendChild(abCard);
     });
@@ -2008,50 +1998,60 @@ function scrollSpy(){
 function drawRadar(){
   const canvas=document.getElementById('radar-canvas');
   if(!canvas)return;
-  // Size canvas to match photo element height
-  const photo=document.getElementById('ui-photo');
-  if(photo&&photo.offsetWidth>0){
-    canvas.width=photo.offsetWidth;
-    canvas.height=photo.offsetHeight>10?photo.offsetHeight:Math.round(photo.offsetWidth*4/3);
-  }
-  const W=canvas.width,H=canvas.height;
-  if(!W||!H)return;
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
 
+  // High-DPI rendering
+  const dpr=window.devicePixelRatio||1;
+  const wrap=canvas.parentElement;
+  if(!wrap)return;
+  const cssW=wrap.clientWidth||wrap.offsetWidth||200;
+  const cssH=Math.round(cssW*0.72); // ~130px tall for a ~180px wide box
+  canvas.style.width=cssW+'px';
+  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cssW,cssH);
+
+  const W=cssW,H=cssH;
   const cats=['Físicas','Práticas','Sociais','Condução','Conhecimento','Investigativas','Específicas'];
   const labels=['Físicas','Práticas','Sociais','Condução','Conhec.','Invest.','Específ.'];
   const N=cats.length;
-  const cx=W/2, cy=H/2;
-  const maxR=Math.min(W,H)/2-28;
-  const maxVal=150;
-  const ringSteps=[30,60,90,120,150];
+  const cx=W/2,cy=H/2;
+  const maxR=Math.min(W,H)/2-22;
+  const maxVal=120;
+  const ringSteps=[30,60,90,120];
 
-  // Base values: average of category skills, clamped to 0-150
   const vals=cats.map(cat=>{
-    const sk=S.skills[cat];
-    if(!sk)return 0;
+    const sk=S.skills[cat];if(!sk)return 0;
     const vs=Object.values(sk);
     const avg=vs.reduce((a,v)=>a+v,0)/vs.length;
     return Math.min(maxVal,Math.max(0,Math.floor(avg/5)*5));
   });
 
-  // Read accent color from CSS variable
-  const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#00e5c8';
-  // Parse hex to rgb for alpha compositing
-  const hex=acc.replace('#','');
-  const ar=parseInt(hex.slice(0,2),16)||0;
-  const ag=parseInt(hex.slice(2,4),16)||229;
-  const ab=parseInt(hex.slice(4,6),16)||200;
+  // Accent and secondary from CSS vars
+  const style=getComputedStyle(document.documentElement);
+  const acc=(style.getPropertyValue('--acc')||'#00e5c8').trim();
+  const sec=(style.getPropertyValue('--secondary')||style.getPropertyValue('--acc2')||'#196f67').trim();
 
-  function angle(i){return(Math.PI*2/N)*i - Math.PI/2;}
-  function pt(i,r){return{x:cx+Math.cos(angle(i))*r, y:cy+Math.sin(angle(i))*r};}
+  function hexToRgb(h){
+    h=h.replace('#','');
+    if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    return{r:parseInt(h.slice(0,2),16)||0,g:parseInt(h.slice(2,4),16)||0,b:parseInt(h.slice(4,6),16)||0};
+  }
+  const ac=hexToRgb(acc);
+  const sc=hexToRgb(sec);
 
-  // Background
-  ctx.fillStyle='rgba(6,11,24,0.6)';
+  function angle(i){return(Math.PI*2/N)*i-Math.PI/2;}
+  function pt(i,r){return{x:cx+Math.cos(angle(i))*r,y:cy+Math.sin(angle(i))*r};}
+
+  // Background fill with secondary color (darker/muted)
   ctx.beginPath();
   for(let i=0;i<N;i++){const p=pt(i,maxR);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
-  ctx.closePath();ctx.fill();
+  ctx.closePath();
+  ctx.fillStyle=`rgba(${sc.r},${sc.g},${sc.b},0.35)`;
+  ctx.fill();
 
   // Grid rings
   ringSteps.forEach(step=>{
@@ -2059,42 +2059,48 @@ function drawRadar(){
     ctx.beginPath();
     for(let i=0;i<N;i++){const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
     ctx.closePath();
-    ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;ctx.stroke();
-    // Ring value label
-    ctx.fillStyle='rgba(255,255,255,.18)';
-    ctx.font=`${Math.max(7,Math.round(W/28))}px monospace`;
+    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.stroke();
+    // ring label
+    ctx.fillStyle='rgba(255,255,255,.35)';
+    ctx.font=`${Math.max(8,Math.round(W/28))}px monospace`;
     ctx.textAlign='left';
-    ctx.fillText(step, cx+3, cy-r+3);
+    ctx.fillText(step,cx+4,cy-r+4);
   });
+
+  // Outer border of polygon (accent color)
+  ctx.beginPath();
+  for(let i=0;i<N;i++){const p=pt(i,maxR);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+  ctx.closePath();
+  ctx.strokeStyle=`rgba(${ac.r},${ac.g},${ac.b},0.5)`;ctx.lineWidth=1;ctx.stroke();
 
   // Axes
   for(let i=0;i<N;i++){
     const p=pt(i,maxR);
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);
-    ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.stroke();
   }
 
-  // Data polygon — fill
+  // Data polygon fill
   ctx.beginPath();
   vals.forEach((v,i)=>{const r=(v/maxVal)*maxR;const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
   ctx.closePath();
-  ctx.fillStyle=`rgba(${ar},${ag},${ab},0.2)`;ctx.fill();
-  ctx.strokeStyle=`rgba(${ar},${ag},${ab},0.9)`;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=`rgba(${ac.r},${ac.g},${ac.b},0.22)`;ctx.fill();
+  ctx.strokeStyle=`rgba(${ac.r},${ac.g},${ac.b},0.95)`;ctx.lineWidth=2;ctx.stroke();
 
   // Data points
   vals.forEach((v,i)=>{
     const r=(v/maxVal)*maxR;const p=pt(i,r);
-    ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
-    ctx.fillStyle=`rgba(${ar},${ag},${ab},1)`;ctx.fill();
+    ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
+    ctx.fillStyle=acc;ctx.fill();
   });
 
-  // Category labels
-  const fontSize=Math.max(8,Math.round(W/24));
-  ctx.font=`600 ${fontSize}px sans-serif`;
+  // Labels
+  const fs=Math.max(9,Math.round(W/22));
+  ctx.font=`600 ${fs}px sans-serif`;
   ctx.textAlign='center';
   labels.forEach((lbl,i)=>{
-    const p=pt(i,maxR+fontSize+4);
-    ctx.fillStyle='rgba(205,214,232,0.75)';
+    const p=pt(i,maxR+fs+5);
+    ctx.fillStyle='rgba(205,214,232,0.85)';
     ctx.fillText(lbl,p.x,p.y+3);
   });
 }
@@ -2107,41 +2113,80 @@ let secDragSrc=null;
 function initSidebarDrag(){
   const nav=document.getElementById('snav');
   if(!nav)return;
-  const links=nav.querySelectorAll('a');
-  links.forEach(a=>{
-    a.setAttribute('draggable','true');
-    a.addEventListener('dragstart',e=>{
-      secDragSrc=a;
-      e.dataTransfer.effectAllowed='move';
-      e.dataTransfer.setData('text/plain',a.getAttribute('href'));
-      setTimeout(()=>a.classList.add('nav-dragging'),0);
+
+  // We use pointer events for universal mouse+touch support
+  // and avoid HTML5 draggable which triggers context menu on mobile
+  let dragEl=null,ghost=null,startY=0,lastOver=null;
+
+  nav.querySelectorAll('a').forEach(a=>{
+    // Prevent context menu on long press on mobile
+    a.addEventListener('contextmenu',e=>e.preventDefault());
+
+    a.addEventListener('pointerdown',e=>{
+      // Only start drag on long press (300ms) or if not a tap
+      const timer=setTimeout(()=>{
+        dragEl=a;
+        startY=e.clientY;
+        a.classList.add('nav-dragging');
+        nav.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      },300);
+      a._dragTimer=timer;
     });
-    a.addEventListener('dragend',()=>{
-      a.classList.remove('nav-dragging');
-      nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
-      secDragSrc=null;
+
+    a.addEventListener('click',e=>{
+      // Cancel drag timer on quick tap
+      clearTimeout(a._dragTimer);
     });
-    a.addEventListener('dragover',e=>{
-      if(!secDragSrc||secDragSrc===a)return;
-      e.preventDefault();
-      nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
-      a.classList.add('drag-over-nav');
+  });
+
+  nav.addEventListener('pointermove',e=>{
+    if(!dragEl)return;
+    e.preventDefault();
+    const y=e.clientY;
+    // Find which link we're over
+    const links=[...nav.querySelectorAll('a')];
+    let over=null;
+    links.forEach(l=>{
+      const r=l.getBoundingClientRect();
+      if(y>=r.top&&y<=r.bottom)over=l;
     });
-    a.addEventListener('drop',e=>{
-      e.preventDefault();
-      a.classList.remove('drag-over-nav');
-      if(!secDragSrc||secDragSrc===a)return;
-      // Reorder in sidebar
-      const parent=nav;
-      const children=[...parent.children];
-      const fromIdx=children.indexOf(secDragSrc);
-      const toIdx=children.indexOf(a);
-      if(fromIdx<toIdx) parent.insertBefore(secDragSrc,a.nextSibling);
-      else parent.insertBefore(secDragSrc,a);
-      // Reorder sections in main
+    if(over&&over!==dragEl&&over!==lastOver){
+      links.forEach(l=>l.classList.remove('drag-over-nav'));
+      over.classList.add('drag-over-nav');
+      lastOver=over;
+    }
+  });
+
+  nav.addEventListener('pointerup',e=>{
+    // Cancel pending drag timer (it was a tap)
+    nav.querySelectorAll('a').forEach(a=>clearTimeout(a._dragTimer));
+
+    if(!dragEl){return;}
+    const y=e.clientY;
+    const links=[...nav.querySelectorAll('a')];
+    let target=null;
+    links.forEach(l=>{
+      const r=l.getBoundingClientRect();
+      if(y>=r.top&&y<=r.bottom)target=l;
+    });
+    if(target&&target!==dragEl){
+      // Reorder: insert dragEl before or after target
+      const fromIdx=links.indexOf(dragEl);
+      const toIdx=links.indexOf(target);
+      if(fromIdx<toIdx)nav.insertBefore(dragEl,target.nextSibling);
+      else nav.insertBefore(dragEl,target);
       reorderSectionsFromNav();
       saveSectionOrder();
-    });
+    }
+    dragEl.classList.remove('nav-dragging');
+    nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
+    dragEl=null;lastOver=null;
+  });
+
+  nav.addEventListener('pointercancel',()=>{
+    nav.querySelectorAll('a').forEach(a=>{clearTimeout(a._dragTimer);a.classList.remove('nav-dragging','drag-over-nav');});
+    dragEl=null;lastOver=null;
   });
 }
 
@@ -2181,30 +2226,40 @@ function applySavedSectionOrder(){
   });
 }
 
-/* ═══════════════════════════════════
-   MOBILE TOUCH DRAG FOR ABILITIES
-   HTML5 drag doesn't fire on touch — use pointer events
-═══════════════════════════════════ */
-function setupTouchDragStrip(strip,onDropIndex,getItems,setItems,rerender){
-  let startY=0,startIdx=onDropIndex,dragging=false;
-  strip.addEventListener('touchstart',e=>{
-    startY=e.touches[0].clientY;dragging=false;
-  },{passive:true});
-  strip.addEventListener('touchmove',e=>{
-    const dy=Math.abs(e.touches[0].clientY-startY);
-    if(dy>10){dragging=true;e.preventDefault();}
-  },{passive:false});
-  strip.addEventListener('touchend',e=>{
+/* ── ABILITY REORDER via pointer events (works on mobile) ── */
+function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
+  strip.addEventListener('contextmenu',e=>e.preventDefault());
+  let dragging=false,startY=0,timer=null;
+
+  strip.addEventListener('pointerdown',e=>{
+    startY=e.clientY;dragging=false;
+    timer=setTimeout(()=>{dragging=true;strip.setPointerCapture(e.pointerId);strip.closest('.ab-card').style.opacity='.4';},250);
+  });
+  strip.addEventListener('pointermove',e=>{
     if(!dragging)return;
-    const endY=e.changedTouches[0].clientY;
-    const items=getItems();
-    const cardH=strip.closest('.ab-card')?.offsetHeight||40;
-    const delta=Math.round((endY-startY)/cardH);
-    if(delta===0)return;
-    const newIdx=Math.max(0,Math.min(items.length-1,startIdx+delta));
-    const[item]=items.splice(startIdx,1);items.splice(newIdx,0,item);
-    setItems(items);
-    rerender();
+    e.preventDefault();
+  });
+  strip.addEventListener('pointerup',e=>{
+    clearTimeout(timer);
+    if(!dragging){strip.closest('.ab-card').style.opacity='';return;}
+    strip.closest('.ab-card').style.opacity='';
+    const endY=e.clientY;
+    const cards=[...strip.closest('.abilities-wrap,.ab-group-body').querySelectorAll('.ab-card')];
+    let targetIdx=getIdx();
+    cards.forEach((card,ci)=>{
+      const r=card.getBoundingClientRect();
+      if(endY>=r.top&&endY<=r.bottom&&ci!==getIdx())targetIdx=ci;
+    });
+    if(targetIdx!==getIdx()){
+      const arr=getArr();
+      const[item]=arr.splice(getIdx(),1);arr.splice(targetIdx,0,item);
+      setArr(arr);rerender();
+    }
+    dragging=false;
+  });
+  strip.addEventListener('pointercancel',()=>{
+    clearTimeout(timer);dragging=false;
+    const card=strip.closest('.ab-card');if(card)card.style.opacity='';
   });
 }
 
