@@ -352,315 +352,6 @@ section{margin-bottom:50px;scroll-margin-top:80px}
   position:absolute;
   left:0;right:0;
   height:1px;
-  background:var(--ainput[type=checkbox]{width:20px;min-height:20px;accent-color:var(--acc);cursor:pointer}
-select option{background:var(--bg1)}
-/* textarea auto-resize handled below */
-
-/* ── BUTTONS ── */
-button{background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer;border-radius:var(--r);padding:10px 18px;font-size:.9rem;font-family:var(--sans);font-weight:700;letter-spacing:.07em;text-transform:uppercase;transition:background var(--tr),border-color var(--tr),color var(--tr),opacity var(--tr);min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none}
-button:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
-button:active{opacity:.75}
-button:disabled{opacity:.28;cursor:not-allowed}
-.bp{background:var(--acc-dim);border-color:var(--acc);color:var(--acc);font-size:.9rem}
-.bp:hover{background:var(--acc);color:#000}
-.blink{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;padding:10px 16px;border-color:var(--border);color:var(--muted)}
-.blink:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
-
-/* ── LAYOUT ── */
-#app{display:flex;min-height:100vh}
-
-/* ── SIDEBAR ── */
-#sidebar{width:var(--sb);background:var(--panel);border-right:1px solid var(--border);position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:100;transition:transform .28s cubic-bezier(.4,0,.2,1);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-#sidebar::after{content:'';position:absolute;top:0;right:-1px;width:1px;height:60px;background:linear-gradient(var(--acc),transparent)}
-.brand{padding:20px 16px 16px;border-bottom:1px solid var(--border2)}
-.bmark{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px;display:block}
-.bname{font-family:var(--sans);font-size:.95rem;font-weight:700;color:var(--acc);letter-spacing:.06em;text-transform:uppercase;line-height:1.25;display:block}
-#sidebar nav{display:flex;flex-direction:column;padding:6px 0;flex-grow:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-#sidebar nav::-webkit-scrollbar{width:2px}
-#sidebar nav::-webkit-scrollbar-thumb{background:var(--border)}
-/* ── CHAR GRID — 2 col: photo+aparência | info col (radar + fields) ── */
-.char-grid{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:start}
-.char-photo-col{display:flex;flex-direction:column;gap:10px}
-.char-fields-col{display:flex;flex-direction:column;gap:10px}
-/* Radar inside fields col, full width, high-DPI canvas */
-.radar-wrap{
-  position:relative;width:100%;
-  border:1.5px solid var(--acc);
-  border-radius:var(--r);
-  overflow:hidden;
-  background:var(--acc2,#196f67); /* secondary color fill */
-}
-#radar-canvas{display:block;width:100%;height:auto}
-
-/* ── SIDEBAR NAV DRAG ── */
-#sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:grab}
-#sidebar nav a:hover{background:var(--acc-dim);color:var(--text)}
-#sidebar nav a.act{border-left-color:var(--acc);background:var(--acc-dim);color:var(--acc)}
-#sidebar nav a.drag-over-nav{border-top:2px solid var(--acc);background:var(--acc-dim)}
-#sidebar nav a.nav-dragging{opacity:.4}
-
-/* ── AB-GROUP BODY themed dark ── */
-.ab-group-body{
-  display:none;padding:6px 8px 8px;flex-direction:column;gap:5px;
-  background:rgba(0,10,20,.45);
-  border-top:1px solid var(--border2);
-}
-.ab-group.open .ab-group-body{display:flex}
-.nic{font-size:.85rem;width:16px;text-align:center;flex-shrink:0}
-.sbfoot{padding:10px;border-top:1px solid var(--border2)}
-.ptbox{background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center}
-.ptbox .lbl{font-family:var(--mono);font-size:.62rem;color:var(--acc);letter-spacing:.16em;text-transform:uppercase;display:block;margin-bottom:3px}
-.ptbox .val{font-family:var(--mono);font-size:1.25rem;color:var(--text)}
-
-/* ── MAIN ── */
-#main{flex-grow:1;margin-left:var(--sb);padding:32px 36px 120px;max-width:1280px}
-
-/* ── SECTIONS ── */
-section{margin-bottom:50px;scroll-margin-top:80px}
-.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
-.sec-hd-l{display:flex;align-items:center;gap:10px}
-.sec-bar{width:3px;height:18px;background:var(--acc);border-radius:1px;flex-shrink:0}
-.sec-title{font-family:var(--sans);font-size:1rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
-.sec-num{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.06em}
-.sec-arr{font-size:.72rem;color:var(--muted);transition:transform .25s}
-.sec-hd.closed .sec-arr{transform:rotate(-90deg)}
-.sec-body.hidden{display:none!important}
-
-/* ── CARDS ── */
-.card{background:rgba(6,11,24,.75);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.card::after{content:'';position:absolute;top:0;right:0;border-style:solid;border-width:0 14px 14px 0;border-color:transparent var(--acc) transparent transparent;opacity:.22;border-radius:0 var(--r) 0 0}
-
-/* ── CHAR LAYOUT ── */
-/* char-grid — see top */
-.photo-wrap{position:relative;width:100%;cursor:pointer;border-radius:var(--r);overflow:hidden}
-.char-photo{width:100%;aspect-ratio:3/4;object-fit:cover;border:1px solid var(--border);border-radius:var(--r);display:block;background:var(--bg1);transition:border-color var(--tr),box-shadow var(--tr)}
-.photo-wrap:hover .char-photo{border-color:var(--acc);box-shadow:0 0 18px var(--acc-glow)}
-.photo-edit-icon{position:absolute;bottom:8px;right:8px;width:28px;height:28px;background:rgba(4,7,18,.75);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.55;transition:opacity var(--tr),border-color var(--tr),background var(--tr)}
-.photo-wrap:hover .photo-edit-icon{opacity:1;border-color:var(--acc);background:var(--acc-dim)}
-.photo-edit-icon svg{width:14px;height:14px;fill:none;stroke:var(--acc);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.flbl{font-family:var(--mono);font-size:.72rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:5px}
-.frow{margin-bottom:13px}
-.grid-fields{display:grid;grid-template-columns:95px 1fr;gap:9px 14px;align-items:center;margin-bottom:18px}
-.grid-fields .flbl{margin:0}
-
-/* ── CORRUPTION ── */
-.corr-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-.corr-lbl{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-.corr-squares{display:flex;gap:6px;flex-wrap:wrap}
-.csq{width:28px;height:28px;border:1px solid var(--border);border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:transparent;transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);flex-shrink:0}
-.csq:hover{background:var(--acc-dim);border-color:var(--acc)}
-.csq.on{background:var(--acc)!important;border-color:var(--acc);box-shadow:0 0 8px var(--acc-glow)}
-
-/* ── VITAL HUD ── */
-.vhud{display:flex;flex-direction:column;gap:13px}
-.hrow{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
-.hlbl{font-family:var(--mono);font-size:.9rem;color:var(--acc);width:30px;flex-shrink:0;letter-spacing:.04em}
-.hctrl{display:flex;align-items:center;gap:6px;flex-grow:1;min-width:0;flex-wrap:nowrap}
-.hbtn{width:40px;height:40px;min-height:40px;min-width:40px;padding:0;font-size:.8rem;font-family:var(--mono);border-radius:4px;flex-shrink:0;position:relative;z-index:1}
-.htrack{flex-grow:1;height:6px;background:rgba(0,0,0,.6);border-radius:99px;overflow:hidden;min-width:20px}
-.hfill{height:100%;border-radius:99px;transition:width .3s cubic-bezier(.4,0,.2,1)}
-.hfill.pv{background:linear-gradient(90deg,#7f1d1d,var(--danger))}
-.hfill.ps{background:linear-gradient(90deg,#1e3a5f,var(--psblue))}
-.hfill.pe{background:linear-gradient(90deg,#005544,var(--acc))}
-.hnums{display:flex;align-items:center;gap:4px;flex-shrink:0}
-.hin{width:52px;text-align:center;padding:4px 5px;height:40px;min-height:40px;font-family:var(--mono);font-size:.95rem;background:rgba(0,0,0,.5);border-color:var(--border)}
-.hmax{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:36px;white-space:nowrap}
-.ql{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-
-/* ── SKILLS ── */
-.scat{background:rgba(6,11,24,.75);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
-.scath{background:rgba(0,0,0,.35);padding:10px 14px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center}
-.scath span:first-child{font-family:var(--mono);font-size:.74rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
-.sbase{font-family:var(--mono);font-size:.74rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:3px;transition:all .15s}
-.sbase:hover{background:var(--acc-dim);color:var(--acc)}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
-.srow:hover{background:var(--acc-dim)}
-.srow:last-child{border-bottom:none}
-.skname{font-size:.92rem;font-weight:500;flex-grow:1;pointer-events:none}
-.skinw{display:flex;align-items:center}
-.skinp{width:62px;text-align:center;height:38px;min-height:38px;padding:4px;font-size:.95rem;font-family:var(--mono);pointer-events:auto}
-
-/* ── TOOLTIP D100 ── */
-#tt{position:absolute;background:rgba(3,6,15,.98);border:1px solid var(--acc);border-radius:var(--r);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.9),0 0 20px var(--acc-glow);z-index:9999;color:var(--text);width:max-content;opacity:0;visibility:hidden;transform:scale(.93) translateY(4px);transition:all 140ms cubic-bezier(.4,0,.2,1);pointer-events:none;display:grid;grid-template-columns:auto auto;gap:6px 22px}
-#tt::before{content:'D100';position:absolute;top:-11px;left:10px;font-family:var(--mono);font-size:.62rem;background:var(--acc);color:#000;padding:2px 7px;border-radius:2px;letter-spacing:.12em}
-#tt.show{opacity:1;visibility:visible;transform:scale(1) translateY(0)}
-.ttl{font-family:var(--mono);font-size:.75rem;letter-spacing:.06em}
-.ttv{text-align:right;font-family:var(--mono);font-size:.75rem}
-.td{color:#f87171}.tf{color:#fbbf24}.ts{color:#cbd5e1}.tb{color:#60a5fa}.te{color:#34d399}
-
-/* ── ITEM CARDS — fixed layout ── */
-.igrid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  /* Crucial: align-items:start prevents grid cells from stretching
-     to match the tallest card in the row — this was the visual bug */
-  align-items:start;
-}
-.icard.dragging{opacity:.4;border-style:dashed}
-.icard.drag-over{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-glow)}
-.icard{
-  background:rgba(6,11,24,.75);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  display:flex;flex-direction:column;
-  /* No min/max height — card is only as tall as its contents */
-  transition:border-color .15s,box-shadow .15s,opacity .15s;
-}
-.icard:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
-
-/* Top bar: name + qty + del */
-.ibar{display:flex;align-items:center;gap:6px;padding:9px 10px 8px;min-height:42px}
-.ibar-name-input{
-  flex-grow:1;font-size:.95rem;font-weight:600;color:var(--text);
-  font-family:var(--sans);background:transparent;border:none;
-  padding:0;min-height:unset;height:auto;border-radius:0;min-width:0;width:100%;
-}
-.ibar-name-input:focus{outline:none;border-bottom:1px solid var(--acc);background:rgba(0,0,0,.2);padding:0 2px;box-shadow:none}
-.ibar-qty{display:flex;align-items:center;gap:3px;flex-shrink:0}
-.iqbtn{width:22px;height:22px;min-height:22px;padding:0;font-size:.75rem;border-radius:3px;border-color:var(--border2);color:var(--muted)}
-.iqbtn:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
-.iqnum{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:20px;text-align:center}
-.idel{width:22px;height:22px;min-height:22px;padding:0;flex-shrink:0;border:none;background:transparent;color:var(--danger);font-size:.95rem;border-radius:3px;opacity:.5}
-.idel:hover{background:var(--danger-dim);opacity:1;border:none}
-
-/* ── TOP COLLAPSE STRIP (only visible when card is open) ── */
-.ibar-top-strip{
-  display:none; /* hidden by default */
-  align-items:center;justify-content:center;gap:0;
-  height:20px;cursor:pointer;
-  border-bottom:1px solid var(--border2);
-  background:transparent;
-  transition:background .15s;
-  user-select:none;-webkit-tap-highlight-color:transparent;
-  position:relative;
-}
-.icard.open .ibar-top-strip{display:flex}
-.ibar-top-strip:hover{background:var(--acc-dim)}
-/* Two lines spanning full width with arrow in center */
-.ibar-top-strip::before,
-.ibar-top-strip::after{
-  content:'';
-  position:absolute;
-  left:0;right:0;
-  height:1px;
-  background:var(--acc);
-  opacity:.3;
-}
-.ibar-top-strip::before{top:5px}
-.ibar-top-strip::after{top:11px}
-.ibar-top-strip-arrow{
-  font-size:.55rem;color:var(--acc);opacity:.7;
-  pointer-events:none;
-  position:relative;z-index:1;
-  background:rgba(6,11,24,.9);
-  padding:0 4px;
-  transition:opacity .15s;
-  /* Arrow points UP to indicate "collapse" */
-  transform:rotate(180deg);
-}
-.ibar-top-strip:hover .ibar-top-strip-arrow{opacity:1}
-
-/* Damage row */
-.ibar-dmg{padding:0 10px 7px;display:flex;align-items:center;gap:6px}
-.ibar-dmg-lbl{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
-.ibar-dmg-inp{
-  flex-grow:1;font-size:.85rem;font-family:var(--mono);
-  background:rgba(0,0,0,.3);border:1px solid var(--border2);
-  border-radius:3px;padding:3px 7px;height:28px;min-height:28px;color:var(--text);
-}
-.ibar-dmg-inp:focus{border-color:var(--acc);outline:none;box-shadow:none}
-
-/* ── HIERARCHY DEPTH ──
-   icard           → bg: rgba(6,11,24,.75)   level 0
-   ibody           → bg: rgba(0,0,0,.15)      level 1 tint (subtle)
-   abilities-wrap  → level 1
-   ab-group        → bg: rgba(0,0,0,.25)      level 2
-   ab-group-body   → bg: rgba(0,0,0,.15)      level 2 inner
-   ab-card         → bg: rgba(0,0,0,.35)      level 3
-   ab-body         → bg: rgba(0,0,0,.2)       level 3 inner
-── */
-.ibody{
-  background:rgba(0,0,0,.12);
-  display:none;flex-direction:column;gap:8px;padding:8px 10px 8px;
-  border-left:2px solid var(--border2);
-  margin:0 4px 4px;
-  border-radius:0 0 3px 3px;
-}
-.icard.open .ibody{display:flex}
-.ab-group{
-  background:rgba(0,0,0,.28);
-  border:1px solid var(--border2);
-  border-radius:4px;
-  display:flex;flex-direction:column;
-  border-left:2px solid rgba(var(--acc-rgb,.25));
-}
-.ab-group-body{
-  background:rgba(0,0,0,.15);
-  display:none;padding:6px 8px 8px;flex-direction:column;gap:5px;
-}
-.ab-group.open .ab-group-body{display:flex}
-.ab-card{
-  background:rgba(0,0,0,.38);
-  border:1px solid rgba(255,255,255,.05);
-  border-radius:4px;
-  display:flex;flex-direction:column;
-}
-.ab-body{
-  background:rgba(0,0,0,.2);
-  display:none;padding:6px 8px 8px;
-  border-top:1px solid rgba(255,255,255,.04);
-}
-.ab-card.open .ab-body{display:block}
-
-/* Modificadores section */
-.mod-list{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
-.mod-item{
-  display:flex;flex-direction:column;gap:4px;
-  background:rgba(6,11,24,.75);border:1px solid var(--border);
-  border-radius:var(--r);padding:12px 14px;
-  min-width:180px;flex:1 1 180px;max-width:280px;
-  transition:border-color .15s;
-  user-select:none;
-}
-.mod-item:hover{border-color:var(--acc)}
-.mod-item[style*="cursor:pointer"]:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-dim)}
-.mod-title{
-  font-family:var(--sans);font-size:.85rem;font-weight:700;
-  color:var(--acc);letter-spacing:.06em;text-transform:uppercase;
-}
-.mod-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
-.mod-lbl{
-  font-family:var(--mono);font-size:.65rem;color:var(--muted);
-  letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
-}
-.mod-val{
-  font-family:var(--mono);font-size:.82rem;color:var(--text);
-  font-weight:600;
-  border:1px solid var(--border);border-radius:3px;
-  padding:1px 7px;min-width:26px;text-align:center;
-  background:rgba(0,0,0,.3);white-space:nowrap;flex-shrink:0;margin-left:auto;
-}
-
-/* ── BOTTOM EXPAND STRIP ── */
-.ibar-strip{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  height:22px;cursor:pointer;
-  border-top:1px solid var(--border2);
-  background:transparent;
-  transition:background .15s;
-  border-radius:0 0 var(--r) var(--r);
-  user-select:none;-webkit-tap-highlight-color:transparent;
-  position:relative;flex-shrink:0;
-}
-.ibar-strip:hover{background:var(--acc-dim)}
-/* Two lines spanning full width */
-.ibar-strip::before,
-.ibar-strip::after{
-  content:'';
-  position:absolute;
-  left:0;right:0;
-  height:1px;
   background:var(--acc);
   opacity:.28;
   transition:opacity .15s;
@@ -903,7 +594,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   .ptbox .lbl{display:none}
   .ptbox .val{font-size:1rem}
   #main{padding:24px 20px 100px}
-  .char-grid{grid-template-columns:160px 1fr}
+  .char-grid{grid-template-columns:190px 1fr}
 }
 
 /* ── MOBILE ── */
@@ -914,10 +605,11 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   #sidebar.open{transform:translateX(0)}
   #overlay.open{display:block}
   #main{margin-left:0;padding:68px 14px 84px}
-  /* Mobile: single column, photo on top then fields */
+  /* Mobile: single column, photo col stacks vertically */
   .char-grid{grid-template-columns:1fr;gap:12px}
-  .char-photo-col{flex-direction:row;align-items:flex-start;gap:12px}
-  .photo-wrap{width:110px;flex-shrink:0}
+  .char-photo-col{flex-direction:column;align-items:center;gap:10px}
+  .photo-wrap{width:140px;flex-shrink:0}
+  .radar-wrap{width:140px} /* same width as photo, square via aspect-ratio */
   /* Modificadores single column on mobile */
   .mod-list{flex-direction:column}
   .mod-item{max-width:100%;flex:none;width:100%}
@@ -1006,7 +698,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
     <div id="bd-personagem" class="sec-body">
       <div class="card char-grid">
 
-        <!-- Col 1: Photo + Aparência -->
+        <!-- Col 1: Photo + Radar + Aparência -->
         <div class="char-photo-col">
           <div class="photo-wrap" onclick="document.getElementById('fileup').click()" title="Clique para alterar">
             <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo" id="ui-photo">
@@ -1017,20 +709,19 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
               </svg>
             </div>
           </div>
+          <!-- Radar chart — same width as photo, square -->
+          <div class="radar-wrap">
+            <canvas id="radar-canvas"></canvas>
+          </div>
           <input type="file" id="fileup" style="display:none" accept="image/*" onchange="handleImg(event)">
-          <div class="frow">
+          <div class="frow" style="width:100%">
             <span class="flbl">Aparência</span>
             <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
           </div>
         </div>
 
-        <!-- Col 2: Fields (radar on top, then name/age/etc, then fobias/corruption/HUD) -->
+        <!-- Col 2: Fields (name/age/etc, then fobias/corruption/HUD) -->
         <div class="char-fields-col">
-
-          <!-- Radar chart — full width of this column -->
-          <div class="radar-wrap">
-            <canvas id="radar-canvas"></canvas>
-          </div>
 
           <div class="grid-fields">
             <span class="flbl">Nome</span>       <input type="text" id="ui-name" oninput="saveData()">
@@ -2316,13 +2007,13 @@ function scrollSpy(){
 function drawRadar(){
   const canvas=document.getElementById('radar-canvas');
   if(!canvas)return;
-
-  // High-DPI rendering
-  const dpr=window.devicePixelRatio||1;
   const wrap=canvas.parentElement;
   if(!wrap)return;
+
+  // Use wrapper's actual pixel size (it's square via aspect-ratio:1/1)
+  const dpr=window.devicePixelRatio||1;
   const cssW=wrap.clientWidth||wrap.offsetWidth||200;
-  const cssH=Math.round(cssW*0.72); // ~130px tall for a ~180px wide box
+  const cssH=wrap.clientHeight||wrap.offsetHeight||cssW; // should be square
   canvas.style.width=cssW+'px';
   canvas.style.height=cssH+'px';
   canvas.width=Math.round(cssW*dpr);
@@ -2332,14 +2023,26 @@ function drawRadar(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,cssW,cssH);
 
+  // ── Sample the live starfield canvas as background ──
+  const sf=document.getElementById('starfield');
+  if(sf){
+    try{
+      const rect=wrap.getBoundingClientRect();
+      // starfield canvas is drawn in CSS pixel space (no DPR in starfield)
+      ctx.save();
+      ctx.drawImage(sf,rect.left,rect.top,rect.width,rect.height,0,0,cssW,cssH);
+      ctx.restore();
+    }catch(e){}
+  }
+
   const W=cssW,H=cssH;
   const cats=['Físicas','Práticas','Sociais','Condução','Conhecimento','Investigativas','Específicas'];
   const labels=['Físicas','Práticas','Sociais','Condução','Conhec.','Invest.','Específ.'];
   const N=cats.length;
   const cx=W/2,cy=H/2;
-  const maxR=Math.min(W,H)/2-22;
-  const maxVal=120;
-  const ringSteps=[30,60,90,120];
+  const maxR=Math.min(W,H)/2-28;
+  const maxVal=150;
+  const ringSteps=[30,60,90,120,150];
 
   const vals=cats.map(cat=>{
     const sk=S.skills[cat];if(!sk)return 0;
@@ -2348,28 +2051,26 @@ function drawRadar(){
     return Math.min(maxVal,Math.max(0,Math.floor(avg/5)*5));
   });
 
-  // Accent and secondary from CSS vars
   const style=getComputedStyle(document.documentElement);
   const acc=(style.getPropertyValue('--acc')||'#00e5c8').trim();
-  const sec=(style.getPropertyValue('--secondary')||style.getPropertyValue('--acc2')||'#196f67').trim();
-
-  function hexToRgb(h){
+  function hexRgb(h){
     h=h.replace('#','');
     if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
     return{r:parseInt(h.slice(0,2),16)||0,g:parseInt(h.slice(2,4),16)||0,b:parseInt(h.slice(4,6),16)||0};
   }
-  const ac=hexToRgb(acc);
-  const sc=hexToRgb(sec);
+  const ac=hexRgb(acc);
 
   function angle(i){return(Math.PI*2/N)*i-Math.PI/2;}
   function pt(i,r){return{x:cx+Math.cos(angle(i))*r,y:cy+Math.sin(angle(i))*r};}
 
-  // Background fill with secondary color (darker/muted)
+  // Subtle dark overlay so data is readable against starfield
+  ctx.save();
   ctx.beginPath();
   for(let i=0;i<N;i++){const p=pt(i,maxR);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
   ctx.closePath();
-  ctx.fillStyle=`rgba(${sc.r},${sc.g},${sc.b},0.35)`;
+  ctx.fillStyle='rgba(3,6,15,0.45)';
   ctx.fill();
+  ctx.restore();
 
   // Grid rings
   ringSteps.forEach(step=>{
@@ -2378,133 +2079,136 @@ function drawRadar(){
     for(let i=0;i<N;i++){const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
     ctx.closePath();
     ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.stroke();
-    // ring label
+    // ring value label
+    const fs=Math.max(7,Math.round(W/30));
     ctx.fillStyle='rgba(255,255,255,.35)';
-    ctx.font=`${Math.max(8,Math.round(W/28))}px monospace`;
+    ctx.font=`${fs}px monospace`;
     ctx.textAlign='left';
-    ctx.fillText(step,cx+4,cy-r+4);
+    ctx.fillText(step,cx+4,cy-r+fs*0.4);
   });
-
-  // Outer border of polygon (accent color)
-  ctx.beginPath();
-  for(let i=0;i<N;i++){const p=pt(i,maxR);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
-  ctx.closePath();
-  ctx.strokeStyle=`rgba(${ac.r},${ac.g},${ac.b},0.5)`;ctx.lineWidth=1;ctx.stroke();
 
   // Axes
   for(let i=0;i<N;i++){
     const p=pt(i,maxR);
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);
-    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;ctx.stroke();
   }
 
-  // Data polygon fill
+  // Data polygon
   ctx.beginPath();
   vals.forEach((v,i)=>{const r=(v/maxVal)*maxR;const p=pt(i,r);i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});
   ctx.closePath();
-  ctx.fillStyle=`rgba(${ac.r},${ac.g},${ac.b},0.22)`;ctx.fill();
-  ctx.strokeStyle=`rgba(${ac.r},${ac.g},${ac.b},0.95)`;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle=`rgba(${ac.r},${ac.g},${ac.b},0.18)`;ctx.fill();
+  ctx.strokeStyle=`rgba(${ac.r},${ac.g},${ac.b},0.9)`;ctx.lineWidth=2;ctx.stroke();
 
   // Data points
   vals.forEach((v,i)=>{
     const r=(v/maxVal)*maxR;const p=pt(i,r);
     ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
     ctx.fillStyle=acc;ctx.fill();
+    ctx.strokeStyle='rgba(3,6,15,0.6)';ctx.lineWidth=1;ctx.stroke();
   });
 
   // Labels
-  const fs=Math.max(9,Math.round(W/22));
+  const fs=Math.max(9,Math.round(W/20));
   ctx.font=`600 ${fs}px sans-serif`;
   ctx.textAlign='center';
   labels.forEach((lbl,i)=>{
     const p=pt(i,maxR+fs+5);
-    ctx.fillStyle='rgba(205,214,232,0.85)';
+    ctx.fillStyle='rgba(205,214,232,0.9)';
     ctx.fillText(lbl,p.x,p.y+3);
   });
 }
 
-/* ═══════════════════════════════════
-   SECTION REORDER via sidebar drag
-═══════════════════════════════════ */
-let secDragSrc=null;
-
+/* ══════════════════════════════════════════════════════════
+   SECTION REORDER — sidebar nav (desktop) + tabbar (mobile)
+   Mesmo sistema dos cards de inventário: pointer events,
+   segure 1,5 s para ativar o arrasto. Funciona em mouse e toque.
+══════════════════════════════════════════════════════════ */
 function initSidebarDrag(){
-  const nav=document.getElementById('snav');
-  if(!nav)return;
+  _initNavDrag(document.getElementById('snav'), false);
+  _initNavDrag(document.querySelector('#tabbar .tbinner'), true);
+}
 
-  // We use pointer events for universal mouse+touch support
-  // and avoid HTML5 draggable which triggers context menu on mobile
-  let dragEl=null,ghost=null,startY=0,lastOver=null;
+function _initNavDrag(navEl, isTabbar){
+  if(!navEl)return;
+  let dragEl=null,lastOver=null;
 
-  nav.querySelectorAll('a').forEach(a=>{
-    // Prevent context menu on long press on mobile
+  navEl.addEventListener('contextmenu',e=>e.preventDefault());
+
+  function links(){return[...navEl.querySelectorAll('a')];}
+
+  links().forEach(a=>{
     a.addEventListener('contextmenu',e=>e.preventDefault());
-
     a.addEventListener('pointerdown',e=>{
-      // Only start drag on long press (300ms) or if not a tap
-      const timer=setTimeout(()=>{
+      clearTimeout(a._navDt);
+      a._navDt=setTimeout(()=>{
         dragEl=a;
-        startY=e.clientY;
         a.classList.add('nav-dragging');
-        nav.setPointerCapture(e.pointerId);
+        try{navEl.setPointerCapture(e.pointerId);}catch(_){}
         e.preventDefault();
-      },300);
-      a._dragTimer=timer;
+      },1500);
     });
-
-    a.addEventListener('click',e=>{
-      // Cancel drag timer on quick tap
-      clearTimeout(a._dragTimer);
-    });
+    a.addEventListener('click',()=>clearTimeout(a._navDt));
+    a.addEventListener('pointerup',()=>clearTimeout(a._navDt));
   });
 
-  nav.addEventListener('pointermove',e=>{
+  navEl.addEventListener('pointermove',e=>{
     if(!dragEl)return;
     e.preventDefault();
-    const y=e.clientY;
-    // Find which link we're over
-    const links=[...nav.querySelectorAll('a')];
     let over=null;
-    links.forEach(l=>{
+    links().forEach(l=>{
       const r=l.getBoundingClientRect();
-      if(y>=r.top&&y<=r.bottom)over=l;
+      if(isTabbar?e.clientX>=r.left&&e.clientX<=r.right
+                 :e.clientY>=r.top&&e.clientY<=r.bottom)over=l;
     });
     if(over&&over!==dragEl&&over!==lastOver){
-      links.forEach(l=>l.classList.remove('drag-over-nav'));
+      links().forEach(l=>l.classList.remove('drag-over-nav'));
       over.classList.add('drag-over-nav');
       lastOver=over;
     }
   });
 
-  nav.addEventListener('pointerup',e=>{
-    // Cancel pending drag timer (it was a tap)
-    nav.querySelectorAll('a').forEach(a=>clearTimeout(a._dragTimer));
-
-    if(!dragEl){return;}
-    const y=e.clientY;
-    const links=[...nav.querySelectorAll('a')];
+  navEl.addEventListener('pointerup',e=>{
+    links().forEach(a=>clearTimeout(a._navDt));
+    if(!dragEl)return;
     let target=null;
-    links.forEach(l=>{
+    links().forEach(l=>{
       const r=l.getBoundingClientRect();
-      if(y>=r.top&&y<=r.bottom)target=l;
+      if(isTabbar?e.clientX>=r.left&&e.clientX<=r.right
+                 :e.clientY>=r.top&&e.clientY<=r.bottom)target=l;
     });
     if(target&&target!==dragEl){
-      // Reorder: insert dragEl before or after target
-      const fromIdx=links.indexOf(dragEl);
-      const toIdx=links.indexOf(target);
-      if(fromIdx<toIdx)nav.insertBefore(dragEl,target.nextSibling);
-      else nav.insertBefore(dragEl,target);
+      const ls=links();
+      const fi=ls.indexOf(dragEl),ti=ls.indexOf(target);
+      if(fi<ti)navEl.insertBefore(dragEl,target.nextSibling);
+      else navEl.insertBefore(dragEl,target);
+      _syncNavOrder(isTabbar?'sidebar':'tabbar');
       reorderSectionsFromNav();
       saveSectionOrder();
     }
     dragEl.classList.remove('nav-dragging');
-    nav.querySelectorAll('a').forEach(l=>l.classList.remove('drag-over-nav'));
+    links().forEach(l=>l.classList.remove('drag-over-nav'));
     dragEl=null;lastOver=null;
   });
 
-  nav.addEventListener('pointercancel',()=>{
-    nav.querySelectorAll('a').forEach(a=>{clearTimeout(a._dragTimer);a.classList.remove('nav-dragging','drag-over-nav');});
+  navEl.addEventListener('pointercancel',()=>{
+    links().forEach(a=>{clearTimeout(a._navDt);a.classList.remove('nav-dragging','drag-over-nav');});
     dragEl=null;lastOver=null;
+  });
+}
+
+/* Mantém sidebar e tabbar sincronizados após reordenação */
+function _syncNavOrder(syncTarget){
+  const sideEl=document.getElementById('snav');
+  const tabEl=document.querySelector('#tabbar .tbinner');
+  if(!sideEl||!tabEl)return;
+  const src=syncTarget==='tabbar'?sideEl:tabEl;
+  const dst=syncTarget==='tabbar'?tabEl:sideEl;
+  [...src.querySelectorAll('a')].forEach(a=>{
+    const href=a.getAttribute('href');
+    const mirror=dst.querySelector('a[href="'+href+'"]');
+    if(mirror)dst.appendChild(mirror);
   });
 }
 
@@ -2531,12 +2235,20 @@ function applySavedSectionOrder(){
   const order=S.sectionOrder;
   if(!order||!Array.isArray(order))return;
   const nav=document.getElementById('snav');
+  const tabEl=document.querySelector('#tabbar .tbinner');
   const main=document.getElementById('main');
-  // Reorder nav links
+  // Reorder sidebar nav links
   order.forEach(id=>{
     const link=nav.querySelector('a[href="#'+id+'"]');
     if(link)nav.appendChild(link);
   });
+  // Sync tabbar order to match sidebar
+  if(tabEl){
+    order.forEach(id=>{
+      const link=tabEl.querySelector('a[href="#'+id+'"]');
+      if(link)tabEl.appendChild(link);
+    });
+  }
   // Reorder sections
   order.forEach(id=>{
     const sec=document.getElementById(id);
@@ -2544,14 +2256,19 @@ function applySavedSectionOrder(){
   });
 }
 
-/* ── ABILITY REORDER via pointer events (works on mobile) ── */
+/* ── ABILITY REORDER via pointer events — mesmo sistema dos cards de inventário ── */
 function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
   strip.addEventListener('contextmenu',e=>e.preventDefault());
-  let dragging=false,startY=0,timer=null;
+  let dragging=false,timer=null;
 
   strip.addEventListener('pointerdown',e=>{
-    startY=e.clientY;dragging=false;
-    timer=setTimeout(()=>{dragging=true;strip.setPointerCapture(e.pointerId);strip.closest('.ab-card').style.opacity='.4';},250);
+    dragging=false;
+    timer=setTimeout(()=>{
+      dragging=true;
+      try{strip.setPointerCapture(e.pointerId);}catch(_){}
+      const card=strip.closest('.ab-card');
+      if(card)card.style.opacity='.4';
+    },1500);
   });
   strip.addEventListener('pointermove',e=>{
     if(!dragging)return;
@@ -2559,13 +2276,15 @@ function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
   });
   strip.addEventListener('pointerup',e=>{
     clearTimeout(timer);
-    if(!dragging){strip.closest('.ab-card').style.opacity='';return;}
-    strip.closest('.ab-card').style.opacity='';
+    const card=strip.closest('.ab-card');
+    if(card)card.style.opacity='';
+    if(!dragging)return;
+    dragging=false;
     const endY=e.clientY;
     const cards=[...strip.closest('.abilities-wrap,.ab-group-body').querySelectorAll('.ab-card')];
     let targetIdx=getIdx();
-    cards.forEach((card,ci)=>{
-      const r=card.getBoundingClientRect();
+    cards.forEach((c,ci)=>{
+      const r=c.getBoundingClientRect();
       if(endY>=r.top&&endY<=r.bottom&&ci!==getIdx())targetIdx=ci;
     });
     if(targetIdx!==getIdx()){
@@ -2573,8 +2292,8 @@ function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
       const[item]=arr.splice(getIdx(),1);arr.splice(targetIdx,0,item);
       setArr(arr);rerender();
     }
-    dragging=false;
   });
+  strip.addEventListener('click',()=>clearTimeout(timer));
   strip.addEventListener('pointercancel',()=>{
     clearTimeout(timer);dragging=false;
     const card=strip.closest('.ab-card');if(card)card.style.opacity='';
