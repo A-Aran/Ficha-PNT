@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Problemas no Tempo — Ficha</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#060b18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="img/icon_PNT.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -81,11 +85,20 @@ button:disabled{opacity:.28;cursor:not-allowed}
 }
 
 /* ── SIDEBAR NAV DRAG ── */
-#sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:grab}
+#sidebar nav a{padding:12px 16px;display:flex;align-items:center;gap:10px;border-left:2px solid transparent;transition:all var(--tr);font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:default}
 #sidebar nav a:hover{background:var(--acc-dim);color:var(--text)}
 #sidebar nav a.act{border-left-color:var(--acc);background:var(--acc-dim);color:var(--acc)}
 #sidebar nav a.drag-over-nav{border-top:2px solid var(--acc);background:var(--acc-dim)}
-#sidebar nav a.nav-dragging{opacity:.4}
+#sidebar nav a.nav-dragging{opacity:.35;background:var(--acc-dim)!important}
+/* Drag handle: 3 horizontal lines, appears on hover */
+.ndh{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;gap:3.5px;width:18px;padding:3px 2px;
+  opacity:0;transition:opacity .18s;cursor:grab;border-radius:3px;align-self:center;
+  touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+.ndh span{display:block;height:2px;background:var(--muted);border-radius:1px;width:100%;transition:background .15s}
+#sidebar nav a:hover .ndh{opacity:1}
+#sidebar nav a:hover .ndh span{background:var(--acc)}
+#sidebar nav a.nav-dragging .ndh{opacity:1;cursor:grabbing}
+#sidebar nav a.nav-dragging .ndh span{background:var(--acc)}
 /* tabbar drag feedback */
 #tabbar a.nav-dragging{opacity:.4;border-top-color:var(--acc)}
 #tabbar a.drag-over-nav{border-top:3px solid var(--acc);background:var(--acc-dim);color:var(--acc)}
@@ -164,12 +177,44 @@ section{margin-bottom:50px;scroll-margin-top:80px}
 .scath span:first-child{font-family:var(--mono);font-size:.74rem;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
 .sbase{font-family:var(--mono);font-size:.74rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:3px;transition:all .15s}
 .sbase:hover{background:var(--acc-dim);color:var(--acc)}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 14px 4px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
 .srow:hover{background:var(--acc-dim)}
 .srow:last-child{border-bottom:none}
 .skname{font-size:.92rem;font-weight:500;flex-grow:1;pointer-events:none}
 .skinw{display:flex;align-items:center}
 .skinp{width:62px;text-align:center;height:38px;min-height:38px;padding:4px;font-size:.95rem;font-family:var(--mono);pointer-events:auto}
+/* ── SKILL TRACKER ── */
+.sk-inner{flex-grow:1;display:flex;flex-direction:column;gap:3px;min-width:0;pointer-events:none}
+.sk-tracker{display:flex;align-items:center;gap:5px;padding-bottom:5px;pointer-events:none}
+.sk-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--acc);background:transparent;cursor:pointer;pointer-events:auto;flex-shrink:0;
+  transition:background .15s,box-shadow .15s,border-color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.sk-dot:hover{border-color:var(--acc);background:rgba(var(--acc-rgb,0,229,200),.25)}
+.sk-dot.active{background:var(--acc);box-shadow:0 0 6px var(--acc),0 0 12px var(--acc-glow)}
+.sk-max-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--acc);opacity:.85;font-weight:700;padding:0 4px;
+  text-shadow:0 0 8px var(--acc-glow);pointer-events:none}
+/* ── PERÍCIAS INFO PANEL ── */
+.pinfo-btn{background:none;border:none;color:var(--muted);font-size:.9rem;min-height:0;padding:2px 5px;
+  cursor:pointer;border-radius:3px;transition:color .15s,background .15s;line-height:1;display:inline-flex;
+  align-items:center;justify-content:center;margin-left:6px}
+.pinfo-btn:hover{color:var(--acc);background:var(--acc-dim);border:none}
+.pinfo-panel{
+  max-height:0;overflow:hidden;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1),opacity .25s ease,padding .28s ease;
+  opacity:0;padding:0 0;
+  background:rgba(0,10,20,.55);border:1px solid transparent;
+  border-radius:var(--r);margin-bottom:0;
+}
+.pinfo-panel.open{
+  max-height:320px;opacity:1;
+  padding:14px 18px;border-color:var(--border);
+  margin-bottom:14px;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+}
+.pinfo-title{font-family:var(--mono);font-size:.72rem;color:var(--acc);letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px;font-weight:700}
+.pinfo-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;font-size:.83rem;line-height:1.45}
+.pinfo-range{font-family:var(--mono);font-size:.72rem;color:var(--acc);min-width:110px;flex-shrink:0}
+.pinfo-desc{color:var(--muted);font-size:.82rem}
 
 /* ── TOOLTIP D100 ── */
 #tt{position:absolute;background:rgba(3,6,15,.98);border:1px solid var(--acc);border-radius:var(--r);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.9),0 0 20px var(--acc-glow);z-index:9999;color:var(--text);width:max-content;opacity:0;visibility:hidden;transform:scale(.93) translateY(4px);transition:all 140ms cubic-bezier(.4,0,.2,1);pointer-events:none;display:grid;grid-template-columns:auto auto;gap:6px 22px}
@@ -342,6 +387,7 @@ section{margin-bottom:50px;scroll-margin-top:80px}
   transition:background .15s;
   border-radius:0 0 var(--r) var(--r);
   user-select:none;-webkit-tap-highlight-color:transparent;
+  touch-action:none; /* impede scroll nativo ao tocar a strip no mobile */
   position:relative;flex-shrink:0;
 }
 .ibar-strip:hover{background:var(--acc-dim)}
@@ -466,6 +512,7 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   border-top:1px solid var(--border2);
   background:transparent;transition:background .12s;
   user-select:none;-webkit-tap-highlight-color:transparent;
+  touch-action:none; /* evita scroll nativo ao arrastar grupo no mobile */
   position:relative;flex-shrink:0;
 }
 .ab-group.open .ab-group-strip{border-bottom:1px solid var(--border2)}
@@ -486,6 +533,53 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   transition:transform .2s,opacity .12s;
 }
 .ab-group.open .ab-group-strip .ab-strip-arrow{transform:rotate(180deg)}
+/* Inventory category separator — drag-over highlight */
+.catsep.drag-cat-over{background:var(--acc-dim);color:var(--acc);border-color:var(--acc);outline:1px solid var(--acc);}
+
+/* ── PASSIVAS — painel dentro dos cards ── */
+.passivas-list{display:flex;flex-direction:column;gap:5px;margin:4px 0 6px}
+.passiva-row{display:flex;align-items:center;gap:6px}
+.passiva-inp{
+  flex:1;font-family:var(--mono);font-size:.8rem;color:var(--text);
+  background:rgba(0,0,0,.28);border:1px solid var(--border2);
+  border-radius:4px;padding:4px 8px;min-height:unset;
+}
+.passiva-inp:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 1px var(--acc-dim)}
+.passiva-del{width:18px;height:18px;min-height:18px;padding:0;border:none;background:transparent;
+  color:var(--danger);font-size:.9rem;border-radius:2px;opacity:.5;flex-shrink:0;cursor:pointer}
+.passiva-del:hover{background:var(--danger-dim);opacity:1;border:none}
+.passiva-add{
+  min-height:28px;width:28px;height:28px;padding:0;
+  font-size:1rem;font-weight:700;border-radius:4px;
+  border:1px solid var(--acc);color:var(--acc);background:var(--acc-dim);
+  align-self:flex-start;margin-top:2px;cursor:pointer;
+}
+.passiva-add:hover{background:var(--acc);color:#000}
+
+/* ── PASSIVAS chips abaixo do PE no HUD ── */
+#ui-passivas{
+  display:flex;flex-wrap:wrap;gap:5px;align-items:center;
+  padding:6px 0 2px;
+  min-height:0;
+}
+#ui-passivas:empty{display:none}
+.passiva-hud-lbl{
+  font-family:var(--sans);font-size:.65rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;margin-right:4px;
+}
+.passiva-chip{
+  font-family:var(--mono);font-size:.68rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+  color:var(--acc);background:var(--acc-dim);
+  border:1px solid var(--acc);border-radius:var(--r);
+  padding:2px 7px;white-space:nowrap;
+  opacity:.85;transition:opacity .15s;
+}
+.passiva-chip:hover{opacity:1}
+.passiva-chip-src{
+  font-size:.6rem;color:var(--muted);margin-left:3px;
+  opacity:.7;font-weight:400;letter-spacing:0;
+}
 .ab-group-strip:hover .ab-strip-arrow{opacity:1}
 /* ab-group-body — see above */
 
@@ -502,6 +596,28 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   border:1px solid var(--acc);color:var(--acc);background:var(--acc-dim);
 }
 .add-btn:hover{background:var(--acc);color:#000}
+
+/* ── ANOTAÇÕES SPLIT-SCREEN WORKSPACE ── */
+.notes-workspace { display: flex; gap: 10px; width: 100%; align-items: stretch; justify-content: flex-start; }
+.npane { flex: 1 1 0%; min-width: min(100%, 260px); display: flex; flex-direction: column; background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; max-width: 100%; }
+.npane-hd { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); overflow-x: auto; min-height: 40px; align-items: stretch; scrollbar-width: none; }
+.npane-hd::-webkit-scrollbar { display: none; }
+.ntab { flex: 1; padding: 0 6px; min-width: 80px; max-width: 150px; border-right: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; position: relative; user-select: none; touch-action: none; }
+.ntab.active { background: var(--acc-dim); color: var(--acc); border-bottom: 2px solid var(--acc); }
+.ntab-name { font-family: var(--sans); font-size: .85rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background: transparent; border: none; color: inherit; text-align: center; pointer-events: none; width: 100%; outline: none; }
+.ntab.active .ntab-name { pointer-events: auto; }
+.ntab:hover { background: rgba(255,255,255,0.05); }
+.ntab-add { width: 38px; min-width: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; color: var(--muted); background: transparent; border: none; transition: color 0.2s; }
+.ntab-add:hover { color: var(--acc); }
+.add-pane-btn { flex: 0 0 50px; display: flex; align-items: center; justify-content: center; background: var(--bg1); border: 1px dashed var(--border); border-radius: var(--r); cursor: pointer; color: var(--muted); font-size: 1.6rem; transition: background 0.2s; min-height: 200px; }
+.add-pane-btn:hover { background: var(--acc-dim); color: var(--acc); border-style: solid; }
+.add-pane-btn.drag-over { background: rgba(0,229,200,0.1); border-color: var(--acc); color: var(--acc); }
+.npane-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 150px; }
+.npane-body-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--muted); font-size: .85rem; font-family: var(--sans); text-align: center; gap: 10px; }
+/* Drag states */
+.ntab.dragging { opacity: 0.4; }
+.npane-hd.drag-over { background: rgba(0,229,200,0.15); box-shadow: inset 0 -2px 0 var(--acc); }
+
 .fbtn{font-size:.8rem;padding:7px 14px;min-height:36px;font-family:var(--mono);letter-spacing:.07em;border-color:var(--border)}
 .fbtn:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
 .fbtn.on{background:var(--acc)!important;color:#000!important;border-color:var(--acc)!important;font-weight:700}
@@ -525,14 +641,69 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
 #overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99}
 
 /* ── FAB ── 
-   The entire menu uses max-height expansion (same as palette).
+/* ── FAB ── 
    The gear button sits alone at the bottom-right.
-   No invisible block ever intercepts clicks below.
 ── */
 .fabwrap{
   position:fixed;bottom:24px;right:20px;z-index:200;
   display:flex;flex-direction:column;align-items:flex-end;
-  /* NO gap — gap creates dead space even when menu is hidden */
+}
+
+/* FAB MENU LÁPIS (Esquerda da Tela / Depois do menu lateral) */
+.fabwrap-left{
+  right:auto; left:calc(var(--sb) + 20px); 
+  flex-direction:row; /* Lápis primeiro, menu a direita */
+  align-items:center;
+}
+.fabwrap-left .fabmenu{ 
+  flex-direction:row; 
+  padding:0; margin-bottom:0; margin-left:0;
+  align-items:center; width:max-content;
+  max-height:52px; max-width:0; 
+  transition:max-width .35s cubic-bezier(.4,0,.2,1), opacity .2s ease, margin-left .3s;
+  box-shadow:none;
+}
+.fabwrap-left.open .fabmenu{
+  max-width:500px;
+  padding:0 14px; margin-left:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.85);
+}
+.fabwrap-left .fopt{
+  width:auto; white-space:nowrap; margin:0 4px; border:1px solid var(--border);
+}
+@media(max-width:767px){ 
+  .fabwrap-left{ left:20px; bottom:74px; flex-direction:column-reverse; align-items:flex-start; }
+  .fabwrap-left .fabmenu{ 
+    flex-direction:column; width:190px; max-width:190px; max-height:0;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .2s ease, margin-bottom .3s;
+    margin-left:0;
+  }
+  .fabwrap-left.open .fabmenu{
+    max-height:160px;
+    margin-left:0; margin-bottom:10px; padding:12px;
+  }
+  .fabwrap-left .fopt{ width:100%; }
+}
+
+.b-edit{ border-color:var(--border2); color:var(--muted); }
+.b-edit.on{ 
+  background:var(--acc)!important; border-color:var(--acc)!important; color:#000!important;
+  box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 20px var(--acc-glow);
+}
+.b-edit.on svg{ stroke:#000; }
+.b-edit svg{ stroke:currentColor; transition:stroke var(--tr); }
+
+/* CUSTOM CHECKBOX WITH V */
+.edit-checkbox{
+  appearance:none; -webkit-appearance:none; width:18px; height:18px; margin-right:8px; cursor:pointer; flex-shrink:0;
+  border:2px solid var(--border); border-radius:4px;
+  background:transparent; position:relative; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s;
+}
+.edit-checkbox:checked{ 
+  background-color:var(--acc); border-color:var(--acc);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+  background-position: center; background-repeat: no-repeat;
 }
 /* Menu slides up above the gear button using max-height */
 .fabmenu{
@@ -570,6 +741,8 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
 .fabwrap.open .fabmain{transform:rotate(90deg)}
 .fopt{background:transparent;border:1px solid var(--border2);border-radius:4px;padding:10px 14px;text-align:left;width:100%;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-height:42px;justify-content:flex-start}
 .fopt:hover{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.fopt-svg{ display:flex; align-items:center; gap:9px; }
+.fopt-svg svg{ flex-shrink:0; }
 .fdiv{height:1px;background:var(--border2);margin:3px 0;flex-shrink:0}
 .paltog{width:100%;justify-content:space-between;background:transparent;border:1px solid var(--border2);border-radius:4px;padding:10px 14px;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-height:42px}
 .paltog:hover{border-color:var(--acc);color:var(--acc)}
@@ -610,8 +783,11 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   .char-photo-col{flex-direction:column;align-items:center;gap:10px}
   .photo-wrap{width:140px;flex-shrink:0}
   .radar-wrap{width:140px} /* same width as photo, square via aspect-ratio */
-  /* Modificadores single column on mobile */
+  
+  /* Modificadores e Anotações single column on mobile */
   .mod-list{flex-direction:column}
+  .notes-workspace{flex-direction:column}
+  
   .mod-item{max-width:100%;flex:none;width:100%}
   .grid-fields{grid-template-columns:75px 1fr;gap:7px 10px}
   .hrow{flex-wrap:wrap;gap:6px}
@@ -669,15 +845,15 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
     <span class="bname">Problemas<br>no Tempo</span>
   </div>
   <nav id="snav">
-    <a href="#personagem" class="act"><span class="nic">◈</span><span>Re-Timed</span></a>
-    <a href="#pericias"><span class="nic">◉</span><span>Perícias</span></a>
-    <a href="#modificadores"><span class="nic">⊞</span><span>Modif.</span></a>
-    <a href="#anotacoes"><span class="nic">✎</span><span>Anotações</span></a>
-    <a href="#tracos"><span class="nic">◇</span><span>Traços</span></a>
-    <a href="#inventario"><span class="nic">⊡</span><span>Inventário</span></a>
-    <a href="#equipamentos"><span class="nic">⚙</span><span>Equip.</span></a>
-    <a href="#espiritos"><span class="nic">✦</span><span>Espíritos</span></a>
-    <a href="#historico"><span class="nic">▤</span><span>Histórico</span></a>
+    <a href="#personagem" class="act"><span class="nic">◈</span><span>Re-Timed</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#pericias"><span class="nic">◉</span><span>Perícias</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#modificadores"><span class="nic">⊞</span><span>Modif.</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#anotacoes"><span class="nic">✎</span><span>Anotações</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#tracos"><span class="nic">◇</span><span>Traços</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#inventario"><span class="nic">⊡</span><span>Inventário</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#equipamentos"><span class="nic">⚙</span><span>Equip.</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#espiritos"><span class="nic">✦</span><span>Espíritos</span><span class="ndh"><span></span><span></span><span></span></span></a>
+    <a href="#historico"><span class="nic">▤</span><span>Histórico</span><span class="ndh"><span></span><span></span><span></span></span></a>
   </nav>
   <div class="sbfoot">
     <div class="ptbox">
@@ -773,6 +949,8 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
               </div>
             </div>
           </div>
+          <!-- Passivas consolidadas de todos os Equip/Espíritos -->
+          <div id="ui-passivas"></div>
           <div class="ql">
             <button class="blink" onclick="window.open('https://www.owlbear.rodeo/room/jcxE-N8n8e0y/TheDirtyProse','_blank')">⚔ MESA</button>
             <button class="blink" onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0','_blank')">▤ LIVRO</button>
@@ -786,10 +964,21 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   <!-- PERÍCIAS -->
   <section id="pericias">
     <div class="sec-hd" onclick="togSec('pericias')">
-      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Perícias</span><span class="sec-num">02</span></div>
+      <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Perícias</span><span class="sec-num">02</span>
+        <button class="pinfo-btn" id="pinfo-toggle" onclick="togPInfo(event)" title="Regras de Desenvolvimento">ⓘ</button>
+      </div>
       <span class="sec-arr">▼</span>
     </div>
     <div id="bd-pericias" class="sec-body">
+      <div class="pinfo-panel" id="pinfo-panel">
+        <div class="pinfo-title">Sistema de Desenvolvimento</div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Para evoluir +5 pontos em uma perícia, preencha os pontos baseando-se no seu nível atual:</p>
+        <div class="pinfo-row"><span class="pinfo-range">Até nível 99</span><span class="pinfo-desc">3 sucessos extremos no mesmo teste.</span></div>
+        <div class="pinfo-row"><span class="pinfo-range">Nível 100 a 124</span><span class="pinfo-desc">5 sucessos extremos em testes de sessões diferentes.</span></div>
+        <div class="pinfo-row"><span class="pinfo-range">Nível 125 a 139</span><span class="pinfo-desc">3 sucessos extremos em 2 sessões seguidas.</span></div>
+        <div class="pinfo-row"><span class="pinfo-range">Nível 140 a 149</span><span class="pinfo-desc">5 sucessos extremos (na mesma sessão) seguidos de uma Provação.</span></div>
+        <div class="pinfo-row"><span class="pinfo-range">Nível 150</span><span class="pinfo-desc">Nível máximo alcançado. Não é mais possível evoluir.</span></div>
+      </div>
       <div class="g2" id="ui-skills-container"></div>
     </div>
   </section>
@@ -811,8 +1000,8 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
       <div class="sec-hd-l"><div class="sec-bar"></div><span class="sec-title">Anotações</span><span class="sec-num">04</span></div>
       <span class="sec-arr">▼</span>
     </div>
-      <div class="sec-body" id="bd-anotacoes">
-        <textarea id="ui-notes" class="fta" oninput="saveData()" placeholder="Pistas, contatos, segredos..."></textarea>
+      <div class="sec-body" id="bd-anotacoes" style="padding:14px">
+        <div id="ui-notes-workspace" class="notes-workspace"></div>
       </div>
   </section>
 
@@ -909,21 +1098,59 @@ textarea{resize:none;overflow:hidden;line-height:1.6;min-height:38px}
   <div class="ttl te">Extremo</div><div class="ttv te" id="tt-e"></div>
 </div>
 
-<!-- FAB — gear icon -->
-<div class="fabwrap" id="fab">
-  <div class="fabmenu">
-    <button class="fopt" onclick="trigLoad()">[ CARREGAR .JSON ]</button>
-    <button class="fopt" onclick="saveFile()">[ SALVAR .JSON ]</button>
-    <button class="fopt" onclick="window.print()">[ PDF / IMPRIMIR ]</button>
-    <div class="fdiv"></div>
-    <button class="paltog" onclick="togPal(event)"><span>[ TEMA ]</span><span class="palchev" id="palchev">▼</span></button>
-    <div class="palgrid" id="ui-pal"></div>
+<!-- FAB & EDIT CONTROLS -->
+<!-- FAB LÁPIS (MODO EDIÇÃO - LADO ESQUERDO) -->
+<div class="fabwrap fabwrap-left" id="fab-edit">
+  <div class="fabmenu" id="menu-edit">
+
+    <button class="fopt fopt-svg" id="btn-import-partial" onclick="document.getElementById('file-load-partial').click()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      IMPORTAR
+    </button>
+
+    <button class="fopt fopt-svg" id="btn-export-partial" onclick="exportPartial()" style="opacity:0.4; cursor:not-allowed">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      EXPORTAR
+    </button>
+
   </div>
-  <!-- Gear SVG icon -->
-  <button class="bp fabmain" onclick="togFab()" title="Opções">⚙</button>
+  <button class="bp fabmain b-edit" id="btn-tog-edit" onclick="togEditMenu()" title="Modo Edição Parcial">
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- document base -->
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <!-- paintbrush diagonal -->
+      <line x1="10" y1="18" x2="17" y2="11"/>
+      <polyline points="17 11 19 9 17 7 15 9 17 11"/>
+      <line x1="10" y1="18" x2="9" y2="19"/>
+    </svg>
+  </button>
+</div>
+
+<!-- FAB GEAR (OPÇÕES - LADO DIREITO) -->
+<div class="fabwrap" id="fab">
+    <div class="fabmenu">
+      <button class="fopt" onclick="trigLoad()">[ CARREGAR .JSON ]</button>
+      <button class="fopt" onclick="saveFile()">[ SALVAR .JSON ]</button>
+      <button class="fopt" style="color:var(--danger); border-color:var(--danger-dim)" onclick="resetConfig()">[ APAGAR DADOS (RESET) ]</button>
+      <button class="fopt" onclick="window.print()">[ PDF / IMPRIMIR ]</button>
+      <div class="fdiv"></div>
+      <button class="paltog" onclick="togPal(event)"><span>[ TEMA ]</span><span class="palchev" id="palchev">▼</span></button>
+      <div class="palgrid" id="ui-pal"></div>
+    </div>
+    <button class="bp fabmain" onclick="togFab()" title="Opções">⚙</button>
 </div>
 
 <input type="file" id="file-load" accept=".json,application/json,text/plain,text/*" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0" onchange="loadFile(event)">
+<input type="file" id="file-load-partial" accept=".json" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0" onchange="importPartial(event)">
 
 <script>
 /* ═══════════════════════════════════
@@ -985,13 +1212,14 @@ const DEF_ST={
   name:'',age:'',nationality:'',profession:'',year:'',appearance:'',phobias:'',photo:'',corruption:0,
   skills:JSON.parse(JSON.stringify(DEF_SK)),vital:{pv:0,ps:0,pe:0},
   traits:[],inventory:[],equipments:[],spirits:[],
-  history:'',notes:'',collapsed:{},paletteIndex:0
+  history:'',notes:'',collapsed:{},paletteIndex:0,
+  skillProgress:{} /* {"Cat|sk": dotsFilled} */
 };
 /* Default item shapes */
 function newTrait(){return{name:'Novo Traço',desc:'',expanded:false}}
 function newInvItem(cat){return{name:'Novo Item',category:cat||'Mochila',qty:1,desc:'',damage:'',defeito:'',alcance:'',usoPorRodada:'',expanded:false}}
-function newEquip(){return{name:'Novo Equipamento',element:'',desc:'',descOpen:true,damage:'',dmgOpen:false,defeito:'',alcance:'',usoPorRodada:'',abilities:[],expanded:false}}
-function newSpirit(){return{name:'Novo Espírito',element:'',desc:'',descOpen:true,groups:[],expanded:false}}
+function newEquip(){return{name:'Novo Equipamento',element:'',desc:'',descOpen:true,damage:'',dmgOpen:false,defeito:'',alcance:'',usoPorRodada:'',passivas:[],passOpen:false,abilities:[],expanded:false}}
+function newSpirit(){return{name:'Novo Espírito',element:'',desc:'',descOpen:true,passivas:[],passOpen:false,groups:[],expanded:false,damage:'',dmgOpen:false}}
 function newAbility(){return{name:'Nova Habilidade',desc:'',open:false}}
 function newGroup(){return{name:'Grupo',abilities:[newAbility()],open:false}}
 
@@ -1000,6 +1228,117 @@ const TT=document.getElementById('tt');
 const DEFAULT_SEC_ORDER=['personagem','pericias','modificadores','anotacoes','tracos','inventario','equipamentos','espiritos','historico'];
 const SECS=DEFAULT_SEC_ORDER.slice();
 const ICATS=['Mochila','Equipamentos','Consumíveis','Utilidades'];
+
+/* ═══════════════════════════════════
+   EDIT MODE STATE (Partial Export)
+═══════════════════════════════════ */
+let editMode = false;
+let selectedItems = new Set(); // Stores strings: 'inventory-0', 'notes-0-1'
+
+function togEditMenu() {
+  const fw = document.getElementById('fab-edit');
+  fw.classList.toggle('open');
+  const isOpen = fw.classList.contains('open');
+  
+  if(editMode !== isOpen) {
+    editMode = isOpen;
+    document.body.classList.toggle('edit-mode', editMode);
+    const btnTog = document.getElementById('btn-tog-edit');
+    if(btnTog) btnTog.classList.toggle('on', editMode);
+    
+    selectedItems.clear();
+    updateEditTools();
+    
+    // Re-render blocks to attach/detach checkboxes
+    renderInv(); renderDyn('traits'); renderNotesWorkspace(); renderEquipments(); renderSpirits();
+  }
+}
+
+function togSelection(type, idx) {
+  const key = type + '-' + idx;
+  if(selectedItems.has(key)) selectedItems.delete(key);
+  else selectedItems.add(key);
+  updateEditTools();
+}
+
+function updateEditTools() {
+  const expBtn = document.getElementById('btn-export-partial');
+  if(expBtn) {
+    if(selectedItems.size > 0){
+      expBtn.style.opacity = '1';
+      expBtn.style.cursor = 'pointer';
+    } else {
+      expBtn.style.opacity = '0.4';
+      expBtn.style.cursor = 'not-allowed';
+    }
+  }
+}
+
+function exportPartial() {
+  if(selectedItems.size === 0) {
+    alert("Selecione pelo menos 1 item (clicando nas caixinhas de seleção ✓) para exportar.");
+    return;
+  }
+  const data = { isPartialData: true, items: [] };
+  
+  selectedItems.forEach(key => {
+    let parts = key.split('-');
+    let list = parts[0];
+    if(list === 'notes') {
+      const pi = parseInt(parts[1]), ti = parseInt(parts[2]);
+      const tab = S.notes.panes[pi]?.tabs[ti];
+      if(tab) data.items.push({ type: 'notes', data: tab });
+    } else {
+      const p = parts.slice(0, parts.length-1).join('-');
+      const idx = parseInt(parts[parts.length-1]);
+      const arr = _getListArr(p||list);
+      if(arr && arr[idx]) data.items.push({ type: list, data: arr[idx] });
+    }
+  });
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `PNT_Pacote_${Date.now()}.json`;
+  a.click();
+  
+  togEditMenu();
+}
+
+function importPartial(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(!data.isPartialData || !data.items) {
+         alert("Arquivo inválido. O arquivo não é um pacote de cards/Anotações exportado."); return;
+      }
+      data.items.forEach(it => {
+        const list = it.type;
+        const obj = it.data;
+        if(list === 'notes') {
+           if(!S.notes.panes) S.notes.panes = [];
+           if(S.notes.panes.length === 0) S.notes.panes.push({activeTabId:0, tabs:[]});
+           S.notes.panes[0].tabs.push(obj);
+           S.notes.panes[0].activeTabId = S.notes.panes[0].tabs.length - 1;
+        } else {
+           if(!S[list]) S[list] = [];
+           S[list].push(obj);
+        }
+      });
+      saveData();
+      alert("Sucesso! " + data.items.length + " itens foram importados.");
+      location.reload();
+    } catch(err) {
+      alert("Erro ao ler Pacote: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
 
 /* ═══════════════════════════════════
    INIT
@@ -1021,23 +1360,39 @@ function init(){
       if(typeof S.corruption!=='number')S.corruption=0;
       if(!S.equipments)S.equipments=[];
       if(!S.spirits)S.spirits=[];
+      if(!S.skillProgress)S.skillProgress={};
       // Migrate old equipments/spirits that lack new fields
-      S.equipments.forEach(e=>{if(e.element===undefined)e.element='';if(!e.abilities)e.abilities=[];if(e.descOpen===undefined)e.descOpen=true;if(e.defeito===undefined)e.defeito='';if(e.alcance===undefined)e.alcance='';if(e.usoPorRodada===undefined)e.usoPorRodada='';});
-      S.spirits.forEach(sp=>{if(sp.element===undefined)sp.element='';if(!sp.groups)sp.groups=[];if(sp.descOpen===undefined)sp.descOpen=true;});
+      S.equipments.forEach(e=>{if(e.element===undefined)e.element='';if(!e.abilities)e.abilities=[];if(e.descOpen===undefined)e.descOpen=true;if(e.defeito===undefined)e.defeito='';if(e.alcance===undefined)e.alcance='';if(e.usoPorRodada===undefined)e.usoPorRodada='';if(!e.passivas)e.passivas=[];if(e.passOpen===undefined)e.passOpen=false;});
+      S.spirits.forEach(sp=>{if(sp.element===undefined)sp.element='';if(!sp.groups)sp.groups=[];if(sp.descOpen===undefined)sp.descOpen=true;if(!sp.passivas)sp.passivas=[];if(sp.passOpen===undefined)sp.passOpen=false;if(sp.damage===undefined)sp.damage='';if(sp.dmgOpen===undefined)sp.dmgOpen=false;});
+      
     }catch{S=JSON.parse(JSON.stringify(DEF_ST));}
   }else{
     S=JSON.parse(JSON.stringify(DEF_ST));
   }
+  
+  // Migrate notes (Unconditionally for both old saves and new characters)
+  if(typeof S.notes === 'string' || !S.notes || !S.notes.panes) {
+    const text = typeof S.notes === 'string' ? S.notes : '';
+    S.notes = {
+      panes: [
+        {
+          activeTabId: 0,
+          tabs: [ { name: 'Anotações', text: text } ]
+        }
+      ]
+    };
+  }
   renderPal();applyPal(S.paletteIndex,false);
   bindInputs();renderCorr();renderSkills();calcAll();
-  renderDyn('traits');renderInv();renderEquipments();renderSpirits();renderMod();
+  renderDyn('traits');renderInv();renderEquipments();renderSpirits();renderPassivas();renderMod();
+  renderNotesWorkspace();
   SECS.forEach(applyColl);
   applySavedSectionOrder();
   scrollSpy();
   initSidebarDrag();
   drawRadar();
   // Bind autoResize to main textareas
-  ['ui-history','ui-notes','ui-appearance','ui-phobias'].forEach(id=>{
+  ['ui-history','ui-appearance','ui-phobias'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)bindAutoResize(el);
   });
@@ -1049,10 +1404,20 @@ function init(){
 }
 
 /* ═══════════════════════════════════
-   SAVE / LOAD
+   SAVE / LOAD / RESET
 ═══════════════════════════════════ */
+function resetConfig() {
+  if(confirm("⚠ CUIDADO ⚠\n\nTem certeza que deseja DELETAR essa ficha?\nIsso apagará permanentemente todos os dados armazenados neste navegador (localstorage)!")) {
+    localStorage.removeItem('rpt_v5');
+    localStorage.removeItem('rpt_v4');
+    localStorage.removeItem('rpg_sheet_v3');
+    localStorage.removeItem('rpg_sheet_data_v2');
+    location.reload();
+  }
+}
+
 function saveData(){
-  ['name','age','nationality','profession','year','appearance','phobias','history','notes'].forEach(k=>{
+  ['name','age','nationality','profession','year','appearance','phobias','history'].forEach(k=>{
     const el=document.getElementById('ui-'+k);if(el)S[k]=el.value;
   });
   localStorage.setItem('rpt_v5',JSON.stringify(S));
@@ -1331,6 +1696,61 @@ function renderMod(){
 }
 
 /* ═══════════════════════════════════
+   SKILLS — TRACKER HELPERS
+═══════════════════════════════════ */
+function getTrackerCount(val){
+  if(val>=150)return 0;
+  if(val>=140)return 5;
+  if(val>=125)return 3;
+  if(val>=100)return 5;
+  return 3;
+}
+function skKey(cat,sk){return cat+'|'+sk;}
+function getProgress(cat,sk){return S.skillProgress[skKey(cat,sk)]||0;}
+function setProgress(cat,sk,v){S.skillProgress[skKey(cat,sk)]=Math.max(0,v);saveData();}
+
+function handleTrackerClick(cat,sk,dotIdx,e){
+  e.stopPropagation();
+  const val=S.skills[cat][sk];
+  if(val>=150)return;
+  const total=getTrackerCount(val);
+  const cur=getProgress(cat,sk);
+  const clickedFilled=(dotIdx<=cur-1); // zero-based check
+  // If clicking last active dot → unmark it
+  if(dotIdx===cur-1){
+    setProgress(cat,sk,cur-1);
+    renderSkills();
+    return;
+  }
+  // Mark up to dotIdx (inclusive)
+  const newVal=dotIdx+1;
+  setProgress(cat,sk,newVal);
+  renderSkills();
+  // Level-up trigger: filled all required dots
+  if(newVal>=total){
+    const skName=cap(sk);
+    const nextVal=val+5;
+    setTimeout(()=>{
+      if(confirm('Evoluir a perícia '+skName+' para '+nextVal+'?')){
+        S.skills[cat][sk]=nextVal;
+        setProgress(cat,sk,0);
+        // Update input display
+        const inp=document.getElementById('sk-'+cat+'-'+sk);
+        if(inp)inp.value=nextVal;
+        calcAll();
+        saveData();
+        renderSkills();
+      } else {
+        // Cancel: unmark last dot to prevent re-trigger loop
+        setProgress(cat,sk,newVal-1);
+        saveData();
+        renderSkills();
+      }
+    },100);
+  }
+}
+
+/* ═══════════════════════════════════
    SKILLS
 ═══════════════════════════════════ */
 function chgSk(cat,sk,v){
@@ -1338,6 +1758,10 @@ function chgSk(cat,sk,v){
   S.skills[cat][sk]=n;
   const inp=document.getElementById('sk-'+cat+'-'+sk);
   if(inp)inp.value=n;
+  // Clamp tracker progress to new max for this level
+  const maxDots=getTrackerCount(n);
+  const cur=getProgress(cat,sk);
+  if(cur>maxDots)setProgress(cat,sk,maxDots);
   if(TT.classList.contains('show')&&TT.dataset.aid==='row-'+cat+'-'+sk)showTT(n,null,true);
   calcAll();saveData();
 }
@@ -1364,14 +1788,47 @@ function renderSkills(){
       const sublabelHtml=sublabel
         ?'<span style="font-size:.7rem;color:var(--muted);font-weight:400;margin-left:5px;font-family:var(--mono);letter-spacing:0;text-transform:none;">'+sublabel+'</span>'
         :'';
-      row.innerHTML='<span class="skname">'+displayName+sublabelHtml+'</span>'
-        +'<div class="skinw"><input type="number" class="skinp" id="sk-'+cat+'-'+sk+'" value="'+v+'" onclick="event.stopPropagation()"></div>';
+
+      // Build structure manually to attach tracker events
+      row.innerHTML='';
+      // Left side: skill name + tracker
+      const inner=document.createElement('div');inner.className='sk-inner';
+      const nameSpan=document.createElement('span');nameSpan.className='skname';
+      nameSpan.innerHTML=displayName+sublabelHtml;
+      inner.appendChild(nameSpan);
+
+      // Tracker row
+      const totalDots=getTrackerCount(v);
+      const filledDots=getProgress(cat,sk);
+      if(v>=150){
+        const maxLbl=document.createElement('span');maxLbl.className='sk-max-lbl sk-tracker';
+        maxLbl.textContent='✦ MÁXIMO';
+        inner.appendChild(maxLbl);
+      } else if(totalDots>0){
+        const tracker=document.createElement('div');tracker.className='sk-tracker';
+        for(let d=0;d<totalDots;d++){
+          const dot=document.createElement('span');dot.className='sk-dot'+(d<filledDots?' active':'');
+          dot.dataset.dot=d;
+          dot.addEventListener('click',e=>handleTrackerClick(cat,sk,d,e));
+          tracker.appendChild(dot);
+        }
+        inner.appendChild(tracker);
+      }
+      row.appendChild(inner);
+
+      // Right side: input
+      const skinw=document.createElement('div');skinw.className='skinw';
+      const inp=document.createElement('input');inp.type='number';inp.className='skinp';
+      inp.id='sk-'+cat+'-'+sk;inp.value=v;
+      inp.addEventListener('click',e=>e.stopPropagation());
+      inp.addEventListener('change',e=>chgSk(cat,sk,e.target.value));
+      inp.addEventListener('blur',e=>chgSk(cat,sk,e.target.value));
+      skinw.appendChild(inp);
+      row.appendChild(skinw);
+
       row.addEventListener('mouseenter',e=>showTT(S.skills[cat][sk],e));
       row.addEventListener('mouseleave',hideTT);
       row.addEventListener('click',e=>showTT(S.skills[cat][sk],e));
-      const inp=row.querySelector('input');
-      inp.addEventListener('change',e=>chgSk(cat,sk,e.target.value));
-      inp.addEventListener('blur',e=>chgSk(cat,sk,e.target.value));
       list.appendChild(row);
     });
     const be=hd.querySelector('.sbase');
@@ -1386,6 +1843,15 @@ function renderSkills(){
     catList.forEach(cat=>col.appendChild(mkCat(cat)));
     cont.appendChild(col);
   });
+}
+
+/* ── Perícias Info Panel toggle ── */
+function togPInfo(e){
+  e.stopPropagation();
+  const panel=document.getElementById('pinfo-panel');
+  const btn=document.getElementById('pinfo-toggle');
+  const isOpen=panel.classList.toggle('open');
+  btn.style.color=isOpen?'var(--acc)':'';
 }
 
 /* ═══════════════════════════════════
@@ -1436,64 +1902,132 @@ function renderCorr(){
 /* ═══════════════════════════════════
    DRAG-TO-REORDER  (shared)
 ═══════════════════════════════════ */
+/* Variáveis globais legadas (mantidas para compatibilidade com renderInv catsep) */
 let dragSrc=null,dragList=null,dragCat=null;
 
+/* Helpers dinâmicos para arrays aninhados (Anotações Multi-pane) */
+function _getListArr(l) {
+  if (l.startsWith('notes-')) { const p=l.split('-'); return S.notes.panes[p[1]]?.tabs[p[2]]?.items || []; }
+  return S[l];
+}
+function _renderList(l) {
+  if(l==='inventory') renderInv();
+  else if(l==='equipments') renderEquipments();
+  else if(l==='spirits') renderSpirits();
+  else if(l.startsWith('notes-')) renderNotesWorkspace();
+  else renderDyn(l);
+}
+
+/* ── setupCardDrag: pointer events com threshold — clique=expandir, arrastar=reordenar ── */
 function setupCardDrag(card,list,idx){
-  // Drag is initiated from the bottom strip only
   const strip=card.querySelector('.ibar-strip');
   if(!strip)return;
   card.dataset.idx=idx;card.dataset.list=list;
 
-  strip.setAttribute('draggable','true');
-  strip.addEventListener('dragstart',e=>{
-    dragSrc=card;dragList=list;dragCat=null;
-    e.dataTransfer.effectAllowed='move';
-    e.dataTransfer.setData('text/plain',idx);
-    setTimeout(()=>card.classList.add('dragging'),0);
-  });
-  strip.addEventListener('dragend',()=>{
+  const DRAG_PX=8; // pixels de movimento para ativar o drag
+  let dragging=false,startX=0,startY=0,ptId=null;
+
+  strip.addEventListener('pointerdown',e=>{
+    dragging=false;
+    startX=e.clientX;startY=e.clientY;ptId=e.pointerId;
+    try{strip.setPointerCapture(e.pointerId);}catch(_){}
+  },{passive:false});
+
+  strip.addEventListener('pointermove',e=>{
+    if(e.pointerId!==ptId)return;
+    const dx=Math.abs(e.clientX-startX),dy=Math.abs(e.clientY-startY);
+    if(!dragging&&(dx>DRAG_PX||dy>DRAG_PX)){
+      dragging=true;
+      dragSrc=card;dragList=list;dragCat=null;
+      card.classList.add('dragging');
+    }
+    if(!dragging)return;
+    e.preventDefault();
+    // Feedback visual: limpa todos e marca o alvo atual
+    document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c=>{
+      c.classList.remove('drag-over','drag-cat-over');
+    });
+    const over=_findCardAt(card,e.clientY);
+    if(over){over.classList.add('drag-over');}
+    else if(list==='inventory'){const sep=_findCatSepAt(e.clientY);if(sep)sep.classList.add('drag-cat-over');}
+  },{passive:false});
+
+  strip.addEventListener('pointerup',e=>{
+    if(!dragging){dragSrc=null;return;} // foi clique simples — o click event vai expandir
+    e.preventDefault(); // bloqueia o click event subsequente
+    dragging=false;
     card.classList.remove('dragging');
-    document.querySelectorAll('.drag-over,.drag-cat-over').forEach(el=>el.classList.remove('drag-over','drag-cat-over'));
+    document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c=>{
+      c.classList.remove('drag-over','drag-cat-over');
+    });
+    // 1º tenta soltar em outro card
+    const target=_findCardAt(card,e.clientY);
+    if(target){
+      const from=parseInt(card.dataset.idx),to=parseInt(target.dataset.idx);
+      const srcList=card.dataset.list,tgtList=target.dataset.list;
+      if(srcList!=='inventory'||tgtList!=='inventory'){
+        let arrFrom = null, arrTo = null;
+        if (srcList.startsWith('notes-') && tgtList.startsWith('notes-')) {
+          arrFrom = _getListArr(srcList); arrTo = _getListArr(tgtList);
+        } else if (srcList === tgtList && !srcList.startsWith('notes-')) {
+          arrFrom = S[srcList]; arrTo = S[srcList];
+        } else {
+          dragSrc=null;return;
+        }
+
+        const[item]=arrFrom.splice(from,1);
+        arrTo.splice(to,0,item);
+        
+        saveData();
+        _renderList(srcList);
+        if(srcList!==tgtList) _renderList(tgtList);
+      } else {
+        const srcCat=S.inventory[from]?.category,tgtCat=S.inventory[to]?.category;
+        if(srcCat===tgtCat){
+          const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
+        } else {
+          S.inventory[from].category=tgtCat;
+          const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
+        }
+        saveData();renderInv();
+      }
+      dragSrc=null;return;
+    }
+    // 2º tenta soltar em um separador de categoria (inventario)
+    if(list==='inventory'){
+      const sep=_findCatSepAt(e.clientY);
+      if(sep){
+        const from=parseInt(card.dataset.idx);
+        S.inventory[from].category=sep.dataset.cat;
+        saveData();renderInv();
+      }
+    }
     dragSrc=null;
   });
-  card.addEventListener('dragover',e=>{
-    if(!dragSrc||dragSrc===card)return;
-    e.preventDefault();e.dataTransfer.dropEffect='move';
-    card.classList.add('drag-over');
+
+  strip.addEventListener('pointercancel',()=>{
+    dragging=false;card.classList.remove('dragging');
+    document.querySelectorAll('.icard.drag-over').forEach(c=>c.classList.remove('drag-over'));
+    dragSrc=null;
   });
-  card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
-  card.addEventListener('drop',e=>{
-    e.preventDefault();card.classList.remove('drag-over');
-    if(!dragSrc||dragSrc===card)return;
-    const from=parseInt(dragSrc.dataset.idx);
-    const to=parseInt(card.dataset.idx);
-    const srcList=dragSrc.dataset.list;
-    const tgtList=card.dataset.list;
-    // Only handle inventory cross-category or same-list reorder
-    if(srcList!=='inventory'||tgtList!=='inventory'){
-      if(srcList!==tgtList)return;
-      const arr=S[srcList];
-      const[item]=arr.splice(from,1);arr.splice(to,0,item);
-      saveData();
-      if(srcList==='equipments')renderEquipments();
-      else if(srcList==='spirits')renderSpirits();
-      else renderDyn(srcList);
-      return;
-    }
-    // Inventory: check if same or different category
-    const srcCat=S.inventory[from]?.category;
-    const tgtCat=S.inventory[to]?.category;
-    if(srcCat===tgtCat){
-      // Same category — reorder
-      const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
-    } else {
-      // Different category — move item to target's category
-      S.inventory[from].category=tgtCat;
-      // Also reorder to sit near the target
-      const[item]=S.inventory.splice(from,1);S.inventory.splice(to,0,item);
-    }
-    saveData();renderInv();
-  });
+}
+
+/* Retorna o .icard irmão mais próximo da coordenada Y, excluindo o card em arrasto */
+function _findCardAt(activeCard,clientY){
+  const container=activeCard.parentElement;
+  if(!container)return null;
+  return [...container.querySelectorAll('.icard')].find(c=>{
+    if(c===activeCard)return false;
+    const r=c.getBoundingClientRect();
+    return clientY>=r.top&&clientY<=r.bottom;
+  })||null;
+}
+/* Retorna o .catsep mais próximo da coordenada Y (para drop de categoria) */
+function _findCatSepAt(clientY){
+  return [...document.querySelectorAll('.catsep')].find(sep=>{
+    const r=sep.getBoundingClientRect();
+    return clientY>=r.top&&clientY<=r.bottom;
+  })||null;
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1526,17 +2060,25 @@ function mkBaseCard(item,i,list,opts={}){
 
   /* ── TOP BAR: name + qty + del ── */
   const bar=document.createElement('div');bar.className='ibar';
+  
+  if(editMode) {
+    const sel = document.createElement('input');
+    sel.type = 'checkbox';
+    sel.className = 'edit-checkbox';
+    sel.checked = selectedItems.has(list + '-' + i);
+    sel.addEventListener('change', e => { 
+      togSelection(list, i); 
+    });
+    sel.addEventListener('click', e => e.stopPropagation());
+    bar.appendChild(sel);
+  }
 
   const nameInp=document.createElement('input');
   nameInp.type='text';nameInp.className='ibar-name-input';
   nameInp.value=item.name||'';nameInp.placeholder='Nome...';
-  nameInp.addEventListener('click',e=>e.stopPropagation());
   nameInp.addEventListener('change',e=>{
-    if(list==='inventory')S.inventory[i].name=e.target.value;
-    else if(list==='equipments')S.equipments[i].name=e.target.value;
-    else if(list==='spirits')S.spirits[i].name=e.target.value;
-    else S[list][i].name=e.target.value;
-    saveData();
+    const arr = _getListArr(list);
+    if(arr[i]) { arr[i].name = e.target.value; saveData(); }
   });
   bar.appendChild(nameInp);
 
@@ -1554,10 +2096,10 @@ function mkBaseCard(item,i,list,opts={}){
   const del=document.createElement('button');del.className='idel';del.textContent='×';del.title='Remover';
   del.addEventListener('click',e=>{
     e.stopPropagation();if(!confirm('Remover?'))return;
-    if(list==='inventory'){S.inventory.splice(i,1);saveData();renderInv();}
-    else if(list==='equipments'){S.equipments.splice(i,1);saveData();renderEquipments();}
-    else if(list==='spirits'){S.spirits.splice(i,1);saveData();renderSpirits();}
-    else{S[list].splice(i,1);saveData();renderDyn(list);}
+    const arr = _getListArr(list);
+    arr.splice(i,1);
+    saveData();
+    _renderList(list);
   });
   bar.appendChild(del);
   card.appendChild(bar);
@@ -1567,11 +2109,9 @@ function mkBaseCard(item,i,list,opts={}){
   const topArrow=document.createElement('span');topArrow.className='ibar-top-strip-arrow';topArrow.textContent='▼';
   topStrip.appendChild(topArrow);
   topStrip.addEventListener('click',()=>{
-    // Collapse this card
-    if(list==='inventory'){S.inventory[i].expanded=false;saveData();renderInv();}
-    else if(list==='equipments'){S.equipments[i].expanded=false;saveData();renderEquipments();}
-    else if(list==='spirits'){S.spirits[i].expanded=false;saveData();renderSpirits();}
-    else{S[list][i].expanded=false;saveData();renderDyn(list);}
+    const arr = _getListArr(list);
+    if(arr[i]) arr[i].expanded = false;
+    saveData(); _renderList(list);
   });
   card.appendChild(topStrip);
 
@@ -1607,11 +2147,8 @@ function mkBaseCard(item,i,list,opts={}){
     const ta=document.createElement('textarea');ta.className='idesc';ta.placeholder='Detalhes...';ta.value=item.desc||'';
     ta.addEventListener('input',e=>{
       autoResize(ta);
-      if(list==='inventory')S.inventory[i].desc=e.target.value;
-      else if(list==='equipments')S.equipments[i].desc=e.target.value;
-      else if(list==='spirits')S.spirits[i].desc=e.target.value;
-      else S[list][i].desc=e.target.value;
-      saveData();
+      const arr = _getListArr(list);
+      if(arr[i]) { arr[i].desc = e.target.value; saveData(); }
     });
     body.appendChild(lbl);body.appendChild(ta);
     // autoResize after render
@@ -1633,14 +2170,245 @@ function mkBaseCard(item,i,list,opts={}){
 
   strip.addEventListener('click',()=>{
     const newVal=!item.expanded;
-    if(list==='inventory'){S.inventory[i].expanded=newVal;saveData();renderInv();}
-    else if(list==='equipments'){S.equipments[i].expanded=newVal;saveData();renderEquipments();}
-    else if(list==='spirits'){S.spirits[i].expanded=newVal;saveData();renderSpirits();}
-    else{S[list][i].expanded=newVal;saveData();renderDyn(list);}
+    const arr = _getListArr(list);
+    if(arr[i]) arr[i].expanded = newVal;
+    saveData(); _renderList(list);
   });
   card.appendChild(strip);
 
   return card;
+}
+
+/* ═══════════════════════════════════
+   PASSIVAS (COMPONENT + HUD)
+═══════════════════════════════════ */
+function _buildPassivasPanel(passivas,isOpen,onToggle,onChange,onDel,onAdd){
+  const wrap=document.createElement('div');
+  wrap.className='passivas-wrap';
+
+  const tog=document.createElement('button');tog.className='desc-tog';
+  tog.textContent=isOpen?'▲ Ocultar Passivas':'▼ Passivas';
+  if(passivas.length>0) tog.innerHTML+=` <span style="font-size:0.7em;opacity:0.6">(${passivas.length})</span>`;
+  tog.addEventListener('click',e=>{e.stopPropagation();onToggle(!isOpen);});
+  wrap.appendChild(tog);
+
+  if(isOpen){
+    const list=document.createElement('div');list.className='passivas-list';
+    passivas.forEach((p,pi)=>{
+      const row=document.createElement('div');row.className='passiva-row';
+      const inp=document.createElement('input');inp.type='text';inp.className='passiva-inp';
+      inp.placeholder='Poder passivo...';inp.value=p;
+      inp.addEventListener('click',e=>e.stopPropagation());
+      inp.addEventListener('change',e=>onChange(pi,e.target.value));
+      const del=document.createElement('button');del.className='passiva-del';del.textContent='×';
+      del.title='Remover';
+      del.addEventListener('click',e=>{e.stopPropagation();onDel(pi);});
+      row.appendChild(inp);row.appendChild(del);list.appendChild(row);
+    });
+    const addBtn=document.createElement('button');addBtn.className='passiva-add';
+    addBtn.textContent='+';addBtn.title='Adicionar Passiva';
+    addBtn.addEventListener('click',e=>{e.stopPropagation();onAdd();});
+    list.appendChild(addBtn);
+    wrap.appendChild(list);
+  }
+  return wrap;
+}
+
+function renderPassivas(){
+  const cont=document.getElementById('ui-passivas');
+  if(!cont)return;
+  
+  let chipHtml='';
+  let hasAny=false;
+
+  // Coleta passivas de Equipamentos
+  (S.equipments||[]).forEach(eq=>{
+    (eq.passivas||[]).forEach(p=>{
+      if(!p.trim())return;
+      hasAny=true;
+      chipHtml+=`<div class="passiva-chip">${esc(p)}<span class="passiva-chip-src">(${esc(eq.name||'Equip.')})</span></div>`;
+    });
+  });
+
+  // Coleta passivas de Espíritos
+  (S.spirits||[]).forEach(sp=>{
+    (sp.passivas||[]).forEach(p=>{
+      if(!p.trim())return;
+      hasAny=true;
+      chipHtml+=`<div class="passiva-chip">${esc(p)}<span class="passiva-chip-src">(${esc(sp.name||'Espírito')})</span></div>`;
+    });
+  });
+  
+  if(hasAny){
+    cont.innerHTML=`<span class="passiva-hud-lbl">Passivas</span>` + chipHtml;
+  } else {
+    cont.innerHTML='';
+  }
+}
+
+/* ═══════════════════════════════════
+   NOTES WORKSPACE (MULTI-PANE)
+═══════════════════════════════════ */
+function renderNotesWorkspace() {
+  const ws = document.getElementById('ui-notes-workspace');
+  if(!ws) return;
+  ws.innerHTML = '';
+  
+  const panes = S.notes.panes || [];
+  
+  panes.forEach((pane, pi) => {
+    const pEl = document.createElement('div');
+    pEl.className = 'npane';
+    pEl.dataset.pi = pi;
+    
+    const hd = document.createElement('div');
+    hd.className = 'npane-hd';
+    
+    hd.addEventListener('dragover', e=> { e.preventDefault(); hd.classList.add('drag-over'); });
+    hd.addEventListener('dragleave', e=> { hd.classList.remove('drag-over'); });
+    hd.addEventListener('drop', e=> {
+      e.preventDefault(); hd.classList.remove('drag-over');
+      const fromP = parseInt(e.dataTransfer.getData('text/fromP'));
+      const fromT = parseInt(e.dataTransfer.getData('text/fromT'));
+      if(isNaN(fromP) || isNaN(fromT) || fromP === pi) return;
+      const tab = S.notes.panes[fromP].tabs.splice(fromT, 1)[0];
+      if (S.notes.panes[fromP].activeTabId >= S.notes.panes[fromP].tabs.length) {
+        S.notes.panes[fromP].activeTabId = Math.max(0, S.notes.panes[fromP].tabs.length - 1);
+      }
+      pane.tabs.push(tab);
+      pane.activeTabId = pane.tabs.length - 1;
+      if (S.notes.panes[fromP].tabs.length === 0) {
+        S.notes.panes.splice(fromP, 1);
+      }
+      saveData(); renderNotesWorkspace();
+    });
+
+    pane.tabs.forEach((tab, ti) => {
+      const isAct = (pane.activeTabId === ti);
+      const tEl = document.createElement('div');
+      tEl.className = 'ntab' + (isAct ? ' active' : '');
+      tEl.draggable = true;
+      tEl.dataset.ti = ti;
+      
+      tEl.addEventListener('click', () => { if(!isAct){ pane.activeTabId = ti; saveData(); renderNotesWorkspace(); } });
+      
+      tEl.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/fromP', pi);
+        e.dataTransfer.setData('text/fromT', ti);
+        tEl.classList.add('dragging');
+      });
+      tEl.addEventListener('dragend', ()=> tEl.classList.remove('dragging'));
+
+      const tName = document.createElement('input');
+      tName.type = 'text'; tName.className = 'ntab-name';
+      tName.value = tab.name; tName.placeholder = 'Nova Aba';
+      tName.addEventListener('click', e => { if(isAct) e.stopPropagation(); });
+      tName.addEventListener('change', e => { tab.name = e.target.value; saveData(); });
+      
+      if(editMode) {
+        const sel = document.createElement('input');
+        sel.type = 'checkbox';
+        sel.className = 'edit-checkbox';
+        sel.checked = selectedItems.has(`notes-${pi}-${ti}`);
+        sel.addEventListener('change', e => togSelection('notes', `${pi}-${ti}`));
+        sel.addEventListener('click', e => e.stopPropagation());
+        tEl.appendChild(sel);
+      }
+
+      tEl.appendChild(tName);
+      
+      if(isAct) {
+        const delBtn = document.createElement('button');
+        delBtn.innerHTML = '×';
+        delBtn.style.cssText = 'background:transparent;border:none;color:var(--danger);font-size:1rem;cursor:pointer;margin-left:4px;opacity:0.6';
+        delBtn.addEventListener('click', e=>{
+          e.stopPropagation();
+          if(confirm('Tem certeza que deseja apagar a aba: ' + tab.name + '?')){
+            pane.tabs.splice(ti, 1);
+            if(pane.tabs.length === 0) S.notes.panes.splice(pi, 1);
+            else if(pane.activeTabId >= pane.tabs.length) pane.activeTabId = Math.max(0, pane.tabs.length - 1);
+            saveData(); renderNotesWorkspace();
+          }
+        });
+        tEl.appendChild(delBtn);
+      }
+      hd.appendChild(tEl);
+    });
+    
+    const tAdd = document.createElement('button');
+    tAdd.className = 'ntab-add'; tAdd.textContent = '+';
+    tAdd.title = "Nova Aba";
+    tAdd.addEventListener('click', () => {
+      pane.tabs.push({ name: 'Aba '+(pane.tabs.length+1), text: '' });
+      pane.activeTabId = pane.tabs.length - 1;
+      saveData(); renderNotesWorkspace();
+    });
+    hd.appendChild(tAdd);
+    pEl.appendChild(hd);
+
+    const bd = document.createElement('div');
+    bd.className = 'npane-body';
+    
+    if (pane.tabs.length > 0) {
+      const cTab = pane.tabs[pane.activeTabId];
+      if (cTab) {
+        // Fallback for migration from "Cards" preview to pure Textarea
+        if(cTab.items && typeof cTab.text === 'undefined') {
+          cTab.text = cTab.items.map(it => (it.name + '\n' + (it.desc||'')).trim()).join('\n\n\n');
+          delete cTab.items;
+        }
+        
+        const ta = document.createElement('textarea');
+        ta.className = 'fta';
+        ta.style.flex = '1';
+        ta.style.minHeight = '300px';
+        ta.style.resize = 'none'; // flex will handle horizontal, autoResize handles vertical
+        ta.placeholder = 'Digite suas anotações aqui...';
+        ta.value = cTab.text || '';
+        ta.addEventListener('input', e => {
+          cTab.text = e.target.value;
+          saveData();
+        });
+        bd.appendChild(ta);
+        requestAnimationFrame(() => { bindAutoResize(ta); autoResize(ta); });
+      }
+    } else {
+      bd.innerHTML = '<div class="npane-body-empty">Nenhuma aba disponível</div>';
+    }
+    pEl.appendChild(bd);
+    ws.appendChild(pEl);
+  });
+  
+  if (panes.length < 3) {
+    const ap = document.createElement('button');
+    ap.className = 'add-pane-btn';
+    ap.textContent = '+';
+    ap.title = "Nova Coluna";
+    ap.addEventListener('click', () => {
+      if(!S.notes.panes) S.notes.panes = [];
+      S.notes.panes.push({ activeTabId: 0, tabs: [ {name: 'Nova Aba', text: ''} ] });
+      saveData(); renderNotesWorkspace();
+    });
+    
+    ap.addEventListener('dragover', e=> { e.preventDefault(); ap.classList.add('drag-over'); });
+    ap.addEventListener('dragleave', e=> { ap.classList.remove('drag-over'); });
+    ap.addEventListener('drop', e=> {
+      e.preventDefault(); ap.classList.remove('drag-over');
+      const fromP = parseInt(e.dataTransfer.getData('text/fromP'));
+      const fromT = parseInt(e.dataTransfer.getData('text/fromT'));
+      if(isNaN(fromP) || isNaN(fromT)) return;
+      const tab = S.notes.panes[fromP].tabs.splice(fromT, 1)[0];
+      if (S.notes.panes[fromP].activeTabId >= S.notes.panes[fromP].tabs.length) {
+        S.notes.panes[fromP].activeTabId = Math.max(0, S.notes.panes[fromP].tabs.length - 1);
+      }
+      if (S.notes.panes[fromP].tabs.length === 0) S.notes.panes.splice(fromP, 1);
+      
+      S.notes.panes.push({ activeTabId: 0, tabs: [ tab ] });
+      saveData(); renderNotesWorkspace();
+    });
+    
+    ws.appendChild(ap);
+  }
 }
 
 /* ═══════════════════════════════════
@@ -1654,18 +2422,10 @@ function renderInv(){
 
     // Category separator (always when showing multiple or all)
     if(showAll||invFilters.size>1){
+      // Category separator — apenas marca categoria, sem HTML5 drag
       const sep=document.createElement('div');
       sep.className='catsep';sep.textContent='── '+cat+' ──';
       sep.dataset.cat=cat;
-      sep.addEventListener('dragover',e=>{if(!dragSrc)return;e.preventDefault();sep.classList.add('drag-cat-over');});
-      sep.addEventListener('dragleave',()=>sep.classList.remove('drag-cat-over'));
-      sep.addEventListener('drop',e=>{
-        e.preventDefault();sep.classList.remove('drag-cat-over');
-        if(!dragSrc||dragList!=='inventory')return;
-        const from=parseInt(dragSrc.dataset.idx);
-        S.inventory[from].category=cat;
-        saveData();renderInv();
-      });
       cont.appendChild(sep);
       const items=S.inventory.filter(it=>it.category===cat);
       if(!items.length){const p=document.createElement('p');p.className='emptyn';p.textContent='(Vazio)';cont.appendChild(p);}
@@ -1754,6 +2514,15 @@ function buildEquipBody(eq,i){
     dinp.addEventListener('change',e=>{S.equipments[i].damage=e.target.value;saveData();});
     wrap.appendChild(dinp);
   }
+
+  // Passivas (colapsável, 0 ou mais entradas)
+  wrap.appendChild(_buildPassivasPanel(
+    eq.passivas,eq.passOpen,
+    open=>{S.equipments[i].passOpen=open;saveData();renderEquipments();},
+    (pi,val)=>{S.equipments[i].passivas[pi]=val;saveData();renderPassivas();},
+    (pi)=>{S.equipments[i].passivas.splice(pi,1);saveData();renderEquipments();},
+    ()=>{S.equipments[i].passivas.push('');S.equipments[i].passOpen=true;saveData();renderEquipments();}
+  ));
 
   // Description (collapsible)
   const dtog=document.createElement('button');dtog.className='desc-tog';
@@ -1858,6 +2627,15 @@ function buildSpiritBody(sp,i){
     wrap.appendChild(dinp);
   }
 
+  // Passivas (colapsável, 0 ou mais entradas)
+  wrap.appendChild(_buildPassivasPanel(
+    sp.passivas,sp.passOpen,
+    open=>{S.spirits[i].passOpen=open;saveData();renderSpirits();},
+    (pi,val)=>{S.spirits[i].passivas[pi]=val;saveData();renderPassivas();},
+    (pi)=>{S.spirits[i].passivas.splice(pi,1);saveData();renderSpirits();},
+    ()=>{S.spirits[i].passivas.push('');S.spirits[i].passOpen=true;saveData();renderSpirits();}
+  ));
+
   // Description (collapsible)
   const dtog=document.createElement('button');dtog.className='desc-tog';
   dtog.textContent=sp.descOpen?'▲ Ocultar Descrição':'▼ Descrição';
@@ -1892,7 +2670,17 @@ function buildSpiritBody(sp,i){
     const gArr=document.createElement('span');gArr.className='ab-strip-arrow';gArr.textContent='▼';
     if(grp.open)gArr.style.transform='rotate(180deg)';
     gStrip.appendChild(gArr);
-    gStrip.addEventListener('click',()=>{S.spirits[i].groups[gi].open=!grp.open;saveData();renderSpirits();});
+    gStrip.addEventListener('click',()=>{
+      // só responde a cliques reais (não a cliques sintetizados pelo sistema de drag)
+      S.spirits[i].groups[gi].open=!grp.open;saveData();renderSpirits();
+    });
+    setupGroupDrag(
+      gStrip,
+      ()=>gi,
+      ()=>S.spirits[i].groups,
+      arr=>{S.spirits[i].groups=arr;},
+      ()=>{saveData();renderSpirits();}
+    );
     grpEl.appendChild(gStrip);
 
     // Group body
@@ -2121,16 +2909,87 @@ function drawRadar(){
 }
 
 /* ══════════════════════════════════════════════════════════
-   SECTION REORDER — sidebar nav (desktop) + tabbar (mobile)
-   Mesmo sistema dos cards de inventário: pointer events,
-   segure 1,5 s para ativar o arrasto. Funciona em mouse e toque.
+   SECTION REORDER
+   Sidebar: clique+arrasto direto no handle (≡)
+   Tabbar:  long-press (mobile, comportamento original)
 ══════════════════════════════════════════════════════════ */
 function initSidebarDrag(){
-  _initNavDrag(document.getElementById('snav'), false);
-  _initNavDrag(document.querySelector('#tabbar .tbinner'), true);
+  _initSidebarNavDrag(document.getElementById('snav'));
+  _initTabbarNavDrag(document.querySelector('#tabbar .tbinner'));
 }
 
-function _initNavDrag(navEl, isTabbar){
+/* ── SIDEBAR: drag via handle — imediato ao pressionar ── */
+function _initSidebarNavDrag(navEl){
+  if(!navEl)return;
+  let dragEl=null,lastOver=null;
+
+  function links(){return[...navEl.querySelectorAll('a')];}
+
+  /* Pointerdown no handle → inicia arrasto imediatamente */
+  navEl.addEventListener('pointerdown',e=>{
+    if(!e.target.closest('.ndh'))return;
+    const a=e.target.closest('a');
+    if(!a)return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragEl=a;
+    a.classList.add('nav-dragging');
+    // Captura o pointer no navEl para que pointermove/up disparem mesmo fora do elemento
+    try{navEl.setPointerCapture(e.pointerId);}catch(_){}
+  // {passive:false} garante que preventDefault() nunca seja ignorado pelo browser
+  },{passive:false});
+
+  // {passive:false}: obrigatório para que preventDefault() bloqueie o scroll nativo
+  navEl.addEventListener('pointermove',e=>{
+    if(!dragEl)return;
+    e.preventDefault();
+    let over=null;
+    links().forEach(l=>{
+      const r=l.getBoundingClientRect();
+      if(e.clientY>=r.top&&e.clientY<=r.bottom)over=l;
+    });
+    if(over&&over!==dragEl){
+      if(over!==lastOver){
+        links().forEach(l=>l.classList.remove('drag-over-nav'));
+        over.classList.add('drag-over-nav');
+        lastOver=over;
+      }
+    } else if(!over){
+      links().forEach(l=>l.classList.remove('drag-over-nav'));
+      lastOver=null;
+    }
+  },{passive:false});
+
+  navEl.addEventListener('pointerup',e=>{
+    if(!dragEl)return;
+    let target=null;
+    links().forEach(l=>{
+      const r=l.getBoundingClientRect();
+      if(e.clientY>=r.top&&e.clientY<=r.bottom)target=l;
+    });
+    if(target&&target!==dragEl){
+      const ls=links();
+      const fi=ls.indexOf(dragEl),ti=ls.indexOf(target);
+      if(fi<ti)navEl.insertBefore(dragEl,target.nextSibling);
+      else navEl.insertBefore(dragEl,target);
+      _syncNavOrder('tabbar');
+      reorderSectionsFromNav();
+      saveSectionOrder();
+    }
+    dragEl.classList.remove('nav-dragging');
+    links().forEach(l=>l.classList.remove('drag-over-nav'));
+    dragEl=null;lastOver=null;
+  });
+
+  navEl.addEventListener('pointercancel',()=>{
+    if(dragEl)dragEl.classList.remove('nav-dragging');
+    links().forEach(l=>l.classList.remove('drag-over-nav'));
+    dragEl=null;lastOver=null;
+  });
+}
+
+/* ── TABBAR: long-press original (mobile/touch) ── */
+function _initTabbarNavDrag(navEl){
   if(!navEl)return;
   let dragEl=null,lastOver=null;
 
@@ -2159,8 +3018,7 @@ function _initNavDrag(navEl, isTabbar){
     let over=null;
     links().forEach(l=>{
       const r=l.getBoundingClientRect();
-      if(isTabbar?e.clientX>=r.left&&e.clientX<=r.right
-                 :e.clientY>=r.top&&e.clientY<=r.bottom)over=l;
+      if(e.clientX>=r.left&&e.clientX<=r.right)over=l;
     });
     if(over&&over!==dragEl&&over!==lastOver){
       links().forEach(l=>l.classList.remove('drag-over-nav'));
@@ -2175,15 +3033,14 @@ function _initNavDrag(navEl, isTabbar){
     let target=null;
     links().forEach(l=>{
       const r=l.getBoundingClientRect();
-      if(isTabbar?e.clientX>=r.left&&e.clientX<=r.right
-                 :e.clientY>=r.top&&e.clientY<=r.bottom)target=l;
+      if(e.clientX>=r.left&&e.clientX<=r.right)target=l;
     });
     if(target&&target!==dragEl){
       const ls=links();
       const fi=ls.indexOf(dragEl),ti=ls.indexOf(target);
       if(fi<ti)navEl.insertBefore(dragEl,target.nextSibling);
       else navEl.insertBefore(dragEl,target);
-      _syncNavOrder(isTabbar?'sidebar':'tabbar');
+      _syncNavOrder('sidebar');
       reorderSectionsFromNav();
       saveSectionOrder();
     }
@@ -2256,32 +3113,41 @@ function applySavedSectionOrder(){
   });
 }
 
-/* ── ABILITY REORDER via pointer events — mesmo sistema dos cards de inventário ── */
+/* ── setupAbilityDrag: mesmo sistema de threshold — clique=expandir, arrastar=reordenar ── */
 function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
-  strip.addEventListener('contextmenu',e=>e.preventDefault());
-  let dragging=false,timer=null;
+  const DRAG_PX=8;
+  let dragging=false,startX=0,startY=0,ptId=null;
+
+  strip.style.touchAction='none'; // evita scroll nativo no mobile
 
   strip.addEventListener('pointerdown',e=>{
     dragging=false;
-    timer=setTimeout(()=>{
+    startX=e.clientX;startY=e.clientY;ptId=e.pointerId;
+    try{strip.setPointerCapture(e.pointerId);}catch(_){}
+  },{passive:false});
+
+  strip.addEventListener('pointermove',e=>{
+    if(e.pointerId!==ptId)return;
+    const dx=Math.abs(e.clientX-startX),dy=Math.abs(e.clientY-startY);
+    if(!dragging&&(dx>DRAG_PX||dy>DRAG_PX)){
       dragging=true;
-      try{strip.setPointerCapture(e.pointerId);}catch(_){}
       const card=strip.closest('.ab-card');
       if(card)card.style.opacity='.4';
-    },1500);
-  });
-  strip.addEventListener('pointermove',e=>{
+    }
     if(!dragging)return;
     e.preventDefault();
-  });
+  },{passive:false});
+
   strip.addEventListener('pointerup',e=>{
-    clearTimeout(timer);
+    if(!dragging)return; // foi toque simples — o click event vai expandir/colapsar
+    e.preventDefault(); // bloqueia o click event subsequente
+    dragging=false;
     const card=strip.closest('.ab-card');
     if(card)card.style.opacity='';
-    if(!dragging)return;
-    dragging=false;
+    const wrap=strip.closest('.abilities-wrap,.ab-group-body');
+    if(!wrap)return;
+    const cards=[...wrap.querySelectorAll('.ab-card')];
     const endY=e.clientY;
-    const cards=[...strip.closest('.abilities-wrap,.ab-group-body').querySelectorAll('.ab-card')];
     let targetIdx=getIdx();
     cards.forEach((c,ci)=>{
       const r=c.getBoundingClientRect();
@@ -2293,10 +3159,65 @@ function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
       setArr(arr);rerender();
     }
   });
-  strip.addEventListener('click',()=>clearTimeout(timer));
+
   strip.addEventListener('pointercancel',()=>{
-    clearTimeout(timer);dragging=false;
-    const card=strip.closest('.ab-card');if(card)card.style.opacity='';
+    dragging=false;
+    const card=strip.closest('.ab-card');
+    if(card)card.style.opacity='';
+  });
+}
+
+/* ── setupGroupDrag: reordena grupos de habilidades no spirit ── */
+function setupGroupDrag(strip,getIdx,getArr,setArr,rerender){
+  const DRAG_PX=8;
+  let dragging=false,startX=0,startY=0,ptId=null;
+
+  strip.style.touchAction='none';
+
+  strip.addEventListener('pointerdown',e=>{
+    dragging=false;
+    startX=e.clientX;startY=e.clientY;ptId=e.pointerId;
+    try{strip.setPointerCapture(e.pointerId);}catch(_){}
+  },{passive:false});
+
+  strip.addEventListener('pointermove',e=>{
+    if(e.pointerId!==ptId)return;
+    const dx=Math.abs(e.clientX-startX),dy=Math.abs(e.clientY-startY);
+    if(!dragging&&(dx>DRAG_PX||dy>DRAG_PX)){
+      dragging=true;
+      const grp=strip.closest('.ab-group');
+      if(grp)grp.style.opacity='.4';
+    }
+    if(!dragging)return;
+    e.preventDefault();
+  },{passive:false});
+
+  strip.addEventListener('pointerup',e=>{
+    if(!dragging)return; // toque simples — o click event expande/colapsa o grupo
+    e.preventDefault(); // bloqueia o click subsequente
+    dragging=false;
+    const grp=strip.closest('.ab-group');
+    if(grp)grp.style.opacity='';
+    const wrap=strip.closest('.ab-group-wrap');
+    if(!wrap)return;
+    const groups=[...wrap.querySelectorAll('.ab-group')];
+    const endY=e.clientY;
+    let targetIdx=getIdx();
+    groups.forEach((g,gi)=>{
+      const r=g.getBoundingClientRect();
+      if(endY>=r.top&&endY<=r.bottom&&gi!==getIdx())targetIdx=gi;
+    });
+    if(targetIdx!==getIdx()){
+      const arr=getArr();
+      const[item]=arr.splice(getIdx(),1);arr.splice(targetIdx,0,item);
+      setArr(arr);rerender();
+    }
+  });
+
+  strip.addEventListener('pointercancel',()=>{
+    dragging=false;
+    const grp=strip.closest('.ab-group');
+    if(grp)grp.style.opacity='';
   });
 }
 
@@ -2304,6 +3225,17 @@ function setupAbilityDrag(strip,getIdx,getArr,setArr,rerender){
   window.addEventListener('resize',()=>drawRadar());
 
 window.onload=init;
+
+/* ═══════════════════════════════════
+   PWA SERVICE WORKER REGISTRO
+═══════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('PWA Service Worker Registrado!', reg.scope))
+      .catch(err => console.error('Falha ao registrar Service Worker', err));
+  });
+}
 </script>
 </body>
 </html>
