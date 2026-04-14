@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Problemas no Tempo â€” Ficha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <canvas id="starfield"></canvas>
+  <div id="atmo"></div>
+  <div id="scanlines"></div>
+
+  <div id="app">
+    <header id="mhdr">
+      <button class="hambtn" onclick="togMenu()" aria-label="Menu">â‰¡</button>
+      <span class="mtitle">â§– Problemas no Tempo</span>
+      <span class="mpts" id="mhdr-pts">0 pts</span>
+    </header>
+    <div id="overlay" onclick="togMenu()"></div>
+
+    <aside id="sidebar">
+      <div class="brand">
+        <span class="bmark">sys / ficha / v5</span>
+        <span class="bname">Problemas<br>no Tempo</span>
+      </div>
+      <nav id="snav"></nav>
+      <div class="sbfoot">
+        <div class="ptbox">
+          <span class="lbl">Total de Pontos</span>
+          <span class="val" id="ui-total-pts">0</span>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main">
+
+      <!-- PERSONAGEM -->
+      <div id="bd-personagem" class="sec-body">
+        <div class="sec-hd" onclick="togSec('personagem')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">Re-Timed</span><span class="sec-num">01</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-personagem" class="sec-body">
+          <div class="card char-grid">
+
+            <!-- Col 1: Photo + Radar + AparÃªncia -->
+            <div class="char-photo-col">
+              <div class="photo-wrap" onclick="document.getElementById('fileup').click()" title="Clique para alterar">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto" class="char-photo"
+                  id="ui-photo">
+                <div class="photo-edit-icon">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </div>
+              </div>
+              <!-- Radar chart â€” same width as photo, square -->
+              <div class="radar-wrap">
+                <canvas id="radar-canvas"></canvas>
+              </div>
+              <input type="file" id="fileup" style="display:none" accept="image/*" onchange="handleImg(event)">
+              <div class="frow" style="width:100%">
+                <span class="flbl">AparÃªncia</span>
+                <textarea id="ui-appearance" rows="3" oninput="saveData()"></textarea>
+              </div>
+            </div>
+
+            <!-- Col 2: Fields (name/age/etc, then fobias/corruption/HUD) -->
+            <div class="char-fields-col">
+
+              <div class="grid-fields">
+                <span class="flbl">Nome</span> <input type="text" id="ui-name" oninput="saveData()">
+                <span class="flbl">Idade</span> <input type="text" id="ui-age" oninput="saveData()">
+                <span class="flbl">Nac.</span> <input type="text" id="ui-nationality" oninput="saveData()">
+                <span class="flbl">ProfissÃ£o</span> <input type="text" id="ui-profession" oninput="saveData()">
+                <span class="flbl">Ano</span> <input type="text" id="ui-year" oninput="saveData()">
+              </div>
+              <div class="frow">
+                <span class="flbl">Fobias / ObsessÃµes</span>
+                <textarea id="ui-phobias" rows="2" oninput="saveData()"></textarea>
+              </div>
+              <div class="corr-row">
+                <span class="corr-lbl">CorrupÃ§Ã£o</span>
+                <div class="corr-squares" id="ui-corruption"></div>
+              </div>
+              <div id="vhud-container" class="vhud"></div>`r`n              <div class="ql">
+                <button class="blink"
+                  onclick="window.open('https://www.owlbear.rodeo/room/jcxE-N8n8e0y/TheDirtyProse','_blank')">âš”
+                  MESA</button>
+                <button class="blink"
+                  onclick="window.open('https://1drv.ms/w/c/0b399d772d6e79ec/EUv3R3JWXKFIogpO1ougPwEBG70m6z4AzvhfUKwJTVgiyQ?e=lhKWi0','_blank')">â–¤
+                  LIVRO</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PERÃCIAS -->
+      <div id="bd-pericias" class="sec-body">
+        <div class="sec-hd" onclick="togSec('pericias')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">PerÃ­cias</span><span class="sec-num">02</span>
+            <button class="sk-info-btn" id="sk-info-toggle" onclick="event.stopPropagation(); togSkInfo()"
+              title="Regras de desenvolvimento">â“˜</button>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-pericias" class="sec-body">
+          <div class="sk-info-panel" id="sk-info-panel">
+            <div class="sk-info-inner">
+              <div class="sk-info-title">Sistema de Desenvolvimento</div>
+              <p class="sk-info-sub">Para evoluir +5 pontos em uma perÃ­cia, preencha os pontos baseando-se no seu nÃ­vel
+                atual:</p>
+              <ul class="sk-info-list">
+                <li><span>AtÃ© o nÃ­vel <strong>99</strong>: 3 sucessos extremos no mesmo teste.</span></li>
+                <li><span>NÃ­vel <strong>100 a 124</strong>: 5 sucessos extremos em testes de sessÃµes diferentes.</span>
+                </li>
+                <li><span>NÃ­vel <strong>125 a 139</strong>: 3 sucessos extremos em 2 sessÃµes seguidas.</span></li>
+                <li><span>NÃ­vel <strong>140 a 149</strong>: 5 sucessos extremos (na mesma sessÃ£o) seguidos de uma
+                    ProvaÃ§Ã£o.</span></li>
+                <li><span>NÃ­vel <strong>150</strong>: NÃ­vel mÃ¡ximo alcanÃ§ado.</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="g2" id="ui-skills-container"></div>
+        </div>
+      </div>
+
+      <!-- MODIFICADORES -->
+      <div id="bd-modificadores" class="sec-body">
+        <div class="sec-hd" onclick="togSec('modificadores')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">Modificadores</span><span class="sec-num">03</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-modificadores" class="sec-body">
+          <div class="mod-list" id="ui-mod-list"></div>
+        </div>
+      </div>
+
+      <!-- ANOTAÃ‡Ã•ES -->
+      <div id="bd-anotacoes" class="sec-body">
+        <div class="sec-hd" onclick="togSec('anotacoes')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">AnotaÃ§Ãµes</span><span class="sec-num">04</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div class="sec-body" id="bd-anotacoes">
+          <textarea id="ui-notes" class="fta" oninput="saveData()"
+            placeholder="Pistas, contatos, segredos..."></textarea>
+        </div>
+      </div>
+
+      <!-- TRAÃ‡OS -->
+      <div id="bd-tracos" class="sec-body">
+        <div class="sec-hd" onclick="togSec('tracos')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">TraÃ§os</span><span class="sec-num">05</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-tracos" class="sec-body">
+          <div class="lc"><button class="add-btn" onclick="addDyn('traits')" title="Adicionar TraÃ§o">+</button></div>
+          <div id="ui-traits-list" class="igrid"></div>
+        </div>
+      </div>
+
+      <!-- INVENTÃRIO -->
+      <div id="bd-inventario" class="sec-body">
+        <div class="sec-hd" onclick="togSec('inventario')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">InventÃ¡rio</span><span class="sec-num">06</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-inventario" class="sec-body">
+          <div class="lc" id="invfilt">
+            <button class="fbtn on" data-f="Todos" onclick="setF('Todos')">Todos</button>
+            <button class="fbtn" data-f="Mochila" onclick="setF('Mochila')">Mochila</button>
+            <button class="fbtn" data-f="Equipamentos" onclick="setF('Equipamentos')">Equip.</button>
+            <button class="fbtn" data-f="ConsumÃ­veis" onclick="setF('ConsumÃ­veis')">Cons.</button>
+            <button class="fbtn" data-f="Utilidades" onclick="setF('Utilidades')">Util.</button>
+          </div>
+          <div class="lc"><button class="add-btn" onclick="addInv()" title="Adicionar Item">+</button></div>
+          <div id="ui-inv-list" class="igrid"></div>
+        </div>
+      </div>
+
+      <!-- EQUIPAMENTOS -->
+      <div id="bd-equipamentos" class="sec-body">
+        <div class="sec-hd" onclick="togSec('equipamentos')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">Equipamentos Especiais</span><span
+              class="sec-num">07</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-equipamentos" class="sec-body">
+          <div class="lc"><button class="add-btn" onclick="addEquip()" title="Adicionar Equipamento">+</button></div>
+          <div id="ui-equipments-list" class="igrid"></div>
+        </div>
+      </div>
+
+      <!-- ESPÃRITOS -->
+      <div id="bd-espiritos" class="sec-body">
+        <div class="sec-hd" onclick="togSec('espiritos')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">EspÃ­ritos</span><span class="sec-num">08</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div id="bd-espiritos" class="sec-body">
+          <div class="lc"><button class="add-btn" onclick="addSpirit()" title="Adicionar EspÃ­rito">+</button></div>
+          <div id="ui-spirits-list" class="igrid"></div>
+        </div>
+      </div>
+
+      <!-- HISTÃ“RICO -->
+      <div id="bd-historico" class="sec-body">
+        <div class="sec-hd" onclick="togSec('historico')">
+          <div class="sec-hd-l">
+            <div class="sec-bar"></div><span class="sec-title">HistÃ³rico</span><span class="sec-num">09</span>
+          </div>
+          <span class="sec-arr">â–¼</span>
+        </div>
+        <div class="sec-body" id="bd-historico">
+          <textarea id="ui-history" class="fta" oninput="saveData()"
+            placeholder="A histÃ³ria do personagem..."></textarea>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- #app -->
+
+  <nav id="tabbar">
+    <div class="tbinner" id="tabbar-inner"></div>
+  </nav>
+
+  <!-- D100 TOOLTIP -->
+  <div id="tt">
+    <div class="ttl td">Desastre</div>
+    <div class="ttv td" id="tt-d"></div>
+    <div class="ttl tf">Fracasso</div>
+    <div class="ttv tf" id="tt-f"></div>
+    <div class="ttl ts">Sucesso</div>
+    <div class="ttv ts" id="tt-s"></div>
+    <div class="ttl tb">Bom</div>
+    <div class="ttv tb" id="tt-b"></div>
+    <div class="ttl te">Extremo</div>
+    <div class="ttv te" id="tt-e"></div>
+  </div>
+
+  <!-- FAB â€” gear icon -->
+  <div class="fabwrap" id="fab">
+    <div class="fabmenu">
+      <button class="fopt" onclick="trigLoad()">[ CARREGAR .JSON ]</button>
+      <button class="fopt" onclick="saveFile()">[ SALVAR .JSON ]</button>
+      <button class="fopt" onclick="window.print()">[ PDF / IMPRIMIR ]</button>
+      <div class="fdiv"></div>
+      <button class="paltog" onclick="togPal(event)"><span>[ TEMA ]</span><span class="palchev"
+          id="palchev">â–¼</span></button>
+      <div class="palgrid" id="ui-pal"></div>
+    </div>
+    <!-- Gear SVG icon -->
+    <button class="bp fabmain" onclick="togFab()" title="OpÃ§Ãµes">âš™</button>
+  </div>
+
+  <input type="file" id="file-load" accept=".json,application/json,text/plain,text/*"
+    style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0" onchange="loadFile(event)">
+
+  <script src="main.js"></script>
+</body>
+
+</html>
+
+
