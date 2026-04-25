@@ -3080,6 +3080,18 @@
         display: none !important
       }
     }
+    
+    /* ── DONATION MODAL SCROLLBAR ── */
+    .modal-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-scroll::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .modal-scroll::-webkit-scrollbar-thumb {
+      background: var(--acc);
+      border-radius: 4px;
+    }
   </style>
 </head>
 
@@ -3098,7 +3110,7 @@
 
     <aside id="sidebar">
       <div class="brand">
-        <span class="bmark">SYS // PNT-CORE v34</span>
+        <span class="bmark">SYS // PNT-CORE v41</span>
         <span class="bname">Problemas<br>no Tempo</span>
       </div>
       <nav id="snav">
@@ -5655,6 +5667,23 @@
     // Redraw radar when window resizes
     window.addEventListener('resize', () => drawRadar());
 
+    window.addEventListener('DOMContentLoaded', () => {
+      const donationModal = document.getElementById('donation-modal');
+      const closeDonationBtn = document.getElementById('close-donation');
+      
+      if (donationModal && closeDonationBtn) {
+        closeDonationBtn.addEventListener('click', () => {
+          donationModal.style.display = 'none';
+        });
+        
+        donationModal.addEventListener('click', (e) => {
+          if (e.target === donationModal) {
+            donationModal.style.display = 'none';
+          }
+        });
+      }
+    });
+
     window.onload = init;
 
     /* ═══════════════════════════════════
@@ -5678,6 +5707,96 @@
       <div style="display:flex;gap:12px;justify-content:center;">
         <button id="custom-confirm-btn-cancel" style="flex:1;">CANCELAR</button>
         <button id="custom-confirm-btn-ok" class="bp" style="flex:1;">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Doação -->
+  <div id="donation-modal"
+    style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10001;align-items:center;justify-content:center;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);padding:20px;">
+    <div class="donation-box"
+      style="background:var(--bg1);border:1px solid var(--acc);border-radius:var(--r);max-width:550px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.9),0 0 20px var(--acc-glow);position:relative;overflow:hidden;display:flex;flex-direction:column;max-height:90vh;">
+      
+      <!-- Header banner -->
+      <div style="background:var(--acc-dim);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.4rem;color:var(--acc);line-height:1;">⚠</span>
+        <span style="font-family:var(--mono);font-weight:bold;color:var(--acc);letter-spacing:0.1em;font-size:1.1rem;text-transform:uppercase;">IMPORTANTE!!!</span>
+        <button id="close-donation" style="margin-left:auto;width:32px;height:32px;min-height:32px;padding:0;background:transparent;border:none;color:var(--text);font-size:2rem;line-height:0.8;cursor:pointer;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.color='var(--acc)'" onmouseout="this.style.color='var(--text)'">&times;</button>
+      </div>
+
+      <div class="modal-scroll" style="padding:24px 30px;overflow-y:auto;">
+        
+        <!-- Title -->
+        <div style="text-align:center;margin-bottom:20px;">
+          <h2 style="font-family:var(--sans);color:var(--text);font-size:1.4rem;letter-spacing:0.05em;text-transform:uppercase;margin:0;">
+            <span style="color:var(--acc);margin-right:8px;">⧖</span> O FUTURO DO PROJETO
+          </h2>
+        </div>
+
+        <!-- Text -->
+        <p style="color:var(--text);font-size:1rem;line-height:1.6;margin-bottom:20px;text-align:justify;">
+          Olá! Esta ficha foi fruto de muita dedicação e esforço. Alcançar nossa primeira meta de doações é um reconhecimento vital desse trabalho e servirá para cobrir os custos de produção e manutenção desta versão.
+        </p>
+
+        <!-- Highlighted text -->
+        <div style="border-left:3px solid var(--acc);padding-left:16px;margin:0 0 20px 0;background:var(--acc-dim);padding:14px 16px;border-radius:0 var(--r) var(--r) 0;">
+          <p style="color:var(--text);font-size:0.95rem;line-height:1.6;margin:0;">
+            Se ultrapassarmos essa meta inicial com um apoio maior, o projeto poderá escalar para uma plataforma online completa, com novas funcionalidades e sincronização em tempo real.
+          </p>
+        </div>
+
+        <!-- Quote -->
+        <p style="color:var(--acc);font-style:italic;text-align:center;font-size:1.05rem;margin-bottom:28px;">
+          "Se você gostou do que está sendo apresentado, considere apoiar com uma doação de qualquer valor."
+        </p>
+
+        <!-- Progress Section -->
+        <div style="margin-bottom:30px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.85rem;color:var(--text);margin-bottom:8px;text-transform:uppercase;">
+            <span>Arrecadado: <strong style="color:var(--acc);">R$ 0</strong></span>
+            <span>Meta Online: <strong style="color:var(--text);">R$ 600</strong></span>
+          </div>
+          
+          <!-- Progress bar -->
+          <div style="position:relative;height:16px;background:rgba(0,0,0,0.6);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px;">
+            <!-- Fill -->
+            <div style="position:absolute;top:0;left:0;height:100%;width:0%;background:linear-gradient(90deg, #005544, var(--acc));box-shadow:0 0 10px var(--acc-glow);"></div>
+            <!-- Milestone Marker: Manutenção -->
+            <div style="position:absolute;top:0;left:50%;height:100%;width:2px;background:var(--text);opacity:0.5;"></div>
+          </div>
+
+          <!-- Labels under progress bar -->
+          <div style="position:relative;height:30px;font-family:var(--mono);font-size:0.75rem;color:var(--muted);">
+            <div style="position:absolute;left:0;text-align:left;">R$ 0</div>
+            <div style="position:absolute;left:50%;transform:translateX(-50%);text-align:center;">
+              <span style="color:var(--text);">R$ 300</span><br>
+              <span style="font-size:0.65rem;">(MANUTENÇÃO)</span>
+            </div>
+            <div style="position:absolute;right:0;text-align:right;">
+              <span style="color:var(--text);">R$ 600+</span><br>
+              <span style="font-size:0.65rem;">(ONLINE)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:16px;">
+          <!-- QR Code Image -->
+          <div style="border:2px solid var(--acc);border-radius:var(--r);padding:10px;background:var(--bg2);margin-bottom:16px;box-shadow:0 0 15px var(--acc-glow);">
+            <img src="img/QR_Code.jpeg" alt="QR Code Pix" style="width:200px;height:200px;display:block;border-radius:4px;object-fit:contain;">
+          </div>
+          <!-- Pix Copy Button -->
+          <button class="bp" style="width:100%;padding:14px;font-size:1.1rem;letter-spacing:0.1em;box-shadow:0 0 15px var(--acc-glow);border-radius:var(--r);display:flex;align-items:center;justify-content:center;gap:8px;" onclick="navigator.clipboard.writeText('00020101021126580014br.gov.bcb.pix01365e3b2eb2-bb74-4597-9b21-3470047321375204000053039865802BR5920ALISSON A N DE SOUZA6011PETROLANDIA62070503***6304E83E').then(() => { const btn = this; const orig = btn.innerHTML; btn.innerHTML = 'CHAVE COPIADA! ✓'; setTimeout(() => btn.innerHTML = orig, 2000); })">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            COPIAR CHAVE PIX
+          </button>
+        </div>
+
+        <!-- Footer text -->
+        <div style="text-align:center;font-family:var(--sans);font-size:0.85rem;color:var(--muted);letter-spacing:0.05em;">
+          Sua ajuda mantém o tempo em ordem.
+        </div>
+
       </div>
     </div>
   </div>
