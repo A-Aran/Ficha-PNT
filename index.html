@@ -2882,12 +2882,14 @@
       }
 
       .photo-wrap {
-        width: 140px;
+        width: 240px;
+        max-width: 100%;
         flex-shrink: 0
       }
 
       .radar-wrap {
-        width: 140px
+        width: 240px;
+        max-width: 100%;
       }
 
       /* same width as photo, square via aspect-ratio */
@@ -5172,7 +5174,7 @@
       if (!wrap) return;
 
       // Use wrapper's actual pixel size (it's square via aspect-ratio:1/1)
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.max(2, window.devicePixelRatio || 1);
       const cssW = wrap.clientWidth || wrap.offsetWidth || 200;
       const cssH = wrap.clientHeight || wrap.offsetHeight || cssW; // should be square
       canvas.style.width = cssW + 'px';
@@ -5201,7 +5203,7 @@
       const labels = ['Físicas', 'Práticas', 'Sociais', 'Condução', 'Conhec.', 'Invest.', 'Específ.'];
       const N = cats.length;
       const cx = W / 2, cy = H / 2;
-      const maxR = Math.min(W, H) / 2 - 28;
+      const maxR = Math.min(W, H) / 2 - 44;
       const maxVal = 150;
       const ringSteps = [30, 60, 90, 120, 150];
 
@@ -5214,6 +5216,8 @@
 
       const style = getComputedStyle(document.documentElement);
       const acc = (style.getPropertyValue('--acc') || '#00e5c8').trim();
+      const fSans = (style.getPropertyValue('--sans') || 'sans-serif').trim();
+      const fMono = (style.getPropertyValue('--mono') || 'monospace').trim();
       function hexRgb(h) {
         h = h.replace('#', '');
         if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
@@ -5242,8 +5246,8 @@
         ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1; ctx.stroke();
         // ring value label
         const fs = Math.max(7, Math.round(W / 30));
-        ctx.fillStyle = 'rgba(255,255,255,.35)';
-        ctx.font = `${fs}px monospace`;
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.font = `${fs}px ${fMono}`;
         ctx.textAlign = 'left';
         ctx.fillText(step, cx + 4, cy - r + fs * 0.4);
       });
@@ -5272,7 +5276,7 @@
 
       // Labels
       const fs = Math.max(9, Math.round(W / 20));
-      ctx.font = `600 ${fs}px sans-serif`;
+      ctx.font = `600 ${fs}px ${fSans}`;
       ctx.textAlign = 'center';
       labels.forEach((lbl, i) => {
         const p = pt(i, maxR + fs + 5);
