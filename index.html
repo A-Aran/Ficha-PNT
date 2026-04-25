@@ -83,6 +83,8 @@
     }
 
     body {
+      margin: 0;
+      padding: 0;
       font-family: var(--sans);
       font-size: 16px;
       font-weight: 400;
@@ -90,7 +92,7 @@
       background: var(--bg);
       min-height: 100vh;
       overflow-x: hidden;
-      line-height: 1.5
+      line-height: 1.5;
     }
 
     a {
@@ -1232,6 +1234,7 @@
       transition: background .15s;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none;
       position: relative;
     }
 
@@ -2842,6 +2845,12 @@
 
     /* ── MOBILE ── */
     @media(max-width:767px) {
+      /* Evita zoom automático do navegador (iOS/Android) ao focar campos */
+      input, textarea, select { font-size: 16px !important; }
+
+      /* Esconder total de pontos no sidebar mobile */
+      .ptbox { display: none !important; }
+
       #mhdr {
         display: flex
       }
@@ -3089,7 +3098,7 @@
 
     <aside id="sidebar">
       <div class="brand">
-        <span class="bmark">sys / ficha / v5</span>
+        <span class="bmark">SYS // PNT-CORE v34</span>
         <span class="bname">Problemas<br>no Tempo</span>
       </div>
       <nav id="snav">
@@ -3441,13 +3450,8 @@
     <button class="bp fabmain b-edit" id="btn-tog-edit" onclick="togEditMenu()" title="Modo Edição Parcial">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
-        <!-- document base -->
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <!-- paintbrush diagonal -->
-        <line x1="10" y1="18" x2="17" y2="11" />
-        <polyline points="17 11 19 9 17 7 15 9 17 11" />
-        <line x1="10" y1="18" x2="9" y2="19" />
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <path d="M20 4a2.121 2.121 0 0 1 3 3L15 15l-3 1 1-3L20 4z" />
       </svg>
     </button>
   </div>
@@ -4280,108 +4284,110 @@
 
     /* ── setupCardDrag: pointer events com threshold — clique=expandir, arrastar=reordenar ── */
     function setupCardDrag(card, list, idx) {
-      const strip = card.querySelector('.ibar-strip');
-      if (!strip) return;
+      const strips = card.querySelectorAll('.ibar-strip, .ibar-top-strip');
+      if (!strips.length) return;
       card.dataset.idx = idx; card.dataset.list = list;
 
       const DRAG_PX = 8; // pixels de movimento para ativar o drag
       let dragging = false, startX = 0, startY = 0, ptId = null;
       let dragTimer = null, dragReady = false;
 
-      strip.addEventListener('pointerdown', e => {
-        dragging = false; dragReady = false;
-        startX = e.clientX; startY = e.clientY; ptId = e.pointerId;
-        if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-          dragTimer = setTimeout(() => { dragReady = true; if (navigator.vibrate) navigator.vibrate(40); try { strip.setPointerCapture(e.pointerId); } catch (_) { } }, 300);
-        } else {
-          dragReady = true;
-          try { strip.setPointerCapture(e.pointerId); } catch (_) { }
-        }
-      }, { passive: false });
-
-      strip.addEventListener('pointermove', e => {
-        if (e.pointerId !== ptId) return;
-        const dx = Math.abs(e.clientX - startX), dy = Math.abs(e.clientY - startY);
-        if (!dragReady) {
-          if (dx > DRAG_PX || dy > DRAG_PX) { clearTimeout(dragTimer); ptId = null; }
-          return;
-        }
-        if (!dragging && (dx > DRAG_PX || dy > DRAG_PX)) {
-          dragging = true;
-          dragSrc = card; dragList = list; dragCat = null;
-          card.classList.add('dragging');
-        }
-        if (!dragging) return;
-        e.preventDefault();
-        // Feedback visual: limpa todos e marca o alvo atual
-        document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c => {
-          c.classList.remove('drag-over', 'drag-cat-over');
-        });
-        const over = _findCardAt(card, e.clientY);
-        if (over) { over.classList.add('drag-over'); }
-        else if (list === 'inventory') { const sep = _findCatSepAt(e.clientY); if (sep) sep.classList.add('drag-cat-over'); }
-      }, { passive: false });
-
-      strip.addEventListener('pointerup', e => {
-        clearTimeout(dragTimer);
-        if (!dragReady && !dragging) { dragSrc = null; return; } // foi clique simples — o click event vai expandir
-        if (!dragging) { dragSrc = null; return; }
-        e.preventDefault(); // bloqueia o click event subsequente
-        dragging = false;
-        card.classList.remove('dragging');
-        document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c => {
-          c.classList.remove('drag-over', 'drag-cat-over');
-        });
-        // 1º tenta soltar em outro card
-        const target = _findCardAt(card, e.clientY);
-        if (target) {
-          const from = parseInt(card.dataset.idx), to = parseInt(target.dataset.idx);
-          const srcList = card.dataset.list, tgtList = target.dataset.list;
-          if (srcList !== 'inventory' || tgtList !== 'inventory') {
-            let arrFrom = null, arrTo = null;
-            if (srcList.startsWith('notes-') && tgtList.startsWith('notes-')) {
-              arrFrom = _getListArr(srcList); arrTo = _getListArr(tgtList);
-            } else if (srcList === tgtList && !srcList.startsWith('notes-')) {
-              arrFrom = S[srcList]; arrTo = S[srcList];
-            } else {
-              dragSrc = null; return;
-            }
-
-            const [item] = arrFrom.splice(from, 1);
-            arrTo.splice(to, 0, item);
-
-            saveData();
-            _renderList(srcList);
-            if (srcList !== tgtList) _renderList(tgtList);
+      strips.forEach(strip => {
+        strip.addEventListener('pointerdown', e => {
+          dragging = false; dragReady = false;
+          startX = e.clientX; startY = e.clientY; ptId = e.pointerId;
+          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+            dragTimer = setTimeout(() => { dragReady = true; if (navigator.vibrate) navigator.vibrate(40); try { strip.setPointerCapture(e.pointerId); } catch (_) { } }, 300);
           } else {
-            const srcCat = S.inventory[from]?.category, tgtCat = S.inventory[to]?.category;
-            if (srcCat === tgtCat) {
-              const [item] = S.inventory.splice(from, 1); S.inventory.splice(to, 0, item);
-            } else {
-              S.inventory[from].category = tgtCat;
-              const [item] = S.inventory.splice(from, 1); S.inventory.splice(to, 0, item);
-            }
-            saveData(); renderInv();
+            dragReady = true;
+            try { strip.setPointerCapture(e.pointerId); } catch (_) { }
           }
-          dragSrc = null; return;
-        }
-        // 2º tenta soltar em um separador de categoria (inventario)
-        if (list === 'inventory') {
-          const sep = _findCatSepAt(e.clientY);
-          if (sep) {
-            const from = parseInt(card.dataset.idx);
-            S.inventory[from].category = sep.dataset.cat;
-            saveData(); renderInv();
-          }
-        }
-        dragSrc = null;
-      });
+        }, { passive: false });
 
-      strip.addEventListener('pointercancel', () => {
-        clearTimeout(dragTimer);
-        dragging = false; card.classList.remove('dragging');
-        document.querySelectorAll('.icard.drag-over').forEach(c => c.classList.remove('drag-over'));
-        dragSrc = null;
+        strip.addEventListener('pointermove', e => {
+          if (e.pointerId !== ptId) return;
+          const dx = Math.abs(e.clientX - startX), dy = Math.abs(e.clientY - startY);
+          if (!dragReady) {
+            if (dx > DRAG_PX || dy > DRAG_PX) { clearTimeout(dragTimer); ptId = null; }
+            return;
+          }
+          if (!dragging && (dx > DRAG_PX || dy > DRAG_PX)) {
+            dragging = true;
+            dragSrc = card; dragList = list; dragCat = null;
+            card.classList.add('dragging');
+          }
+          if (!dragging) return;
+          e.preventDefault();
+          // Feedback visual: limpa todos e marca o alvo atual
+          document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c => {
+            c.classList.remove('drag-over', 'drag-cat-over');
+          });
+          const over = _findCardAt(card, e.clientY);
+          if (over) { over.classList.add('drag-over'); }
+          else if (list === 'inventory') { const sep = _findCatSepAt(e.clientY); if (sep) sep.classList.add('drag-cat-over'); }
+        }, { passive: false });
+
+        strip.addEventListener('pointerup', e => {
+          clearTimeout(dragTimer);
+          if (!dragReady && !dragging) { dragSrc = null; return; } // foi clique simples — o click event vai expandir
+          if (!dragging) { dragSrc = null; return; }
+          e.preventDefault(); // bloqueia o click event subsequente
+          dragging = false;
+          card.classList.remove('dragging');
+          document.querySelectorAll('.icard.drag-over,.catsep.drag-cat-over').forEach(c => {
+            c.classList.remove('drag-over', 'drag-cat-over');
+          });
+          // 1º tenta soltar em outro card
+          const target = _findCardAt(card, e.clientY);
+          if (target) {
+            const from = parseInt(card.dataset.idx), to = parseInt(target.dataset.idx);
+            const srcList = card.dataset.list, tgtList = target.dataset.list;
+            if (srcList !== 'inventory' || tgtList !== 'inventory') {
+              let arrFrom = null, arrTo = null;
+              if (srcList.startsWith('notes-') && tgtList.startsWith('notes-')) {
+                arrFrom = _getListArr(srcList); arrTo = _getListArr(tgtList);
+              } else if (srcList === tgtList && !srcList.startsWith('notes-')) {
+                arrFrom = S[srcList]; arrTo = S[srcList];
+              } else {
+                dragSrc = null; return;
+              }
+
+              const [item] = arrFrom.splice(from, 1);
+              arrTo.splice(to, 0, item);
+
+              saveData();
+              _renderList(srcList);
+              if (srcList !== tgtList) _renderList(tgtList);
+            } else {
+              const srcCat = S.inventory[from]?.category, tgtCat = S.inventory[to]?.category;
+              if (srcCat === tgtCat) {
+                const [item] = S.inventory.splice(from, 1); S.inventory.splice(to, 0, item);
+              } else {
+                S.inventory[from].category = tgtCat;
+                const [item] = S.inventory.splice(from, 1); S.inventory.splice(to, 0, item);
+              }
+              saveData(); renderInv();
+            }
+            dragSrc = null; return;
+          }
+          // 2º tenta soltar em um separador de categoria (inventario)
+          if (list === 'inventory') {
+            const sep = _findCatSepAt(e.clientY);
+            if (sep) {
+              const from = parseInt(card.dataset.idx);
+              S.inventory[from].category = sep.dataset.cat;
+              saveData(); renderInv();
+            }
+          }
+          dragSrc = null;
+        });
+
+        strip.addEventListener('pointercancel', () => {
+          clearTimeout(dragTimer);
+          dragging = false; card.classList.remove('dragging');
+          document.querySelectorAll('.icard.drag-over').forEach(c => c.classList.remove('drag-over'));
+          dragSrc = null;
+        });
       });
     }
 
@@ -4481,7 +4487,7 @@
 
       /* ── TOP COLLAPSE STRIP (visible only when open, collapses card) ── */
       const topStrip = document.createElement('div'); topStrip.className = 'ibar-top-strip';
-      const topArrow = document.createElement('span'); topArrow.className = 'ibar-top-strip-arrow'; topArrow.textContent = '▼';
+      const topArrow = document.createElement('span'); topArrow.className = 'ibar-top-strip-arrow'; topArrow.textContent = '/// ▼ ///';
       topStrip.appendChild(topArrow);
       topStrip.addEventListener('click', () => {
         const arr = _getListArr(list);
@@ -4540,7 +4546,7 @@
       const strip = document.createElement('div'); strip.className = 'ibar-strip';
       strip.title = 'Clique para expandir · Arraste para mover';
       const stripIcon = document.createElement('span'); stripIcon.className = 'ibar-strip-icon'; stripIcon.textContent = '= =';
-      const stripArrow = document.createElement('span'); stripArrow.className = 'ibar-strip-arrow'; stripArrow.textContent = '▼';
+      const stripArrow = document.createElement('span'); stripArrow.className = 'ibar-strip-arrow'; stripArrow.textContent = '/// ▼ ///';
       strip.appendChild(stripIcon); strip.appendChild(stripArrow);
 
       strip.addEventListener('click', () => {
@@ -4935,7 +4941,7 @@
 
         // Strip — expand toggle + pointer drag to reorder
         const abStrip = document.createElement('div'); abStrip.className = 'ab-strip';
-        const abArr = document.createElement('span'); abArr.className = 'ab-strip-arrow'; abArr.textContent = '▼';
+        const abArr = document.createElement('span'); abArr.className = 'ab-strip-arrow'; abArr.textContent = '/// ▼ ///';
         if (ab.open) abArr.style.transform = 'rotate(180deg)';
         abStrip.appendChild(abArr);
         abStrip.addEventListener('click', e => {
@@ -5042,7 +5048,7 @@
         ghd.appendChild(gname); ghd.appendChild(gdel); grpEl.appendChild(ghd);
 
         const gStrip = document.createElement('div'); gStrip.className = 'ab-group-strip';
-        const gArr = document.createElement('span'); gArr.className = 'ab-strip-arrow'; gArr.textContent = '▼';
+        const gArr = document.createElement('span'); gArr.className = 'ab-strip-arrow'; gArr.textContent = '/// ▼ ///';
         if (grp.open) gArr.style.transform = 'rotate(180deg)';
         gStrip.appendChild(gArr);
         gStrip.addEventListener('click', () => {
@@ -5078,7 +5084,7 @@
           requestAnimationFrame(() => autoResize(abDesc));
 
           const abStrip = document.createElement('div'); abStrip.className = 'ab-strip';
-          const abArr = document.createElement('span'); abArr.className = 'ab-strip-arrow'; abArr.textContent = '▼';
+          const abArr = document.createElement('span'); abArr.className = 'ab-strip-arrow'; abArr.textContent = '/// ▼ ///';
           if (ab.open) abArr.style.transform = 'rotate(180deg)';
           abStrip.appendChild(abArr);
           abStrip.addEventListener('click', e => {
@@ -5454,6 +5460,9 @@
         const sec = document.getElementById(id);
         if (sec) main.appendChild(sec);
       });
+      // Mover o footer para o final
+      const footer = main.querySelector('.site-footer');
+      if (footer) main.appendChild(footer);
       // Update scroll spy
       scrollSpy();
     }
@@ -5488,6 +5497,9 @@
         const sec = document.getElementById(id);
         if (sec) main.appendChild(sec);
       });
+      // Mover o footer para o final
+      const footer = main.querySelector('.site-footer');
+      if (footer) main.appendChild(footer);
     }
 
     /* ── setupAbilityDrag: mesmo sistema de threshold — clique=expandir, arrastar=reordenar ── */
