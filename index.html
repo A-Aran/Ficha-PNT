@@ -3658,7 +3658,19 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `PNT_Pacote_${Date.now()}.json`;
+
+      let filename = `PNT_Pacote_${Date.now()}.json`;
+      if (data.items.length === 1) {
+        const obj = data.items[0].data;
+        let cName = (obj.name || obj.title || obj.desc || 'Card').trim();
+        if (cName.length > 30) cName = cName.substring(0, 30).trim();
+        cName = cName.replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_');
+        if (cName) filename = `${cName}_Card_PNT.json`;
+      } else if (data.items.length > 1) {
+        filename = `Pacote_${data.items.length}_Cards_PNT.json`;
+      }
+      
+      a.download = filename;
       a.click();
 
       togEditMenu();
@@ -3805,7 +3817,11 @@
     function saveFile() {
       const b = new Blob([JSON.stringify(S)], { type: 'application/json' });
       const u = URL.createObjectURL(b), a = document.createElement('a');
-      a.href = u; a.download = 'ficha_retimed.json'; document.body.appendChild(a); a.click();
+      
+      let cName = (S.charName || 'Ficha').trim().replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_');
+      if (!cName) cName = 'Ficha';
+      
+      a.href = u; a.download = `${cName}_Ficha_PNT.json`; document.body.appendChild(a); a.click();
       setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 300);
       document.getElementById('fab').classList.remove('open');
     }
