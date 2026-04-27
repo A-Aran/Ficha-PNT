@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pnt-ficha-v44';
+const CACHE_NAME = 'pnt-ficha-v46';
 
 // Os arquivos em si não mudam com o salvamento do usuário local
 const ASSETS_TO_CACHE = [

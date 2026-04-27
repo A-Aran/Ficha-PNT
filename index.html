@@ -3589,7 +3589,7 @@
       skillProgress: {} /* {"Cat|sk": dotsFilled} */
     };
     /* Default item shapes */
-    function newTrait() { return { name: 'Novo Traço', desc: '', expanded: false } }
+    function newTrait() { return { name: 'Novo Traço', desc: '', passivas: [], passOpen: false, expanded: false } }
     function newInvItem(cat) { return { name: 'Novo Item', category: cat || 'Mochila', qty: 1, desc: '', damage: '', defeito: '', alcance: '', usoPorRodada: '', expanded: false } }
     function newEquip() { return { name: 'Novo Equipamento', element: '', desc: '', descOpen: true, damage: '', dmgOpen: false, defeito: '', alcance: '', usoPorRodada: '', passivas: [], passOpen: false, abilities: [], expanded: false } }
     function newSpirit() { return { name: 'Novo Espírito', element: '', desc: '', descOpen: true, passivas: [], passOpen: false, groups: [], expanded: false, damage: '', dmgOpen: false } }
@@ -4448,7 +4448,27 @@
     function renderDyn(list) {
       const cont = document.getElementById('ui-' + list + '-list'); cont.innerHTML = '';
       S[list].forEach((item, i) => {
-        const card = mkBaseCard(item, i, list, { hasDesc: true, hasQty: false });
+        const extraBodyFn = list === 'traits' ? () => {
+          const wrap = document.createElement('div');
+          if (!item.passivas) {
+            item.passivas = [];
+            item.passOpen = false;
+          }
+          wrap.appendChild(_buildPassivasPanel(
+            item.passivas, item.passOpen,
+            open => { S[list][i].passOpen = open; saveData(); renderDyn(list); },
+            (pi, val) => { S[list][i].passivas[pi] = val; saveData(); renderPassivas(); },
+            (pi) => { S[list][i].passivas.splice(pi, 1); saveData(); renderDyn(list); },
+            () => { S[list][i].passivas.push(''); S[list][i].passOpen = true; saveData(); renderDyn(list); }
+          ));
+          return wrap;
+        } : undefined;
+
+        const card = mkBaseCard(item, i, list, {
+          hasDesc: true,
+          hasQty: false,
+          extraBody: extraBodyFn
+        });
         cont.appendChild(card); setupCardDrag(card, list, i);
       });
     }
@@ -4467,6 +4487,7 @@
     function mkBaseCard(item, i, list, opts = {}) {
       const card = document.createElement('div');
       card.className = 'icard' + (item.expanded ? ' open' : '');
+      card.id = 'card-' + list + '-' + i;
 
       /* ── TOP BAR: name + qty + del ── */
       const bar = document.createElement('div'); bar.className = 'ibar';
@@ -4626,6 +4647,16 @@
       return wrap;
     }
 
+    function scrollToCard(list, i) {
+      const el = document.getElementById('card-' + list + '-' + i);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transition = 'box-shadow 0.3s ease';
+        el.style.boxShadow = '0 0 15px var(--acc)';
+        setTimeout(() => el.style.boxShadow = '', 1500);
+      }
+    }
+
     function renderPassivas() {
       const cont = document.getElementById('ui-passivas');
       if (!cont) return;
@@ -4633,21 +4664,30 @@
       let chipHtml = '';
       let hasAny = false;
 
+      // Coleta passivas de Traços
+      (S.traits || []).forEach((tr, i) => {
+        (tr.passivas || []).forEach(p => {
+          if (!p.trim()) return;
+          hasAny = true;
+          chipHtml += `<div class="passiva-chip" onclick="scrollToCard('traits', ${i})" style="cursor:pointer" title="Ir para o card">${esc(p)}<span class="passiva-chip-src">(${esc(tr.name || 'Traço')})</span></div>`;
+        });
+      });
+
       // Coleta passivas de Equipamentos
-      (S.equipments || []).forEach(eq => {
+      (S.equipments || []).forEach((eq, i) => {
         (eq.passivas || []).forEach(p => {
           if (!p.trim()) return;
           hasAny = true;
-          chipHtml += `<div class="passiva-chip">${esc(p)}<span class="passiva-chip-src">(${esc(eq.name || 'Equip.')})</span></div>`;
+          chipHtml += `<div class="passiva-chip" onclick="scrollToCard('equipments', ${i})" style="cursor:pointer" title="Ir para o card">${esc(p)}<span class="passiva-chip-src">(${esc(eq.name || 'Equip.')})</span></div>`;
         });
       });
 
       // Coleta passivas de Espíritos
-      (S.spirits || []).forEach(sp => {
+      (S.spirits || []).forEach((sp, i) => {
         (sp.passivas || []).forEach(p => {
           if (!p.trim()) return;
           hasAny = true;
-          chipHtml += `<div class="passiva-chip">${esc(p)}<span class="passiva-chip-src">(${esc(sp.name || 'Espírito')})</span></div>`;
+          chipHtml += `<div class="passiva-chip" onclick="scrollToCard('spirits', ${i})" style="cursor:pointer" title="Ir para o card">${esc(p)}<span class="passiva-chip-src">(${esc(sp.name || 'Espírito')})</span></div>`;
         });
       });
 
